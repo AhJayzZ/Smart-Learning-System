@@ -1,6 +1,7 @@
 from cv2 import cv2
 import mediapipe as mp
 import PoseTable as  pose_table
+
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
@@ -9,11 +10,11 @@ start_count = 0
 start_x,start_y = 0,0
 
 # For webcam input:
-hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-#鏡頭選擇與解析度設定(最高為720*1280)
+hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5,max_num_hands=1)
+#鏡頭選擇與解析度設定(最高為1280*720,預設480*640)
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,480)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT,640)
 while cap.isOpened():
   success, image = cap.read()
   if not success:
@@ -29,11 +30,12 @@ while cap.isOpened():
   image.flags.writeable = False
   results = hands.process(image)
   
+  
   # Draw the hand annotations on the image.
   image.flags.writeable = False
   image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+  image_proto=image         #保存原影像
 
-  image_height, image_width, _ = image.shape
   annotated_image = image.copy()
 
   if results.multi_hand_landmarks:
@@ -48,17 +50,18 @@ while cap.isOpened():
     for hand_landmarks in results.multi_hand_landmarks:
       #print("start pos",start_x,start_y)
       #print("start count:",start_count)
-      center,ROI_coef,ROI_x,ROI_y,start_count,start_x,start_y=pose_table.table(image,hand_landmarks,start_count,start_x,start_y)
+      center,ROI_x,ROI_y,start_count,start_x,start_y=pose_table.table(image,image_proto,hand_landmarks,start_count,start_x,start_y)
     
+
 
     #打印出中心點位置與食指中心點位置
     cv2.putText(image,"Center Point:" + str(center) ,(0,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-    cv2.putText(image,"Finger Center Point:" + str((ROI_x,ROI_y)) ,(0,35),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-
-
+    cv2.putText(image,"ROI Center Point:" + str((ROI_x,ROI_y)) ,(0,35),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
    
   #調整視窗大小與輸出影像
   cv2.imshow('MediaPipe Hands', image)
+
+
 
   if cv2.waitKey(5) & 0xFF == 27 :
     break

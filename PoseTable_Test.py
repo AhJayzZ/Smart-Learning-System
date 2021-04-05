@@ -112,21 +112,6 @@ def table(image,hand_landmarks,start,start_count,start_x,start_y) :
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         # #擷取ROI圖片(.png)
         # if(ROI_x-200 > 50) & (ROI_x+200 <= image_width) :
         #     if(ROI_coef > 0 & ROI_y-ROI_coef*200 > 50 ) :
