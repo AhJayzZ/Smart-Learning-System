@@ -1,7 +1,5 @@
 from selenium import webdriver
 
-import requests
-
 base_url = "https://dictionary.cambridge.org/dictionary/english-chinese-traditional/"
 option = webdriver.ChromeOptions()
 option.add_argument('headless')
