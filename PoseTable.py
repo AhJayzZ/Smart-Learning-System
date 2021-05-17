@@ -145,7 +145,7 @@ def OCR_func():
     #text = pytesseract.image_to_string(img, lang="chi_tra",config='--psm 6')
     print("OCR Text:",text)
     return text
-
+#---------------------------------------------------------------------------------
 # Google translate
 def google_translate(text):
     google_translator = Translator()
@@ -153,7 +153,8 @@ def google_translate(text):
     res = google_translator.translate(text,dest='en').text
     print("Google Translate:",res)
     return res
-
+#---------------------------------------------------------------------------------
+# Get mp3 url
 def get_mp3(text):
     home_url = "https://dictionary.cambridge.org/dictionary/english-chinese-traditional/"
     base_url = "https://dictionary.cambridge.org"
