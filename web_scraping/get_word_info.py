@@ -6,7 +6,7 @@ from googletrans import Translator
 # 輸入單詞
 # input: word_string
 # output: word_defination
-# usage: parser.word_info_dict
+# usage: parser.word_info_dict[]
 
 
 class DictRstParser:
