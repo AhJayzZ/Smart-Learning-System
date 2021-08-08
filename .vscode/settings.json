@@ -1,0 +1,8 @@
+{
+    "python.pythonPath" : "C:\\Users\\AhJayzZ\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
+    "python.analysis.extraPaths": [
+        "./src",　　　　　　　　
+        "./modules",
+        "./Scripts",
+    ],
+}
