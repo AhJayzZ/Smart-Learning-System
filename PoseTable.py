@@ -1,4 +1,5 @@
 #pose_table
+from bs4.element import ResultSet
 from cv2 import cv2
 import numpy as np
 import mediapipe as mp
@@ -6,7 +7,6 @@ import pytesseract
 import requests
 from PIL import Image
 from bs4 import BeautifulSoup 
-from googletrans import Translator
 
 #PoseTableIndex:
   #WRIST = 0
@@ -119,10 +119,10 @@ def catching_start(image,image_proto,start_count,start_x,start_y,finger_detected
                 cv2.imshow("cropped image",crop_image)
                 cv2.imwrite("output.png",crop_image)
                 
-                # Image binarization
+                #Image binarization
                 # test_img = cv2.cvtColor(crop_image,cv2.COLOR_RGB2GRAY)
                 # cv2.imshow("blur img",test_img)
-                # #test_img = cv2.GaussianBlur(test_img, (5,5), 0)
+                # test_img = cv2.GaussianBlur(test_img, (5,5), 5)
                 # test_img = cv2.medianBlur(test_img, 3)
                 # test_img = cv2.adaptiveThreshold(test_img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,3)
                 # cv2.imshow("test_img",test_img)
@@ -131,11 +131,10 @@ def catching_start(image,image_proto,start_count,start_x,start_y,finger_detected
 
                 #OCR recognize
                 OCR_text = OCR_func()
-                trans_text = google_translate(OCR_text)
-                get_mp3(trans_text)
-                
+                print("OCR Output:",OCR_text)
 
     return start_count,start_x,start_y
+
 #---------------------------------------------------------------------------------
 # OCR recognize function
 def OCR_func():
@@ -143,35 +142,7 @@ def OCR_func():
     img = Image.open("output.png")
     text = pytesseract.image_to_string(img, lang="eng",config='--psm 6')
     #text = pytesseract.image_to_string(img, lang="chi_tra",config='--psm 6')
-    print("OCR Text:",text)
     return text
-#---------------------------------------------------------------------------------
-# Google translate
-def google_translate(text):
-    google_translator = Translator()
-    #res = google_translator.translate(text,dest='zh-tw').text
-    res = google_translator.translate(text,dest='en').text
-    print("Google Translate:",res)
-    return res
-#---------------------------------------------------------------------------------
-# Get mp3 url
-def get_mp3(text):
-    home_url = "https://dictionary.cambridge.org/dictionary/english-chinese-traditional/"
-    base_url = "https://dictionary.cambridge.org"
-    myheader = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',}
-    word_url = home_url + str(text)
-    res = requests.get(word_url,headers=myheader)
-    soup = BeautifulSoup(res.text,'html.parser')
-    mp3_file = soup.find('source',{'type':'audio/mpeg'}).text
-    
-    try :
-        mp3_url = base_url+mp3_file
-        print("MP3_url:",mp3_url)
-        return mp3_url
-    except :
-        print('MP3 Search Failed\n')
-        pass
-
 
 
 #---------------------------------------------------------------------------------
