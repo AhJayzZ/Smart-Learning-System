@@ -29,7 +29,7 @@ def clean_filename(filename, whitelist=valid_filename_chars, replace=' '):
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 
-image = cv2.imread('test3.jpg',0) 
+image = cv2.imread('image2.jpg',0) 
 image_copy = cv2.medianBlur(image, 5)    # 除噪(使圖片清晰)(中值慮波)
 
 th3 = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 11, 2)    # 自適應二值化(自適應高斯閾值)
