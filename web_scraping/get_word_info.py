@@ -1,12 +1,18 @@
-import pprint
 import requests
 from bs4 import BeautifulSoup
 from googletrans import Translator
 
-# 輸入單詞
-# input: word_string
-# output: word_defination
-# usage: parser.word_info_dict[]
+# 輸入單詞，取得單詞相關資料
+# input: word_str
+# output: wordInfo_dict，
+#   including ['word','eng_pr',eng_pr_url,'ame_pr',ame_pr_url,'tenses','defination']
+#   all in str
+'''
+    usage e.g.:
+    word_str = "fish"
+    wordInfo_dict = get_word_info(word_str)
+    print(wordInfo_dict)
+'''
 
 
 class DictRstParser:
@@ -57,7 +63,7 @@ class DictRstParser:
             'word': 'div#headword',
             'eng_pr': 'div.hd_pr',
             'ame_pr': 'div.hd_prUS',
-            'synonym': 'div.wd_div',
+            # 'synonym': 'div.wd_div',
             'tenses': 'div.hd_div1',
             'defination': 'div.qdef > ul > li',
         }
@@ -85,8 +91,7 @@ class DictRstParser:
         self.related_divs[1], 'div#sentenceSeg')'''
 
 
-word_str = "fish"
-parser = DictRstParser(word_str)
-
-data = parser.word_info_dict["defination"]
-pprint.pprint(data)
+def get_word_info(word_str):
+    parser = DictRstParser(word_str)
+    wordInfo_dict = parser.word_info_dict
+    return wordInfo_dict
