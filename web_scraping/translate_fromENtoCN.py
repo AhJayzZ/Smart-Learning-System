@@ -7,5 +7,5 @@ def translator(WordToTranslate_str):
     from googletrans import Translator
     translator = Translator()
     translation = translator.translate(
-        WordToTranslate_str, src='en', dest='zh-tw')
-    return translation.text
+        WordToTranslate_str, src='en', dest='zh-tw').text
+    return translation
