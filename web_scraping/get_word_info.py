@@ -73,7 +73,6 @@ class DictRstParser:
         self.related_divs = self.soup.select('div.lf_area > div')
         for k, v in self.word_info_selector_dict.items():
             self.word_info_dict[k] = self.get_content(self.related_divs[0], v)
-            print(self.word_info_dict[k])
             if(self.word_info_dict[k] != None):
                 translation = translator.translate(
                     self.word_info_dict[k], src='zh-cn', dest='zh-tw')
