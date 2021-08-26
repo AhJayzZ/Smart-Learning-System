@@ -83,8 +83,8 @@ class DictRstParser:
 
         self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
             "網絡", "網絡：", 1)
-        self.word_info_dict['defination'] = self.word_info_dict['defination'].split(
-            "\n")
+        # self.word_info_dict['defination'] = self.word_info_dict['defination'].split(
+        #    "\n")
 
 
 '''
