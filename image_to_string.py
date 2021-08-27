@@ -35,7 +35,7 @@ def clean_filename(filename, whitelist=valid_filename_chars, replace=' '):
 #-------------------------------------------------------------------------------------------------------------------------------------------
 
 # 讀取圖片
-image = cv2.imread('test3.jpg',0) 
+image = cv2.imread('image2.jpg',0) 
 image = cv2.medianBlur(image, 5)    # 除噪(使圖片清晰)(中值慮波)
 image_copy = image.copy()
 
@@ -50,7 +50,7 @@ if average_of_image > 100 and average_of_image < 180:
     text = pytesseract.image_to_string(th3, lang='eng')     # 抓取文字
 
     # 將文字儲存成文字檔
-    with open ("im_to_string1.txt", "a",encoding="utf-8") as file:
+    with open ("file.txt", "a",encoding="utf-8") as file:
         file.write(tool.correct(clean_filename(text))) # 文字糾正API; tool.correct()
         file.write("\n\n\n")
 
