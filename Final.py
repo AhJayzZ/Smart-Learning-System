@@ -1,13 +1,26 @@
 import cv2
 import mediapipe as mp
-import pytesseract  # 文字辨識套件
-from PIL import Image   # 文字辨識
 import numpy as np
-from matplotlib import pyplot as plt
+
+# 文字辨識套件
+import pytesseract  
+from re import A
+import unicodedata
+import string
+import language_tool_python
+from autocorrect import Speller
+
+# 跳出視窗用的
+import tkinter as tk
+from tkinter import messagebox
+
+# 自動糾正API
+tool = language_tool_python.LanguageTool('en-US')
+spell = Speller(lang='en')
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
-list= [0]*63
+list= [1]*63  # 宣告一個陣列，用來處存手指位置
 
 class trigers:
     def __init__(self,list):
@@ -20,49 +33,19 @@ class trigers:
 
     # 點與點之間的距離
     def distance(self,x1,y1,x2,y2):
-        dis=0
-        dis= (((x1-x2)**2+(y1-y2)**2)**0.5)/ max(self.a,self.b,self.c,self.d,self.e) 
-        return dis
+        if max(self.a,self.b,self.c,self.d,self.e) == 0:
+            return 1
+        else :
+            return (((x1-x2)**2+(y1-y2)**2)**0.5)/ max(self.a,self.b,self.c,self.d,self.e) 
 
-    # 計算各點手部landmark與wirst的距離和
-    def distance_sum(self):
-        sum=0
-        for i in range(1,21):
-            sum+= self.distance(self.list[3*i],self.list[3*i+1],self.list[0],self.list[1]) 
-        return sum
-
-    #計算中心點(輸入第幾個點即可)
-    def center(self,*x):
-        sum_x=0
-        sum_y=0
-        for i in x:
-            sum_x+= self.list[3*i]
-            sum_y+= self.list[3*i+1]
-        return sum_x/len(x), sum_y/len(x)
-
-    # 計算所有點的中心
-    def center_all(self):
-        sum_x=0
-        sum_y=0
-        for i in range(21):
-            sum_x+= self.list[3*i]
-            sum_y+= self.list[3*i+1]
-        return sum_x/21, sum_y/21
     # 斜率
     def slope(self,x1,y1,x2,y2):
-        return (y2-y1)/(x2-x1)
+        if x2==x1:
+            return 1
+        else: 
+            return (y2-y1)/(x2-x1)
 
-    # 變異數
-    def variance(self,*x):
-        v=0
-        sum_x=0
-        sum_y=0
-        for i in x:
-            sum_x+= self.list[3*i]
-            sum_y+= self.list[3*i+1]
-        for j in x:
-            v+= self.distance(self.list[j],self.list[j+1],sum_x/len(x),sum_y/len(x))
-        return v/len(x)
+
 
     # 若大拇指伸直:True; 否則: False
     def thumb (self):
@@ -75,11 +58,13 @@ class trigers:
         b= (self.list[1])- m*(self.list[0])   # 直線參數: y=slope*x+b => b= y-slope*x
         line= lambda x,y: abs(m*x-y+b)      # 直線方程
         point_to_line=0     #   拇指各點到線的和
-        for point in range(1,4):
-            point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+        for point in range(1,5): # 點
+            if max(self.a,self.b,self.c,self.d,self.e) == 0:
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)*100  # 公式
+            else: 
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
 
-
-        if (thumb_dis_a+thumb_dis_b) > 0.67 and (point_to_line<0.4):
+        if (thumb_dis_a+thumb_dis_b) > 0.67 and (point_to_line<0.35):
             return True
         else:
             return False
@@ -89,19 +74,17 @@ class trigers:
         index_finger_dis_a= self.distance(self.list[24],self.list[25],self.list[15],self.list[16])
         index_finger_dis_b= self.distance(self.list[21],self.list[22],self.list[15],self.list[16])
         index_finger_dis_c= self.distance(self.list[18],self.list[19],self.list[15],self.list[16])
-        a_to_wrist= self.distance(self.list[3*5],self.list[3*5+1],self.list[0],self.list[1])
-        b_to_wrist= self.distance(self.list[3*6],self.list[3*6+1],self.list[0],self.list[1])
-        c_to_wrist= self.distance(self.list[3*7],self.list[3*7+1],self.list[0],self.list[1])
-        d_to_wrist= self.distance(self.list[3*8],self.list[3*8+1],self.list[0],self.list[1])
-        sum_wrist= a_to_wrist+ b_to_wrist+ c_to_wrist+ d_to_wrist
-        # print(sum_wrist)
+
         # 食指各點到線(兩端點連成的直線)的距離和
         m= self.slope(self.list[3*5],self.list[3*5+1],self.list[3*8],self.list[3*8+1])    # 直線斜率
         b= (self.list[3*5+1])- m*(self.list[3*5])   # 直線參數: y=slope*x+b => b= y-slope*x
         line= lambda x,y: abs(m*x-y+b)      # 直線方程
         point_to_line=0     #   拇指各點到線的和
         for point in range(6,8): # 點
-            point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+            if max(self.a,self.b,self.c,self.d,self.e) == 0:
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)*100  # 公式
+            else: 
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
 
         # 重複點問題
         if (index_finger_dis_a+index_finger_dis_b+index_finger_dis_c)<0.3:
@@ -117,18 +100,19 @@ class trigers:
         middle_finger_dis_b= self.distance(self.list[33],self.list[34],self.list[27],self.list[28])
         middle_finger_dis_c= self.distance(self.list[30],self.list[31],self.list[27],self.list[28])
 
-        # 到手腕距離
-
-
         # 中指各點到線(兩端點連成的直線)的距離和
         m= self.slope(self.list[3*9],self.list[3*9+1],self.list[3*12],self.list[3*12+1])    # 直線斜率
         b= (self.list[3*9+1])- m*(self.list[3*9])   # 直線參數: y=slope*x+b => b= y-slope*x
         line= lambda x,y: abs(m*x-y+b)      # 直線方程
         point_to_line=0     #   拇指各點到線的和
         for point in range(10,12): # 點
-            point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+            if max(self.a,self.b,self.c,self.d,self.e) == 0:
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)*100  # 公式
+            else: 
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+
         # (middle_finger_dis_a+middle_finger_dis_b+middle_finger_dis_c)>1.1 and 
-        if (middle_finger_dis_a>middle_finger_dis_b) and (middle_finger_dis_b>middle_finger_dis_c) and (point_to_line<0.12) \
+        if (middle_finger_dis_a>middle_finger_dis_b) and (middle_finger_dis_b>middle_finger_dis_c) and (point_to_line<0.1) \
         and self.distance(self.list[0],self.list[1],self.list[9*3],self.list[9*3+1])<self.distance(self.list[0],self.list[1],self.list[12*3],self.list[12*3+1]):
             return True
         else:
@@ -145,10 +129,13 @@ class trigers:
         line= lambda x,y: abs(m*x-y+b)      # 直線方程
         point_to_line=0     #   拇指各點到線的和
         for point in range(14,16): # 點
-            point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
-        
+            if max(self.a,self.b,self.c,self.d,self.e) == 0:
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)*100  # 公式
+            else: 
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+
         # (ring_finger_dis_a+ring_finger_dis_b+ring_finger_dis_c) > 1.15 and
-        if  (ring_finger_dis_a>ring_finger_dis_b) and (ring_finger_dis_b>ring_finger_dis_c) and(point_to_line<0.12) \
+        if  (ring_finger_dis_a>ring_finger_dis_b) and (ring_finger_dis_b>ring_finger_dis_c) and(point_to_line<0.1) \
         and self.distance(self.list[0],self.list[1],self.list[13*3],self.list[13*3+1])<self.distance(self.list[0],self.list[1],self.list[16*3],self.list[16*3+1]):
             return True
         else:
@@ -166,10 +153,13 @@ class trigers:
         line= lambda x,y: abs(m*x-y+b)      # 直線方程
         point_to_line=0     #   拇指各點到線的和
         for point in range(18,20): # 點
-            point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
+            if max(self.a,self.b,self.c,self.d,self.e) == 0:
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)*100  # 公式
+            else: 
+                point_to_line+= (line(self.list[3*point],self.list[3*point+1])/(m**2+1)**0.5)/ max(self.a,self.b,self.c,self.d,self.e)  # 公式
 
         # (pinky_dis_a+pinky_dis_b+pinky_dis_c) > 0.9 and
-        if  (pinky_dis_a+pinky_dis_b+pinky_dis_c) > 0.9 and (pinky_dis_a>pinky_dis_b)and(pinky_dis_b>pinky_dis_c) and (point_to_line<0.1) \
+        if  (pinky_dis_a+pinky_dis_b+pinky_dis_c) > 0.9 and (pinky_dis_a>pinky_dis_b)and(pinky_dis_b>pinky_dis_c) and (point_to_line<0.15) \
         and self.distance(self.list[0],self.list[1],self.list[17*3],self.list[17*3+1])<self.distance(self.list[0],self.list[1],self.list[20*3],self.list[20*3+1]):
             return True
         else:
@@ -201,7 +191,6 @@ class trigers:
             cv2.putText(image, "ROCK", (10, 40), cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 2, cv2.LINE_AA)
         if not self.index_finger() and not self.middle_finger() and  self.thumb() and not self.ring_finger() and not self.pinky():
             cv2.putText(image, "Good Game", (10, 40), cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 2, cv2.LINE_AA)
-
 
 state = False
 show = False
@@ -287,18 +276,57 @@ with mp_hands.Hands(min_detection_confidence=0.2,min_tracking_confidence=0.2,max
 
             # 擷取圖片
             crop_img= image[initial_poistion_h: final_h,initial_poistion_w:final_w]
-            crop2_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
-            crop2_img = cv2.medianBlur(crop2_img, 3)    # 除噪(降低邊緣雜訊)
-            th3 = cv2.adaptiveThreshold(crop2_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 11, 2)    # 自適應二值化
+            crop_img_copy = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+            crop_img_copy = cv2.medianBlur(crop_img_copy, 3)    # 除噪(降低邊緣雜訊)
+            average_of_image = np.mean(crop_img_copy) # 計算圖片平均灰度
+            th3 = cv2.adaptiveThreshold(crop_img_copy, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 11, 2)    # 自適應二值化
             th3 = cv2.medianBlur(th3,3)
             cv2.imshow("自適應二值化",th3)
-            # 白名單
-            custom_config = r'-c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz --psm 6'
-            text = pytesseract.image_to_string(th3 , lang='eng',config=custom_config)     # 抓取文字
 
-            # 將文字儲存成文字檔
-            with open ("im_to_string2.txt", "w",encoding="utf-8") as file:
-                file.write(text)
+            if average_of_image > 100 and average_of_image < 180:
+                # your code
+                # --------------------------------------------------------------------------------------------------------------------------------------------------
+                # 白名單設定(來自別人github)
+                valid_filename_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+                char_limit =10000
+                def clean_filename(filename, whitelist=valid_filename_chars, replace=' '):
+                    # replace spaces
+                    for r in replace:
+                        filename = filename.replace(r,' ')
+                    
+                    # keep only valid ascii chars
+                    cleaned_filename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore').decode()
+                    
+                    # keep only whitelisted chars
+                    cleaned_filename = ''.join(c for c in cleaned_filename if c in whitelist)
+                    if len(cleaned_filename)>char_limit:
+                        print("Warning, filename truncated because it was over {}. Filenames may no longer be unique".format(char_limit))
+                    return cleaned_filename[:char_limit]    
+                #-------------------------------------------------------------------------------------------------------------------------------------------
+                
+                text = pytesseract.image_to_string(th3 , lang='eng')     # 抓取文字
+
+                # 將文字儲存成文字檔
+                with open ("file.txt", "a",encoding="utf-8") as file:
+
+                    file.write(tool.correct(clean_filename(text))) # 文字糾正API; tool.correct()
+                    file.write("\n\n\n")
+
+            # 光線太亮
+            elif average_of_image <=100 :
+                # 跳出視窗警告
+                root = tk.Tk()
+                root.withdraw()
+                #括號裡面的兩個字串分別代表彈出視窗的標題(title)與要顯示的文字(index)
+                messagebox.showinfo("警告", "光線太亮") 
+
+            # 光線不足
+            else: 
+                # 跳出視窗警告
+                root = tk.Tk()
+                root.withdraw()
+                #括號裡面的兩個字串分別代表彈出視窗的標題(title)與要顯示的文字(index)
+                messagebox.showinfo("警告", "光線不足")
 
     cv2.imshow('MediaPipe Hands', image)  
     if cv2.waitKey(1) & 0xFF == 27:
