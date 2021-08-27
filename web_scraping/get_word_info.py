@@ -9,7 +9,7 @@ from googletrans import Translator
 #   all in str
 '''
     usage e.g.:
-    word_str = "fish"
+    word_str = "food"
     wordInfo_dict = get_word_info(word_str)
     print(wordInfo_dict)
 '''
@@ -58,33 +58,39 @@ class DictRstParser:
             pass
 
     def __init__(self, word_str):
-        self.soup = self.soup_context(word_str)
-        self.word_info_selector_dict = {
-            'word': 'div#headword',
-            'eng_pr': 'div.hd_pr',
-            'ame_pr': 'div.hd_prUS',
-            # 'synonym': 'div.wd_div',
-            'tenses': 'div.hd_div1',
-            'defination': 'div.qdef > ul > li',
-        }
+        try:
+            self.soup = self.soup_context(word_str)
+            self.word_info_selector_dict = {
+                'word': 'div#headword',
+                'eng_pr': 'div.hd_pr',
+                'ame_pr': 'div.hd_prUS',
+                # 'synonym': 'div.wd_div',
+                'tenses': 'div.hd_div1',
+                'defination': 'div.qdef > ul > li',
+            }
 
-        self.word_info_dict = {}
-        translator = Translator()
-        self.related_divs = self.soup.select('div.lf_area > div')
-        for k, v in self.word_info_selector_dict.items():
-            self.word_info_dict[k] = self.get_content(self.related_divs[0], v)
-            if(self.word_info_dict[k] != None):
-                translation = translator.translate(
-                    self.word_info_dict[k], src='zh-cn', dest='zh-tw')
-                self.word_info_dict[k] = translation.text
+            self.word_info_dict = {}
+            translator = Translator()
+            self.related_divs = self.soup.select('div.lf_area > div')
+            for k, v in self.word_info_selector_dict.items():
+                self.word_info_dict[k] = self.get_content(
+                    self.related_divs[0], v)
+                if(self.word_info_dict[k] != None):
+                    translation = translator.translate(
+                        self.word_info_dict[k], src='zh-cn', dest='zh-tw')
+                    self.word_info_dict[k] = translation.text
 
-        [self.word_info_dict['ame_pr_url'],
-            self.word_info_dict['eng_pr_url']] = self.get_url_mp3()
+            [self.word_info_dict['ame_pr_url'],
+                self.word_info_dict['eng_pr_url']] = self.get_url_mp3()
 
-        self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
-            "網絡", "網絡：", 1)
-        # self.word_info_dict['defination'] = self.word_info_dict['defination'].split(
-        #    "\n")
+            self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
+                "網絡", "網絡：", 1)
+            self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
+                "\n", " | ")
+        except:
+            print("Try another word")
+            self.word_info_dict = None
+            pass
 
 
 '''
@@ -96,3 +102,11 @@ def get_word_info(word_str):
     parser = DictRstParser(word_str)
     wordInfo_dict = parser.word_info_dict
     return wordInfo_dict
+
+
+'''
+# test:
+word_str = "feelings"
+wordInfo_dict = get_word_info(word_str)
+print(wordInfo_dict)
+'''
