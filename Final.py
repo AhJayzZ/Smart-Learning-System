@@ -307,7 +307,7 @@ with mp_hands.Hands(min_detection_confidence=0.2,min_tracking_confidence=0.2,max
                 text = pytesseract.image_to_string(th3 , lang='eng')     # 抓取文字
 
                 # 將文字儲存成文字檔
-                with open ("im_to_string1.txt", "a",encoding="utf-8") as file:
+                with open ("file.txt", "a",encoding="utf-8") as file:
 
                     file.write(tool.correct(clean_filename(text))) # 文字糾正API; tool.correct()
                     file.write("\n\n\n")
