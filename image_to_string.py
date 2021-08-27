@@ -44,7 +44,6 @@ average_of_image = np.mean(image_copy) # 計算圖片平均灰度
 
 
 if average_of_image > 100 and average_of_image < 180:
-    print("1")
     th3 = cv2.adaptiveThreshold(image_copy, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 11, 2)    # 自適應二值化(自適應高斯閾值)
     th3 = cv2.medianBlur(th3, 3)  # 除噪(使圖片清晰)(中值慮波)
     text = pytesseract.image_to_string(th3, lang='eng')     # 抓取文字
