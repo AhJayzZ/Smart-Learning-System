@@ -20,3 +20,6 @@ def selector_TranslateOrWord(text_str):
         return get_word_info(text_str)
     else:
         return translator(text_str)
+
+
+print(selector_TranslateOrWord("fish."))
