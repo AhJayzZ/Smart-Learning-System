@@ -3,12 +3,8 @@ import STATE
 
 
 def show_text_handler(image, state_recognition):
-    if (state_recognition == STATE.START_CROP):
-        str_show_text = "start crop"
-    elif(state_recognition == STATE.CROPPING):
+    if(state_recognition == STATE.CROPPING):
         str_show_text = "cropping"
-    elif (state_recognition == STATE.END_CROP):
-        str_show_text = "end crop"
     else:
         str_show_text = "do nothing"
 

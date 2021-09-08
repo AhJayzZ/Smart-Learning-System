@@ -1,6 +1,16 @@
+"""
+finger_trigger: function for finger trigger
+"""
+
+
 class triggers:
+    """
+    by hanklin: https://hackmd.io/@hruCWOxDQeCuTxZPcF8Y7w/H1KAWMyr_
+    """
+
     def __init__(self, list):
         self.list = list
+        # 用於作手掌比例的基準
         self.a = ((self.list[15]-self.list[0])**2 +
                   (self.list[16]-self.list[1])**2)**0.5   # 點5到點0距離
         self.b = ((self.list[27]-self.list[0])**2 +
@@ -187,6 +197,18 @@ class triggers:
 
 
 def finger_trigger(list):
+    """
+        Args: 
+                list[63] of landmarks of a hand from mediapipe,
+                but where 21 landmarks, coordinates of x,y,z is lined up with
+                x=i, y=i+1, z=i+2, where i is index of landmarks from 0 to 21
+
+        Raises: -
+
+        Returns: finger_trigger_list[5], where 
+            0-thumb, 1-index_finger, 2-middle_finger, 3-ring_finger, 4-pinky
+            and each element with 1 means finger is straight, and 0 is not
+    """
     trigger = triggers(list)
 
     thumb = trigger.thumb()
@@ -202,3 +224,43 @@ def finger_trigger(list):
                            pinky]
 
     return finger_trigger_list
+
+
+def if_only_index_finger(list):
+    """
+        Args: 
+            list[63] of landmarks of a hand from mediapipe,
+            but where 21 landmarks, coordinates of x,y,z is lined up with
+            x=i, y=i+1, z=i+2, where i is index of landmarks from 0 to 21
+
+        Raises: -
+
+        Returns: only_index_finger (TRUE or FALSE)
+    """
+    thumb, index_finger, middle_finger, ring_finger, pinky = finger_trigger(
+        list)
+
+    only_index_finger = (index_finger) and not (
+        thumb and middle_finger and ring_finger and pinky)
+
+    return only_index_finger
+
+
+def if_indexNmiddle_finger(list):
+    """
+        Args: 
+            list[63] of landmarks of a hand from mediapipe,
+            but where 21 landmarks, coordinates of x,y,z is lined up with
+            x=i, y=i+1, z=i+2, where i is index of landmarks from 0 to 21
+
+        Raises: -
+
+        Returns: only_indexNmiddle_finger (TRUE or FALSE)
+    """
+    thumb, index_finger, middle_finger, ring_finger, pinky = finger_trigger(
+        list)
+
+    only_indexNmiddle_finger = (index_finger and middle_finger) and not (
+        thumb and ring_finger and pinky)
+
+    return only_indexNmiddle_finger
