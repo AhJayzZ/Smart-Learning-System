@@ -11,6 +11,14 @@ MAX_LEN_TEXT = 1000
 
 
 def get_clean_text(text, replace=' '):
+    """
+        Args: 
+            string, text that want to clean out garbled text
+
+        Raises: -
+
+        Returns: string, clean text
+    """
     whitelist = "-_.() %s%s" % (string.ascii_letters, string.digits)
     char_limit = MAX_LEN_TEXT
     # replace spaces
@@ -30,11 +38,19 @@ def get_clean_text(text, replace=' '):
         return cleaned_text[:char_limit]
 
 
-def text_correction(text):
+def get_corrected_text(text):
+    """
+        Args: 
+            string, text that want to correct
+
+        Raises: -
+
+        Returns: string, corrected text
+    """
     try:
         text = get_clean_text(text)
         text = tool.correct(text)
         return text
     except:
-        print("error with {text_correction.__name__}")
+        assert 0, "error with {get_corrected_text.__name__}"
         pass
