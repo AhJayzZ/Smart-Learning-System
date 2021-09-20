@@ -15,7 +15,7 @@ import HAND
 
 # class
 from position import Position
-from state import State
+from STATE import State
 
 # state group
 State_WaitingSignal = State("Waiting signal to crop")
