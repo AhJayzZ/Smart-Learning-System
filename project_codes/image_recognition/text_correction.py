@@ -50,6 +50,7 @@ def get_corrected_text(text):
     try:
         text = get_clean_text(text)
         text = tool.correct(text)
+        text = text.strip()
         return text
     except:
         assert 0, "error with {get_corrected_text.__name__}"
