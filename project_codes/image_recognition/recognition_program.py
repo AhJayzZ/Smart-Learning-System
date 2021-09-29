@@ -169,6 +169,7 @@ class recognition_program:
 
     def _show_output_img_original(self):
         self.output_img = self.input_img
+        self.output_img = cv2.flip(self.output_img, 1)
         cv2.imshow('Output Image', self.output_img)
 
     def _show_output_img_edited(self):
@@ -176,6 +177,7 @@ class recognition_program:
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
+        self.output_img = cv2.flip(self.output_img, 1)
         if self.state_lightness != STATE_LIGHTNESS.Fine:
             edit_img.put_text(self.output_img, str(self.state_lightness))
         cv2.imshow('Output Image', self.output_img)
@@ -217,8 +219,13 @@ class recognition_program:
         if (self.Position_initial.y > self.Position_final.y):
             self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
+        self.output_img = cv2.flip(self.output_img, 1)
         self.crop_img = self.output_img[self.Position_initial.y: self.Position_final.y,
                                         self.Position_initial.x: self.Position_final.x]
+        self.crop_img = cv2.flip(self.crop_img, 1)
+
+        self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
+        self.only_index_finger = self.only_indexNmiddle_finger = False
 
     def _do(self):
         """
@@ -266,7 +273,7 @@ class recognition_program:
         if self.now_state == STATE.WaitingSignal:
             self._check_tolerance()
         elif self.now_state == STATE.StartCropping:
-            self.flag_change_state = True
+            self._check_tolerance()
         elif self.now_state == STATE.DoingCropping:
             if (self.Position_initial.x != self.Position_final.x) and (self.Position_initial.y != self.Position_final.y):
                 self._check_tolerance()
@@ -280,7 +287,7 @@ class recognition_program:
         elif self.now_state == STATE.GetTextFailed:
             self.flag_change_state = True
         elif self.now_state == STATE.FinishRecognition:
-            self.flag_change_state = False
+            self.flag_change_state = True
         elif self.now_state == STATE.Error:
             self.flag_change_state = True
         else:  # unknown state
@@ -315,7 +322,7 @@ class recognition_program:
         elif self.now_state == STATE.GetTextFailed:
             self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.FinishRecognition:
-            self.next_state = STATE.FinishRecognition
+            self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.Error:
             self.next_state = self.STATE_INITIAL
         else:  # unknown state
@@ -348,11 +355,11 @@ class recognition_program:
                 min_tracking_confidence=0.7,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource(0)
+            cap = VideoSource(1)
 
             while cap.isOpened():
                 success, self.input_img = cap.read()
-                resized_rate = 0.5
+                resized_rate = 1
                 dsize = (int(
                     self.input_img.shape[1]*resized_rate), int(self.input_img.shape[0]*resized_rate))
                 self.input_img = cv2.resize(self.input_img, dsize)
@@ -373,7 +380,10 @@ class recognition_program:
                     # self._debug_print_statement()
 
                     if(self.now_state == STATE.FinishRecognition):
-                        break
+                        # pass
+                        print(self.text)
+                        # cv2.waitKey(1000)
+                        # break
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """
