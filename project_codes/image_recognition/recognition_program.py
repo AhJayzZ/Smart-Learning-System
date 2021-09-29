@@ -348,7 +348,7 @@ class recognition_program:
                 min_tracking_confidence=0.7,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource.from_LocalCamare(0)
+            cap = VideoSource(0)
 
             while cap.isOpened():
                 success, self.input_img = cap.read()
