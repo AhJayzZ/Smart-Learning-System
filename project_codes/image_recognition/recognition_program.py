@@ -1,4 +1,4 @@
-from state import State
+from STATE import State
 from position import Position
 import HAND
 import USER
@@ -352,7 +352,7 @@ class recognition_program:
 
             while cap.isOpened():
                 success, self.input_img = cap.read()
-                resized_rate = 0.5
+                resized_rate = 1
                 dsize = (int(
                     self.input_img.shape[1]*resized_rate), int(self.input_img.shape[0]*resized_rate))
                 self.input_img = cv2.resize(self.input_img, dsize)
