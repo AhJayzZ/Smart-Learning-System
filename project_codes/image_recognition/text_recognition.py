@@ -11,7 +11,6 @@ def text_recognition(image_for_get_text):
 
         text = pytesseract.image_to_string(image_for_get_text, lang='eng')
         text = get_corrected_text(text)
-
         return text
     except:
         assert 0, "error with {text_recognition.__name__}"
