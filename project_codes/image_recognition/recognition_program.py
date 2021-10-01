@@ -26,10 +26,21 @@ class STATE:
     FinishRecognition = State("Done with Recognition")
 
 
+class STATE_CROPPING:
+    Start = State("Start cropping")
+    Doing = State("Doing cropping")
+    End = State("Finish cropping")
+
+
 class STATE_LIGHTNESS:
     Fine = State("Fine")
     TooBright = State("too bright")
     TooDim = State("too dim")
+
+
+class ROI_frame:
+    start = Position("start")
+    end = Position("end")
 
 
 # mediapipe solution group
@@ -77,14 +88,14 @@ class recognition_program:
         self.last_state = []
         self.next_state = self.STATE_INITIAL
 
-        self.tolerance = 0
-        self.flag_change_state = False
+        self._tolerance = 0
+        self._flag_change_state = False
 
         self.Position_initial = Position("Position Initial")
         self.index_finger_point = Position("Position of Index_Finger")
         self.Position_final = Position("Position Final")
 
-        self.input_img = []
+        self._input_img = []
         self.output_img = []
         self.crop_img = []
 
@@ -92,8 +103,8 @@ class recognition_program:
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
         self.handedness = HAND.NO
-        self.only_index_finger = False
-        self.only_indexNmiddle_finger = False
+        self._only_index_finger = False
+        self._only_indexNmiddle_finger = False
 
         self.state_lightness = []
         self.average_gray_value = 0
@@ -104,16 +115,16 @@ class recognition_program:
         """
         debug
         """
-        if self.tolerance != 0 and self.tolerance < self.MAX_TOLERANCE:
-            print(self.tolerance, end=",")
-        elif self.tolerance == self.MAX_TOLERANCE:
-            print(self.tolerance)
+        if self._tolerance != 0 and self._tolerance < self.MAX_TOLERANCE:
+            print(self._tolerance, end=",")
+        elif self._tolerance == self.MAX_TOLERANCE:
+            print(self._tolerance)
 
         if self.now_state != self.last_state or self.next_state != self.last_state:
             self.last_state = self.now_state
             print(self.now_state, ", ", self.next_state)
-            print("only_index_finger: ", self.only_index_finger, ", only_indexNmiddle_finger: ",
-                  self.only_indexNmiddle_finger, ", flag_change_state: ", self.flag_change_state)
+            print("only_index_finger: ", self._only_index_finger, ", only_indexNmiddle_finger: ",
+                  self._only_indexNmiddle_finger, ", flag_change_state: ", self._flag_change_state)
             print(self.Position_initial)
             print(self.Position_final)
         else:
@@ -142,9 +153,9 @@ class recognition_program:
         [need to update self.list_point_hand first]
         """
         self.index_finger_point.x = int(self.list_point_hand[NUM_DIMENSION*8]*float(
-            self.input_img.shape[1]))
+            self._input_img.shape[1]))
         self.index_finger_point.y = int(self.list_point_hand[NUM_DIMENSION*8+1]*float(
-            self.input_img.shape[0]))
+            self._input_img.shape[0]))
 
     def _update_hand_point(self):
         """
@@ -158,7 +169,7 @@ class recognition_program:
         """
         update average_gray_value and state_lightness
         """
-        self.average_gray_value = np.mean(self.input_img)
+        self.average_gray_value = np.mean(self._input_img)
 
         if self.average_gray_value > self.MAX_AVERAGE_GRAY_VALUE:
             self.state_lightness = STATE_LIGHTNESS.TooBright
@@ -168,12 +179,12 @@ class recognition_program:
             self.state_lightness = STATE_LIGHTNESS.Fine
 
     def _show_output_img_original(self):
-        self.output_img = self.input_img
+        self.output_img = self._input_img
         self.output_img = cv2.flip(self.output_img, 1)
         cv2.imshow('Output Image', self.output_img)
 
     def _show_output_img_edited(self):
-        self.output_img = self.input_img
+        self.output_img = self._input_img
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
@@ -185,7 +196,7 @@ class recognition_program:
     def _do_WaitingSignal(self):
         if self.hand_results.multi_hand_landmarks:
             self._update_hand_point()
-            self.only_index_finger = if_only_index_finger(
+            self._only_index_finger = if_only_index_finger(
                 self.list_point_hand)
 
         self._show_output_img_original()
@@ -201,9 +212,9 @@ class recognition_program:
     def _do_DoingCropping(self):
         if self.hand_results.multi_hand_landmarks:
             self._update_hand_point()
-            self.only_index_finger = if_only_index_finger(
+            self._only_index_finger = if_only_index_finger(
                 self.list_point_hand)
-            self.only_indexNmiddle_finger = if_indexNmiddle_finger(
+            self._only_indexNmiddle_finger = if_indexNmiddle_finger(
                 self.list_point_hand)
             self.Position_final.x, self.Position_final.y = self.index_finger_point()
 
@@ -225,7 +236,7 @@ class recognition_program:
         self.crop_img = cv2.flip(self.crop_img, 1)
 
         self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
-        self.only_index_finger = self.only_indexNmiddle_finger = False
+        self._only_index_finger = self._only_indexNmiddle_finger = False
 
     def _do(self):
         """
@@ -256,15 +267,15 @@ class recognition_program:
 
     def _check_tolerance(self):
         if self.next_state == self.now_state:
-            self.tolerance = 0
-            self.flag_change_state = False
+            self._tolerance = 0
+            self._flag_change_state = False
         else:
-            if self.tolerance > self.MAX_TOLERANCE:
-                self.tolerance = 0
-                self.flag_change_state = True
+            if self._tolerance > self.MAX_TOLERANCE:
+                self._tolerance = 0
+                self._flag_change_state = True
             else:
-                self.tolerance = self.tolerance + 1
-                self.flag_change_state = False
+                self._tolerance = self._tolerance + 1
+                self._flag_change_state = False
 
     def _update_flag_if_can_change_state(self):
         """"
@@ -278,36 +289,36 @@ class recognition_program:
             if (self.Position_initial.x != self.Position_final.x) and (self.Position_initial.y != self.Position_final.y):
                 self._check_tolerance()
             else:
-                self.flag_change_state = False
+                self._flag_change_state = False
 
         elif self.now_state == STATE.FinishCropping:
-            self.flag_change_state = True
+            self._flag_change_state = True
         elif self.now_state == STATE.GetText:
-            self.flag_change_state = True
+            self._flag_change_state = True
         elif self.now_state == STATE.GetTextFailed:
-            self.flag_change_state = True
+            self._flag_change_state = True
         elif self.now_state == STATE.FinishRecognition:
-            self.flag_change_state = True
+            self._flag_change_state = True
         elif self.now_state == STATE.Error:
-            self.flag_change_state = True
+            self._flag_change_state = True
         else:  # unknown state
-            self.flag_change_state = False
+            self._flag_change_state = False
 
     def _update_next_state(self):
         """
         change_next_state by singal(s) with each state
         """
         if self.now_state == STATE.WaitingSignal:
-            if self.handedness == USER.HANDEDNESS and self.only_index_finger:
+            if self.handedness == USER.HANDEDNESS and self._only_index_finger:
                 self.next_state = STATE.StartCropping
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.StartCropping:
             self.next_state = STATE.DoingCropping
         elif self.now_state == STATE.DoingCropping:
-            if self.handedness == USER.HANDEDNESS and self.only_indexNmiddle_finger:
+            if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
                 self.next_state = STATE.FinishCropping
-            elif self.handedness == USER.HANDEDNESS and self.only_index_finger:
+            elif self.handedness == USER.HANDEDNESS and self._only_index_finger:
                 self.next_state = STATE.DoingCropping
             else:
                 self.next_state = STATE.WaitingSignal
@@ -332,7 +343,7 @@ class recognition_program:
         self._update_next_state()
         self._update_flag_if_can_change_state()
 
-        if self.flag_change_state:
+        if self._flag_change_state:
             self.now_state = self.next_state
 
     def _process_state_mechine(self):
@@ -358,26 +369,26 @@ class recognition_program:
             cap = VideoSource(1)
 
             while cap.isOpened():
-                success, self.input_img = cap.read()
+                success, self._input_img = cap.read()
                 resized_rate = 1
                 dsize = (int(
-                    self.input_img.shape[1]*resized_rate), int(self.input_img.shape[0]*resized_rate))
-                self.input_img = cv2.resize(self.input_img, dsize)
+                    self._input_img.shape[1]*resized_rate), int(self._input_img.shape[0]*resized_rate))
+                self._input_img = cv2.resize(self._input_img, dsize)
 
                 if not success:
                     #print("Ignoring empty camera frame.")
                     continue
                 else:
-                    self.input_img = cv2.flip(self.input_img, 1)
-                    img = self.input_img
-                    img = cv2.cvtColor(self.input_img, cv2.COLOR_BGR2RGB)
+                    self._input_img = cv2.flip(self._input_img, 1)
+                    img = self._input_img
+                    img = cv2.cvtColor(self._input_img, cv2.COLOR_BGR2RGB)
                     img.flags.writeable = False
                     self.hand_results = hands.process(img)
 
                     self._process_state_mechine()
 
                     # debug
-                    # self._debug_print_statement()
+                    self._debug_print_statement()
 
                     if(self.now_state == STATE.FinishRecognition):
                         # pass
