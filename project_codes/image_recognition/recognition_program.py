@@ -478,7 +478,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_label.setScaledContents(True)
 
         if self.Recognition.now_state == STATE.FinishRecognition:
-            self.result_list.addItem(Recognition.text)
+            self.result_list.addItem(self.Recognition.text)
 
         if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
             self.warning_label.setText('Warning:光線過亮')
