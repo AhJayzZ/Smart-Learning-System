@@ -492,16 +492,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.show()
-<<<<<<< HEAD
-    
-    text = main_recognition()
-    print("result: [\n%r\n]" % text)
 
-    QCoreApplication.instance().quit()
+    # text = main_recognition()
+    # print("result: [\n%r\n]" % text)
     sys.exit(app.exec_())
     
-=======
-    win.Recognition.run_program()
-    #text = main_recognition()
-    #print("result: [\n%r\n]" % text)
->>>>>>> dev
