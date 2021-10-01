@@ -495,3 +495,4 @@ if __name__ == "__main__":
     win.Recognition.run_program()
     #text = main_recognition()
     #print("result: [\n%r\n]" % text)
+    sys.exit(app.exec_())    
