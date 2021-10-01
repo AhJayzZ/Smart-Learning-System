@@ -8,8 +8,7 @@ import mediapipe as mp
 import numpy as np
 
 # for GUI 
-import sys,random
-import pymysql
+import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
