@@ -1,10 +1,19 @@
-from state import State
+from glob import glob
+from STATE import State
 from position import Position
 import HAND
 import USER
 import cv2
 import mediapipe as mp
 import numpy as np
+
+# for GUI 
+import sys,random
+import pymysql
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from Ui_GUI import *
 
 from handedness_detector import get_handedness
 
@@ -181,7 +190,7 @@ class recognition_program:
     def _show_output_img_original(self):
         self.output_img = self._input_img
         self.output_img = cv2.flip(self.output_img, 1)
-        cv2.imshow('Output Image', self.output_img)
+        # cv2.imshow('Output Image', self.output_img)
 
     def _show_output_img_edited(self):
         self.output_img = self._input_img
@@ -191,7 +200,7 @@ class recognition_program:
         self.output_img = cv2.flip(self.output_img, 1)
         if self.state_lightness != STATE_LIGHTNESS.Fine:
             edit_img.put_text(self.output_img, str(self.state_lightness))
-        cv2.imshow('Output Image', self.output_img)
+        # cv2.imshow('Output Image', self.output_img)
 
     def _do_WaitingSignal(self):
         if self.hand_results.multi_hand_landmarks:
@@ -366,7 +375,7 @@ class recognition_program:
                 min_tracking_confidence=0.7,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource(1)
+            cap = VideoSource(0)
 
             while cap.isOpened():
                 success, self._input_img = cap.read()
@@ -413,6 +422,7 @@ def main_recognition():
         print(t.timeit())
         # 20210915 last test: 1.5569038999999982
         """
+        global Recognition
         Recognition = recognition_program()
         Recognition.run_program()
         return Recognition.text
@@ -422,6 +432,65 @@ def main_recognition():
         pass
 
 
+# ------------------------------------------------------
+    
+
+# 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
+class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
+    def __init__(self, parent=None):
+        # 繼承Ui_Gui.py
+        super(MainWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.setWindowTitle('Hand Recognition')
+
+        # Camera setting
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.play)
+        self.timer.start(10)
+
+        self.confirm_btn.clicked.connect(self.add_btn_click)
+        self.revise_btn.clicked.connect(self.revise_btn_click)
+
+    def add_btn_click(self):
+        self.result_list.addItem(self.revise_textbox.text())
+        self.revise_textbox.clear()
+    
+    def revise_btn_click(self):
+        selected_items = self.result_list.selectedItems()
+        for item in selected_items :
+            item.setText(self.revise_textbox.text())
+            self.revise_textbox.clear()
+    
+    def play(self):
+        frame = Recognition.output_img
+        conveted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # for webcam debug
+        # frame = cv2.flip(frame,1)
+
+        # PyQt image format 
+        height, width = conveted_frame.shape[:2]
+        pyqt_img = QImage(conveted_frame, width, height, QImage.Format_RGB888)
+        pyqt_img = QPixmap.fromImage(pyqt_img)
+
+        self.camera_label.setPixmap(pyqt_img)
+        self.camera_label.setScaledContents(True)
+
+        if Recognition.now_state == STATE.FinishRecognition :
+            self.result_list.addItem(Recognition.text)
+    
+        if Recognition.state_lightness == STATE_LIGHTNESS.TooBright :
+            self.warning_label.setText('Warning:光線過亮')
+        elif Recognition.state_lightness == STATE_LIGHTNESS.TooDim :
+            self.warning_label.setText('Warning:光線過暗')
+        else :
+            self.warning_label.setText('光線正常!')
+
+
 if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    win = MainWindow()
+    win.show()
+
     text = main_recognition()
     print("result: [\n%r\n]" % text)
