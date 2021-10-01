@@ -467,7 +467,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         conveted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # for webcam debug
-        # frame = cv2.flip(frame,1)
+        frame = cv2.flip(frame,0)
 
         # PyQt image format
         height, width = conveted_frame.shape[:2]
