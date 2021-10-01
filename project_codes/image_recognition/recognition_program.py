@@ -9,8 +9,6 @@ import numpy as np
 
 # for GUI
 import sys
-import random
-#import pymysql
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
