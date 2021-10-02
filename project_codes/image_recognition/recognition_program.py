@@ -39,6 +39,12 @@ class STATE_LIGHTNESS:
     TooDim = State("too dim")
 
 
+class STATE_HANDEDNESS:
+    No = State("No Hand")
+    Not = State("Not user handedness")
+    Is = State("Is user handedness")
+
+
 class ROI_frame:
     start = Position("start")
     end = Position("end")
@@ -52,30 +58,26 @@ NUM_DIMENSION = 3
 
 
 class edit_img:
-    def put_text(img, str_show_text):
+    def put_text(img, str_show_text, text_color=(0, 255, 255)):
         cv2.putText(img, str_show_text, (10, 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1, cv2.LINE_AA)
 
-    def draw_point(img, position):
+    def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
         point = (position.x, position.y)
-        point_radius = 3
-        point_color = (0, 0, 255)
         point_thickness = -1  # whole point fill in point_color
 
         cv2.circle(
             img, point, radius=point_radius, color=point_color, thickness=point_thickness)
 
-    def draw_frame(img, position_start, position_end):
+    def draw_frame(img, position_start, position_end, frame_color=(255, 105, 65), frame_thickness=2):
         p1 = (position_start.x, position_start.y)
         p2 = (position_end.x, position_end.y)
-        frame_color = (255, 105, 65)
-        frame_thickness = 2
 
         cv2.rectangle(img, p1, p2, color=frame_color,
                       thickness=frame_thickness)
 
 
-class recognition_program:
+class RecognitionProgram:
     STATE_INITIAL = STATE.WaitingSignal
     MAX_TOLERANCE = 5
     MAX_AVERAGE_GRAY_VALUE = 180
@@ -364,7 +366,7 @@ class recognition_program:
         with mp_hands.Hands(
                 static_image_mode=False,
                 min_detection_confidence=0.7,
-                min_tracking_confidence=0.7,
+                min_tracking_confidence=0.3,
                 max_num_hands=1)as hands:
 
             cap = VideoSource(0)
@@ -404,3 +406,7 @@ class recognition_program:
                         """
                         break
             cap.release()
+
+
+if __name__ == "__main__":
+    recognition = RecognitionProgram()

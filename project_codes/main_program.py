@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.confirm_btn.clicked.connect(self.add_btn_click)
         self.revise_btn.clicked.connect(self.revise_btn_click)
 
-        self.Recognition = recognition_program()
+        self.Recognition = RecognitionProgram()
 
     def add_btn_click(self):
         self.result_list.addItem(self.revise_textbox.text())
