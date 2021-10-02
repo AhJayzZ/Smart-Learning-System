@@ -1,16 +1,17 @@
-from state import State
-from position import Position
-import HAND
-import USER
+from .position import Position
+from .state import State
+
+from . import HAND
+from . import USER
 import cv2
 import mediapipe as mp
 import numpy as np
 
-from handedness_detector import get_handedness
+from .handedness_detector import get_handedness
 
-from finger_trigger import if_only_index_finger, if_indexNmiddle_finger
-from text_recognition import text_recognition
-from video_source_selector import VideoSource
+from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
+from .text_recognition import text_recognition
+from .video_source_selector import VideoSource
 
 
 class STATE:
@@ -390,11 +391,11 @@ class recognition_program:
                     # debug
                     self._debug_print_statement()
 
-                    #if(self.now_state == STATE.FinishRecognition):
-                        # pass
-                        #print(self.text)
-                        # cv2.waitKey(1000)
-                        # break
+                    # if(self.now_state == STATE.FinishRecognition):
+                    # pass
+                    # print(self.text)
+                    # cv2.waitKey(1000)
+                    # break
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """

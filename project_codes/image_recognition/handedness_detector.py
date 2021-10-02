@@ -1,7 +1,7 @@
 """
 handednedd_detector: function about handedness 
 """
-import HAND
+from . import HAND
 
 
 def get_handedness(results):

@@ -1,10 +1,10 @@
-import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import GUI.Ui_GUI
-from image_recognition.recognition_program import recognition_program, STATE, STATE_LIGHTNESS
+from GUI.Ui_GUI import *
+from image_recognition.recognition_program import *
 import cv2
+import sys
 
 
 # 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
