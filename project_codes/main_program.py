@@ -65,4 +65,9 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.show()
-    win.Recognition.run_program()
+    # win.Recognition.run_program()
+    win.Recognition.run_program(selected_camare=1)
+
+if __name__ == "_main__":
+    recognition = RecognitionProgram()
+    recognition.run_program(selected_camare=1)

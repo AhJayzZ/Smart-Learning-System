@@ -56,6 +56,19 @@ mp_hands = mp.solutions.hands
 NUM_POINT_HAND = 21
 NUM_DIMENSION = 3
 
+HD_SIZE = 720
+
+
+def get_dsize(height, weight, max_size=HD_SIZE):
+    if height > HD_SIZE:
+        resized_rate = HD_SIZE/height
+        dsize = (int(height*resized_rate), int(weight*resized_rate))
+    else:
+        dsize = (int(height), int(weight))
+
+    print(dsize)
+    return dsize
+
 
 class edit_img:
     def put_text(img, str_show_text, text_color=(0, 255, 255)):
@@ -88,7 +101,7 @@ class RecognitionProgram:
         initialization of recognition_program
         """
         self.now_state = self.STATE_INITIAL
-        self.last_state = []
+        self.last_state = None
         self.next_state = self.STATE_INITIAL
 
         self._tolerance = 0
@@ -98,19 +111,19 @@ class RecognitionProgram:
         self.index_finger_point = Position("Position of Index_Finger")
         self.Position_final = Position("Position Final")
 
-        self._input_img = []
-        self.output_img = []
-        self.crop_img = []
+        self._input_img = cv2.imread("init_img.jpg")
+        self.output_img = self._input_img
+        self.crop_img = None
 
-        self.hand_results = []
+        self.hand_results = None
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
         self.handedness = HAND.NO
         self._only_index_finger = False
         self._only_indexNmiddle_finger = False
 
-        self.state_lightness = []
-        self.average_gray_value = 0
+        self.state_lightness = None
+        self.average_gray_value = None
 
         self.text = ""
 
@@ -357,29 +370,43 @@ class RecognitionProgram:
         self._do()
         self._change_state_if_needed()
 
-    def run_program(self):
+    def run_program(self, selected_camare=0):
         """
-        1. get input_img, hand_results
-        2. do what should do during change state, until finish doing recognition
+        selected_camare:
+            0 - local front camare
+            1 or else - other local camare, or local webcamare
+            url - url of IpWebcam
+
+        run_program to update input_img, hand_results, text
         """
 
         with mp_hands.Hands(
                 static_image_mode=False,
-                min_detection_confidence=0.7,
-                min_tracking_confidence=0.3,
+                min_detection_confidence=0.6,
+                min_tracking_confidence=0.6,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource(0)
+            cap = VideoSource(selected_camare)
+
+            while True:
+                success, self._input_img = cap.read()
+
+                if success:
+                    dsize = get_dsize(
+                        self._input_img.shape[1], self._input_img.shape[0], max_size=HD_SIZE)
+                    cv2.imshow("test", self._input_img)
+                    break
 
             while cap.isOpened():
                 success, self._input_img = cap.read()
-                resized_rate = 1
-                dsize = (int(
-                    self._input_img.shape[1]*resized_rate), int(self._input_img.shape[0]*resized_rate))
+
+                # speed up mediapipe process, img of too large size will be slow
                 self._input_img = cv2.resize(self._input_img, dsize)
+                print(self._input_img.shape[1], self._input_img.shape[0])
+                cv2.imshow("test 1", self._input_img)
 
                 if not success:
-                    #print("Ignoring empty camera frame.")
+                    # print("Ignoring empty camera frame.")
                     continue
                 else:
                     self._input_img = cv2.flip(self._input_img, 1)
@@ -391,7 +418,7 @@ class RecognitionProgram:
                     self._process_state_mechine()
 
                     # debug
-                    self._debug_print_statement()
+                   # self._debug_print_statement()
 
                     # if(self.now_state == STATE.FinishRecognition):
                     # pass
@@ -406,7 +433,3 @@ class RecognitionProgram:
                         """
                         break
             cap.release()
-
-
-if __name__ == "__main__":
-    recognition = RecognitionProgram()
