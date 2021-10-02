@@ -1,6 +1,6 @@
 import pytesseract
-from crop_img_handler import crop_img_handler
-from text_correction import get_corrected_text
+from .crop_img_handler import crop_img_handler
+from .text_correction import get_corrected_text
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 

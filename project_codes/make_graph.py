@@ -4,7 +4,7 @@ from pycallgraph import PyCallGraph
 from pycallgraph.output import GraphvizOutput
 
 # import your_function
-from recognition_program import main_recognition
+from image_recognition.recognition_program import main_recognition
 
 #config = Config(max_depth=5)
 config = Config()
