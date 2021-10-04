@@ -14,6 +14,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle('Hand Recognition')
+        self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
 
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
