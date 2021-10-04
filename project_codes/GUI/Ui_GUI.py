@@ -79,7 +79,7 @@ class Ui_SmartLearningSystemGUI(object):
         font.setBold(True)
         font.setWeight(75)
         self.camera_selector.setFont(font)
-        self.camera_selector.setEditable(True)
+        self.camera_selector.setEditable(False)
         self.camera_selector.setCurrentText("")
         self.camera_selector.setPlaceholderText("")
         self.camera_selector.setObjectName("camera_selector")
