@@ -16,17 +16,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.setWindowTitle('Hand Recognition')
 
         # Camera setting
+        camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
+        self.camera_selector.setEditable(True)
+        self.camera_selector.addItems(camera_array)
+
+        # Timer trigger setting
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.play)
+        self.timer.timeout.connect(self.refresh)
         self.timer.start(10)
 
+        # Button trigger setting
         self.confirm_btn.clicked.connect(self.add_btn_click)
         self.revise_btn.clicked.connect(self.revise_btn_click)
+        self.clear_btn.clicked.connect(self.clear_btn_click)
+
+        # Combobox trigger setting
+        self.camera_selector.currentTextChanged.connect(self.camera_selector_changed)
 
         self.Recognition = RecognitionProgram()
 
     def add_btn_click(self):
         self.result_list.addItem(self.revise_textbox.text())
+        self.revise_textbox.clear()
+        
+    def clear_btn_click(self):
+        self.result_list.clear()
         self.revise_textbox.clear()
 
     def revise_btn_click(self):
@@ -35,24 +49,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             item.setText(self.revise_textbox.text())
             self.revise_textbox.clear()
 
-    def play(self):
+    def camera_selector_changed(self) :
+        if self.camera_selector.currentIndex() == 0 :
+            self.Recognition._selected_camera = 0
+            self.Recognition.cap = cv2.VideoCapture(0)
+        elif self.camera_selector.currentIndex() == 1 :
+            self.Recognition._selected_camera = 1
+            self.Recognition.cap = cv2.VideoCapture(1)       
+
+    def refresh(self):
         frame = self.Recognition.output_img
-        conveted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        converted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # for webcam debug
         # frame = cv2.flip(frame,1)
 
         # PyQt image format
-        height, width = conveted_frame.shape[:2]
-        pyqt_img = QImage(conveted_frame, width, height, QImage.Format_RGB888)
+        height, width = converted_frame.shape[:2]
+        pyqt_img = QImage(converted_frame, width, height, QImage.Format_RGB888)
         pyqt_img = QPixmap.fromImage(pyqt_img)
 
+        # Camera label changed to frame
         self.camera_label.setPixmap(pyqt_img)
         self.camera_label.setScaledContents(True)
 
+        # Finish recognition 
         if self.Recognition.now_state == STATE.FinishRecognition:
             self.result_list.addItem(self.Recognition.text)
 
+        # Lightness warning 
         if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
             self.warning_label.setText('Warning:光線過亮')
         elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
@@ -60,10 +85,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.warning_label.setText('光線正常!')
 
-
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.show()
     # win.Recognition.run_program()
-    win.Recognition.run_program(selected_camare=1)
+    win.Recognition.run_program()

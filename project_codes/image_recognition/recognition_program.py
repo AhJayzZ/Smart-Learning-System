@@ -58,7 +58,6 @@ NUM_DIMENSION = 3
 
 HD_SIZE = 720
 
-
 def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
         resized_rate = HD_SIZE/height
@@ -103,6 +102,9 @@ class RecognitionProgram:
         self.last_state = None
         self.next_state = self.STATE_INITIAL
 
+        self._selected_camera = 0
+        self.cap = VideoSource(self._selected_camera)
+        
         self._tolerance = 0
         self._flag_change_state = False
 
@@ -365,7 +367,7 @@ class RecognitionProgram:
         self._do()
         self._change_state_if_needed()
 
-    def run_program(self, selected_camare=0):
+    def run_program(self):
         """
         selected_camare:
             0 - local front camare
@@ -381,18 +383,18 @@ class RecognitionProgram:
                 min_tracking_confidence=0.6,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource(selected_camare)
+            #self.cap = VideoSource(self._selected_camera)
 
             while True:
-                success, self._input_img = cap.read()
+                success, self._input_img = self.cap.read()
 
                 if success:
                     dsize = get_dsize(
                         self._input_img.shape[1], self._input_img.shape[0], max_size=HD_SIZE)
                     break
 
-            while cap.isOpened():
-                success, self._input_img = cap.read()
+            while self.cap.isOpened():
+                success, self._input_img = self.cap.read()
 
                 # speed up mediapipe process, img of too large size will be slow
                 self._input_img = cv2.resize(self._input_img, dsize)
@@ -418,4 +420,4 @@ class RecognitionProgram:
                         for complement to the key we want (ascii 27 = esc)
                         """
                         break
-            cap.release()
+            self.cap.release()
