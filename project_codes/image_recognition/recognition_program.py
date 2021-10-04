@@ -1,24 +1,17 @@
-from glob import glob
-from state import State
-from position import Position
-import HAND
-import USER
+from .position import Position
+from .state import State
+
+from . import HAND
+from . import USER
 import cv2
 import mediapipe as mp
 import numpy as np
 
-# for GUI 
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from Ui_GUI import *
+from .handedness_detector import get_handedness
 
-from handedness_detector import get_handedness
-
-from finger_trigger import if_only_index_finger, if_indexNmiddle_finger
-from text_recognition import text_recognition
-from video_source_selector import VideoSource
+from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
+from .text_recognition import text_recognition
+from .video_source_selector import VideoSource
 
 
 class STATE:
@@ -46,6 +39,12 @@ class STATE_LIGHTNESS:
     TooDim = State("too dim")
 
 
+class STATE_HANDEDNESS:
+    No = State("No Hand")
+    Not = State("Not user handedness")
+    Is = State("Is user handedness")
+
+
 class ROI_frame:
     start = Position("start")
     end = Position("end")
@@ -57,32 +56,39 @@ mp_hands = mp.solutions.hands
 NUM_POINT_HAND = 21
 NUM_DIMENSION = 3
 
+HD_SIZE = 720
+
+def get_dsize(height, weight, max_size=HD_SIZE):
+    if height > HD_SIZE:
+        resized_rate = HD_SIZE/height
+        dsize = (int(height*resized_rate), int(weight*resized_rate))
+    else:
+        dsize = (int(height), int(weight))
+
+    return dsize
+
 
 class edit_img:
-    def put_text(img, str_show_text):
+    def put_text(img, str_show_text, text_color=(0, 255, 255)):
         cv2.putText(img, str_show_text, (10, 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1, cv2.LINE_AA)
 
-    def draw_point(img, position):
+    def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
         point = (position.x, position.y)
-        point_radius = 3
-        point_color = (0, 0, 255)
         point_thickness = -1  # whole point fill in point_color
 
         cv2.circle(
             img, point, radius=point_radius, color=point_color, thickness=point_thickness)
 
-    def draw_frame(img, position_start, position_end):
+    def draw_frame(img, position_start, position_end, frame_color=(255, 105, 65), frame_thickness=2):
         p1 = (position_start.x, position_start.y)
         p2 = (position_end.x, position_end.y)
-        frame_color = (255, 105, 65)
-        frame_thickness = 2
 
         cv2.rectangle(img, p1, p2, color=frame_color,
                       thickness=frame_thickness)
 
 
-class recognition_program:
+class RecognitionProgram:
     STATE_INITIAL = STATE.WaitingSignal
     MAX_TOLERANCE = 5
     MAX_AVERAGE_GRAY_VALUE = 180
@@ -93,9 +99,12 @@ class recognition_program:
         initialization of recognition_program
         """
         self.now_state = self.STATE_INITIAL
-        self.last_state = []
+        self.last_state = None
         self.next_state = self.STATE_INITIAL
 
+        self._selected_camera = 0
+        self.cap = VideoSource(self._selected_camera)
+        
         self._tolerance = 0
         self._flag_change_state = False
 
@@ -103,19 +112,19 @@ class recognition_program:
         self.index_finger_point = Position("Position of Index_Finger")
         self.Position_final = Position("Position Final")
 
-        self._input_img = []
-        self.output_img = []
-        self.crop_img = []
+        self._input_img = cv2.imread("init_img.jpg")
+        self.output_img = self._input_img
+        self.crop_img = None
 
-        self.hand_results = []
+        self.hand_results = None
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
         self.handedness = HAND.NO
         self._only_index_finger = False
         self._only_indexNmiddle_finger = False
 
-        self.state_lightness = []
-        self.average_gray_value = 0
+        self.state_lightness = None
+        self.average_gray_value = None
 
         self.text = ""
 
@@ -131,8 +140,8 @@ class recognition_program:
         if self.now_state != self.last_state or self.next_state != self.last_state:
             self.last_state = self.now_state
             print(self.now_state, ", ", self.next_state)
-            print("only_index_finger: ", self._only_index_finger, ", only_indexNmiddle_finger: ",
-                  self._only_indexNmiddle_finger, ", flag_change_state: ", self._flag_change_state)
+            print(
+                f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
             print(self.Position_initial)
             print(self.Position_final)
         else:
@@ -186,20 +195,16 @@ class recognition_program:
         else:
             self.state_lightness = STATE_LIGHTNESS.Fine
 
-    def _show_output_img_original(self):
+    def _update_output_img(self):
         self.output_img = self._input_img
         self.output_img = cv2.flip(self.output_img, 1)
-        # cv2.imshow('Output Image', self.output_img)
 
-    def _show_output_img_edited(self):
+    def _update_output_img_edited(self):
         self.output_img = self._input_img
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
         self.output_img = cv2.flip(self.output_img, 1)
-        if self.state_lightness != STATE_LIGHTNESS.Fine:
-            edit_img.put_text(self.output_img, str(self.state_lightness))
-        # cv2.imshow('Output Image', self.output_img)
 
     def _do_WaitingSignal(self):
         if self.hand_results.multi_hand_landmarks:
@@ -207,7 +212,7 @@ class recognition_program:
             self._only_index_finger = if_only_index_finger(
                 self.list_point_hand)
 
-        self._show_output_img_original()
+        self._update_output_img()
 
     def _do_StartCropping(self):
         if self.hand_results.multi_hand_landmarks:
@@ -215,7 +220,7 @@ class recognition_program:
             self.Position_initial.x, self.Position_initial.y = self.index_finger_point()
             self.Position_final.x, self.Position_final.y = self.index_finger_point()
 
-        self._show_output_img_original()
+        self._update_output_img()
 
     def _do_DoingCropping(self):
         if self.hand_results.multi_hand_landmarks:
@@ -227,7 +232,7 @@ class recognition_program:
             self.Position_final.x, self.Position_final.y = self.index_finger_point()
 
         self._update_state_lightness()
-        self._show_output_img_edited()
+        self._update_output_img_edited()
 
     def _do_FinishCropping(self):
         """
@@ -238,9 +243,9 @@ class recognition_program:
         if (self.Position_initial.y > self.Position_final.y):
             self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
-        self.output_img = cv2.flip(self.output_img, 1)
-        self.crop_img = self.output_img[self.Position_initial.y: self.Position_final.y,
-                                        self.Position_initial.x: self.Position_final.x]
+        self.crop_img = cv2.flip(self.output_img, 1)
+        self.crop_img = self.crop_img[self.Position_initial.y: self.Position_final.y,
+                                      self.Position_initial.x: self.Position_final.x]
         self.crop_img = cv2.flip(self.crop_img, 1)
 
         self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
@@ -364,27 +369,38 @@ class recognition_program:
 
     def run_program(self):
         """
-        1. get input_img, hand_results
-        2. do what should do during change state, until finish doing recognition
+        selected_camare:
+            0 - local front camare
+            1 or else - other local camare, or local webcamare
+            url - url of IpWebcam
+
+        run_program to update input_img, hand_results, text
         """
 
         with mp_hands.Hands(
                 static_image_mode=False,
-                min_detection_confidence=0.7,
-                min_tracking_confidence=0.7,
+                min_detection_confidence=0.6,
+                min_tracking_confidence=0.6,
                 max_num_hands=1)as hands:
 
-            cap = VideoSource(0)
+            #self.cap = VideoSource(self._selected_camera)
 
-            while cap.isOpened():
-                success, self._input_img = cap.read()
-                resized_rate = 1
-                dsize = (int(
-                    self._input_img.shape[1]*resized_rate), int(self._input_img.shape[0]*resized_rate))
+            while True:
+                success, self._input_img = self.cap.read()
+
+                if success:
+                    dsize = get_dsize(
+                        self._input_img.shape[1], self._input_img.shape[0], max_size=HD_SIZE)
+                    break
+
+            while self.cap.isOpened():
+                success, self._input_img = self.cap.read()
+
+                # speed up mediapipe process, img of too large size will be slow
                 self._input_img = cv2.resize(self._input_img, dsize)
 
                 if not success:
-                    #print("Ignoring empty camera frame.")
+                    # print("Ignoring empty camera frame.")
                     continue
                 else:
                     self._input_img = cv2.flip(self._input_img, 1)
@@ -396,13 +412,7 @@ class recognition_program:
                     self._process_state_mechine()
 
                     # debug
-                    self._debug_print_statement()
-
-                    if(self.now_state == STATE.FinishRecognition):
-                        # pass
-                        print(self.text)
-                        # cv2.waitKey(1000)
-                        # break
+                   # self._debug_print_statement()
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """
@@ -410,90 +420,4 @@ class recognition_program:
                         for complement to the key we want (ascii 27 = esc)
                         """
                         break
-            cap.release()
-
-
-def main_recognition():
-    try:
-        """from timeit import Timer
-        t = Timer("Recognition = recognition_program()",
-                  "from main_recognition import recognition_program")
-        print(t.timeit())
-        # 20210915 last test: 1.5569038999999982
-        """
-        global Recognition
-        Recognition = recognition_program()
-        Recognition.run_program()
-        return Recognition.text
-
-    except:
-        assert 0, "main_recognition failed"
-        pass
-
-
-# ------------------------------------------------------
-
-
-# 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
-class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
-    def __init__(self, parent=None):
-        # 繼承Ui_Gui.py
-        super(MainWindow, self).__init__(parent)
-        self.setupUi(self)
-        self.setWindowTitle('Hand Recognition')
-
-        # Camera setting
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.play)
-        self.timer.start(10)
-
-        self.confirm_btn.clicked.connect(self.add_btn_click)
-        self.revise_btn.clicked.connect(self.revise_btn_click)
-
-        self.Recognition = recognition_program()
-
-    def add_btn_click(self):
-        self.result_list.addItem(self.revise_textbox.text())
-        self.revise_textbox.clear()
-
-    def revise_btn_click(self):
-        selected_items = self.result_list.selectedItems()
-        for item in selected_items:
-            item.setText(self.revise_textbox.text())
-            self.revise_textbox.clear()
-
-    def play(self):
-        frame = self.Recognition.output_img
-        conveted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # for webcam debug
-        frame = cv2.flip(frame,0)
-
-        # PyQt image format
-        height, width = conveted_frame.shape[:2]
-        pyqt_img = QImage(conveted_frame, width, height, QImage.Format_RGB888)
-        pyqt_img = QPixmap.fromImage(pyqt_img)
-
-        self.camera_label.setPixmap(pyqt_img)
-        self.camera_label.setScaledContents(True)
-
-        if self.Recognition.now_state == STATE.FinishRecognition:
-            self.result_list.addItem(self.Recognition.text)
-
-        if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
-            self.warning_label.setText('Warning:光線過亮')
-        elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
-            self.warning_label.setText('Warning:光線過暗')
-        else:
-            self.warning_label.setText('光線正常!')
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    win = MainWindow()
-    win.show()
-
-    # text = main_recognition()
-    # print("result: [\n%r\n]" % text)
-    sys.exit(app.exec_())
-    
+            self.cap.release()
