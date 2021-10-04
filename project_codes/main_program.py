@@ -17,7 +17,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
-        self.camera_selector.setEditable(True)
         self.camera_selector.addItems(camera_array)
 
         # Timer setting
