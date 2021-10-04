@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_selector.setEditable(True)
         self.camera_selector.addItems(camera_array)
 
-        # Timer trigger setting
+        # Timer setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
         self.timer.start(10)
@@ -69,11 +69,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         pyqt_img = QImage(converted_frame, width, height, QImage.Format_RGB888)
         pyqt_img = QPixmap.fromImage(pyqt_img)
 
-        # Camera label changed to frame
+        # Camera label changed to video frame
         self.camera_label.setPixmap(pyqt_img)
         self.camera_label.setScaledContents(True)
 
-        # Finish recognition 
+        # Finish recognition and add text to result list
         if self.Recognition.now_state == STATE.FinishRecognition:
             self.result_list.addItem(self.Recognition.text)
 
@@ -89,5 +89,4 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.show()
-    # win.Recognition.run_program()
     win.Recognition.run_program()
