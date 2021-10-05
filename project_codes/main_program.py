@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from GUI.Ui_GUI import *
 from image_recognition.recognition_program import *
+from googletrans import Translator
 import cv2
 import sys
 
@@ -15,6 +16,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.setupUi(self)
         self.setWindowTitle('Hand Recognition')
         self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
+
+        # Label setting
+        
 
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
@@ -79,10 +83,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Lightness warning 
         if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
+            self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('Warning:光線過亮')
         elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
+            self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('Warning:光線過暗')
         else:
+            self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線正常!')
 
 if __name__ == "__main__":
