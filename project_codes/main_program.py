@@ -31,9 +31,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.FinishFlag = Signal()
         self.FinishFlag.Signal.connect(self.text_to_result_box)
         
-        # google translator setting
-        #self.translator = Translator()
-
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
         self.camera_selector.addItems(camera_array)
@@ -55,7 +52,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Button trigger setting
         self.confirm_btn.clicked.connect(self.add_btn_click)
-        self.revise_btn.clicked.connect(self.revise_btn_click)
         self.clear_btn.clicked.connect(self.clear_btn_click)
         
         # Combobox trigger setting
@@ -72,10 +68,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.result_box.clear()
         self.translated_box.clear()
         self.revise_textbox.clear()
-
-    # researching.........(pause)
-    def revise_btn_click(self):
-        selected_text = self.result_box.toPlainText()
 
     # translate english text to translated language
     def translate(self):
@@ -105,6 +97,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.result_box.setText(self.Recognition.text)
 
     def refresh(self):
+        #print(self.Recognition.now_state)
         frame = self.Recognition.output_img
         converted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -121,7 +114,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_label.setScaledContents(True)
 
         # Finish recognition and add text to result list
-        print(self.Recognition.now_state)
         if self.Recognition.now_state == STATE.FinishRecognition:
             self.FinishFlag.Signal.emit()
 
