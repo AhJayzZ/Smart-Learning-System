@@ -82,26 +82,6 @@
     <string>新增</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="revise_btn">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>710</y>
-     <width>81</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>修正</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="tableWidget">
    <property name="geometry">
     <rect>
@@ -142,7 +122,7 @@
     <rect>
      <x>880</x>
      <y>710</y>
-     <width>351</width>
+     <width>451</width>
      <height>41</height>
     </rect>
    </property>

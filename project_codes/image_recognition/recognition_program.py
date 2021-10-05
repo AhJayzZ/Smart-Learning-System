@@ -379,8 +379,8 @@ class RecognitionProgram:
 
         with mp_hands.Hands(
                 static_image_mode=False,
-                min_detection_confidence=0.2,
-                min_tracking_confidence=0.2,
+                min_detection_confidence=0.7,
+                min_tracking_confidence=0.7,
                 max_num_hands=1)as hands:
 
             #self.cap = VideoSource(self._selected_camera)

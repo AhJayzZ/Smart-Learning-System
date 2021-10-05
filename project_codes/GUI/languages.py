@@ -1,6 +1,5 @@
 
-from re import L
-
+# googletrans python lib languages
 
 LANGUAGES = {
     'af': 'afrikaans',
@@ -110,6 +109,10 @@ LANGUAGES = {
     'yi': 'yiddish',
     'yo': 'yoruba',
     'zu': 'zulu',
+}
+
+SPECIAL_CASES = {
+    'ee': 'et',
 }
 
 def langauge_data():
