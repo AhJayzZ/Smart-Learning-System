@@ -4,9 +4,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from GUI.Ui_GUI import *
 from image_recognition.recognition_program import *
+
 from googletrans import Translator
+from GUI.languages import langauge_data
 import cv2
 import sys
+
 
 
 # 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
@@ -25,6 +28,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
         self.camera_selector.addItems(camera_array)
 
+        # Language setting(index 15 means Chinese Traditional)
+        self.lang='zh-tw'
+        self.languages_key_array,self.languages_value_array = langauge_data()
+        self.language_selector.addItems(self.languages_value_array)
+        self.language_selector.setCurrentIndex(15)
+        
+
         # Timer setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
@@ -41,6 +51,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         
         # Combobox trigger setting
         self.camera_selector.currentTextChanged.connect(self.camera_selector_changed)
+        self.language_selector.currentTextChanged.connect(self.languages_selector_changed)
 
         self.Recognition = RecognitionProgram()
 
@@ -54,24 +65,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.revise_textbox.clear()
 
     # still researching how to change the text that clicked
-    def revise_btn_click(self,QMouseEvent):
+    def revise_btn_click(self):
         selected_text = self.result_box.toPlainText()
 
     def translate(self):
         translator = Translator()
         text = self.result_box.toPlainText()
-        if len(text) >= 0 :
-            result = translator.translate(text,dest="zh-tw").text
-            self.translated_box.clear()
+        if len(text) > 0 and type(text) != None :
+            result = translator.translate(text,dest=self.lang).text
             self.translated_box.setText(result)
 
-    def camera_selector_changed(self) :
+    def camera_selector_changed(self):
         if self.camera_selector.currentIndex() == 0 :
             self.Recognition._selected_camera = 0
             self.Recognition.cap = cv2.VideoCapture(0)
         elif self.camera_selector.currentIndex() == 1 :
             self.Recognition._selected_camera = 1
             self.Recognition.cap = cv2.VideoCapture(1)       
+
+    def languages_selector_changed(self):
+        index = self.language_selector.currentIndex()
+        self.lang = self.languages_key_array[index]
+        self.translate()
+
 
     def refresh(self):
         frame = self.Recognition.output_img
@@ -99,7 +115,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.warning_label.setText('Warning:光線過亮')
         elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
             self.warning_label.setStyleSheet("color:red")
-            self.warning_label.setText('Warning:光線過暗')
+            self.warning_label.setText('Warning:光線過暗') 
         else:
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線正常!')
