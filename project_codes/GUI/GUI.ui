@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1338</width>
-    <height>818</height>
+    <width>1374</width>
+    <height>928</height>
    </rect>
   </property>
   <property name="font">
@@ -21,7 +21,7 @@
   <widget class="QLabel" name="result_label">
    <property name="geometry">
     <rect>
-     <x>880</x>
+     <x>910</x>
      <y>0</y>
      <width>161</width>
      <height>41</height>
@@ -35,38 +35,15 @@
     </font>
    </property>
    <property name="text">
-    <string>辨識結果:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="warning_label">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>720</y>
-     <width>421</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>30</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Warning:光線不足</string>
+    <string>辨識結果 :</string>
    </property>
   </widget>
   <widget class="QPushButton" name="confirm_btn">
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>760</y>
-     <width>211</width>
+     <x>910</x>
+     <y>810</y>
+     <width>201</width>
      <height>51</height>
     </rect>
    </property>
@@ -87,7 +64,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>861</width>
+     <width>891</width>
      <height>691</height>
     </rect>
    </property>
@@ -97,7 +74,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>861</width>
+     <width>891</width>
      <height>691</height>
     </rect>
    </property>
@@ -120,8 +97,8 @@
   <widget class="QLineEdit" name="revise_textbox">
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>710</y>
+     <x>910</x>
+     <y>760</y>
      <width>451</width>
      <height>41</height>
     </rect>
@@ -185,8 +162,8 @@
   <widget class="QPushButton" name="clear_btn">
    <property name="geometry">
     <rect>
-     <x>1140</x>
-     <y>760</y>
+     <x>1170</x>
+     <y>810</y>
      <width>191</width>
      <height>51</height>
     </rect>
@@ -205,10 +182,10 @@
   <widget class="QTextEdit" name="result_box">
    <property name="geometry">
     <rect>
-     <x>880</x>
+     <x>910</x>
      <y>40</y>
      <width>451</width>
-     <height>311</height>
+     <height>320</height>
     </rect>
    </property>
    <property name="font">
@@ -222,8 +199,8 @@
   <widget class="QLabel" name="translate_label">
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>350</y>
+     <x>910</x>
+     <y>360</y>
      <width>181</width>
      <height>41</height>
     </rect>
@@ -236,7 +213,7 @@
     </font>
    </property>
    <property name="text">
-    <string>翻譯結果:</string>
+    <string>翻譯結果 :</string>
    </property>
   </widget>
   <widget class="QTextEdit" name="translated_box">
@@ -245,10 +222,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>390</y>
+     <x>910</x>
+     <y>400</y>
      <width>451</width>
-     <height>311</height>
+     <height>320</height>
     </rect>
    </property>
    <property name="font">
@@ -262,9 +239,9 @@
   <widget class="QLabel" name="language_label">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>760</y>
-     <width>81</width>
+     <x>390</x>
+     <y>710</y>
+     <width>151</width>
      <height>41</height>
     </rect>
    </property>
@@ -275,14 +252,14 @@
     </font>
    </property>
    <property name="text">
-    <string>語言:</string>
+    <string>翻譯語言:</string>
    </property>
   </widget>
   <widget class="QComboBox" name="language_selector">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>760</y>
+     <x>550</x>
+     <y>710</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -305,6 +282,183 @@
    </property>
    <property name="placeholderText">
     <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="translate_label_2">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>720</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>文字輸入欄 :</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>770</y>
+     <width>191</width>
+     <height>146</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="frameShow_layout">
+    <item>
+     <widget class="QLabel" name="frameshow_label">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>影像顯示:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="frameDefault_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>影像正常顯示</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="frameHorizontal_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>影像水平反轉</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="frameVertical_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>影像垂直反轉</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="frameInverse_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>影像水平垂直反轉</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>770</y>
+     <width>671</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="state_label">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>現在狀態:Initial</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="warning_label">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>光線狀態:正常</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="exit_btn">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>870</y>
+     <width>451</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Agency FB</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>離開</string>
    </property>
   </widget>
  </widget>
