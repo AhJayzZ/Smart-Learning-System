@@ -1,14 +1,14 @@
 import cv2
 
 
-def VideoSource(selected_camare):
+def VideoSource(selected_camare=0):
     """
     selected_camare:
         0 - local front camare
         1 or else - other local camare, or local webcamare
         url - url of IpWebcam
     """
-    if int(selected_camare):
+    if isinstance(selected_camare, int):
         if selected_camare == 0:
             cap = cv2.VideoCapture(selected_camare)
         else:
