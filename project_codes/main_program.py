@@ -129,7 +129,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.result_box.setText(self.Recognition.text)
         else :
             self.FinishFlag = False
-        
 
         # Lightness warning 
         if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
