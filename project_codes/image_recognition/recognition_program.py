@@ -58,8 +58,7 @@ NUM_DIMENSION = 3
 
 HD_SIZE = 720
 
-
-def get_dsize(height=480, weight=720, max_size=HD_SIZE):
+def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
         resized_rate = HD_SIZE/height
         dsize = (int(height*resized_rate), int(weight*resized_rate))
@@ -70,16 +69,6 @@ def get_dsize(height=480, weight=720, max_size=HD_SIZE):
 
 
 class edit_img:
-    def remove_outside_img(img, rate=0.05):
-        start_point_y = int(img.shape[1]*rate)
-        start_point_x = int(img.shape[0]*rate)
-        end_point_y = int(img.shape[1]-start_point_y)
-        end_point_x = int(img.shape[0]-start_point_x)
-
-        new_img = img[start_point_y: end_point_y,
-                      start_point_x: end_point_x]
-        return new_img
-
     def put_text(img, str_show_text, text_color=(0, 255, 255)):
         cv2.putText(img, str_show_text, (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1, cv2.LINE_AA)
@@ -115,7 +104,7 @@ class RecognitionProgram:
 
         self._selected_camera = 0
         self.cap = VideoSource(self._selected_camera)
-
+        
         self._tolerance = 0
         self._flag_change_state = False
 
@@ -208,7 +197,6 @@ class RecognitionProgram:
 
     def _update_output_img(self):
         self.output_img = self._input_img
-        self.output_img = edit_img.remove_outside_img(self.output_img)
         self.output_img = cv2.flip(self.output_img, 1)
 
     def _update_output_img_edited(self):
@@ -216,8 +204,6 @@ class RecognitionProgram:
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
-
-        self.output_img = edit_img.remove_outside_img(self.output_img)
         self.output_img = cv2.flip(self.output_img, 1)
 
     def _do_WaitingSignal(self):

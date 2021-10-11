@@ -22,9 +22,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         
         # Recognition program
         self.Recognition = RecognitionProgram()
+        self.frame = self.Recognition.output_img
         
-        # Finish Flag setting(Avoid duplicated operation)
+        # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
+        self.triggerCount = 0
         
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
@@ -32,6 +34,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Language setting(index 15 means Chinese Traditional)
         self.lang = 'zh-tw'
+        self.translator = Translator()
         self.languages_key_array,self.languages_value_array = langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
@@ -42,6 +45,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.timer.start(10)
 
         # result & translated box setting
+        self.revise_textbox.setFocus()
         self.result_box.textChanged.connect(self.translate) 
         self.translated_box.setReadOnly(True)
 
@@ -65,16 +69,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.translated_box.clear()
         self.revise_textbox.clear()
 
-    # translate english text to translated language(too many request the translate function will disable)
+    # translate english text to translated language(too many request the translate function will be disable)
     def translate(self):
-        translator = Translator()
-        text = self.result_box.toPlainText()
-        try :
-            result = translator.translate(text,dest=self.lang).text
-            self.translated_box.setText(result)
-        except :
-            self.result_box.clear()
-            self.translated_box.clear()
+        self.triggerCount = self.triggerCount + 1
+        if self.triggerCount >= 5 or self.FinishFlag == True : 
+            self.triggerCount = 0
+            text = self.result_box.toPlainText()
+            try :
+                print('googletrans triggered!')
+                self.translated_box.clear()
+                self.revise_textbox.clear()
+                result = self.translator.translate(text,dest=self.lang,timeout=3).text
+                self.translated_box.setText(result)
+            except :
+                return 
 
     # change camera to the choosen one 
     def camera_selector_changed(self):
@@ -91,23 +99,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate()
 
     # flip the camera frame
-    def frame_flip(self):
-        print(self.frameDefault_btn.checked)
+    def frame_flip_check(self):
+        self.frame = self.Recognition.output_img
+        if self.frameHorizontal_btn.isChecked() :
+            self.frame = cv2.flip(self.frame,1)
+        elif self.frameVertical_btn.isChecked() :
+            self.frame = cv2.flip(self.frame,0)
+        elif self.frameInverse_btn.isChecked() :
+            self.frame = cv2.flip(self.frame,-1)
 
     # insert recognition text to result box
     def text_to_result_box(self):
         self.result_box.setText(self.Recognition.text)
 
     def refresh(self):
-        frame = self.Recognition.output_img
-        if self.frameHorizontal_btn.isChecked() :
-            frame = cv2.flip(frame,1)
-        elif self.frameVertical_btn.isChecked() :
-            frame = cv2.flip(frame,0)
-        elif self.frameInverse_btn.isChecked() :
-            frame = cv2.flip(frame,-1)
-
-        converted_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.frame_flip_check()
+        converted_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
 
         # PyQt image format
         height, width = converted_frame.shape[:2]
@@ -125,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if self.Recognition.now_state == STATE.FinishRecognition :
             if self.FinishFlag == False:
                 self.FinishFlag = True
+                cv2.imshow('Cropped Frame',self.Recognition.crop_img)
                 print('Recognition text : ',self.Recognition.text)
                 self.result_box.setText(self.Recognition.text)
         else :
