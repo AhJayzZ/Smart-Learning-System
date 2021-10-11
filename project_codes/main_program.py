@@ -34,6 +34,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Language setting(index 15 means Chinese Traditional)
         self.lang = 'zh-tw'
+        self.translator = Translator()
         self.languages_key_array,self.languages_value_array = langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
@@ -73,13 +74,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.triggerCount = self.triggerCount + 1
         if self.triggerCount >= 5 or self.FinishFlag == True : 
             self.triggerCount = 0
-            translator = Translator()
             text = self.result_box.toPlainText()
             try :
                 print('googletrans triggered!')
                 self.translated_box.clear()
                 self.revise_textbox.clear()
-                result = translator.translate(text,dest=self.lang,timeout=3).text
+                result = self.translator.translate(text,dest=self.lang,timeout=3).text
                 self.translated_box.setText(result)
             except :
                 return 
