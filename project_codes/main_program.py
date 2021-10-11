@@ -77,13 +77,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if self.triggerCount >= 5 or self.FinishFlag == True:
             self.triggerCount = 0
             text = self.result_box.toPlainText()
-            print('googletrans triggered!')
             self.translated_box.clear()
             self.revise_textbox.clear()
             try:
                 if text == "":
                     result = ""
                 else:
+                    print('googletrans triggered!')
                     result = self.translator.translate(
                         text, dest=self.lang, timeout=3).text
                 self.translated_box.setText(result)
@@ -96,7 +96,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if index == 0:
             self.Recognition.cap = cv2.VideoCapture(0)
         else:
-            self.Recognition.cap = cv2.VideoCapture(index)
+            self.Recognition.cap = cv2.VideoCapture(index,cv2.CAP_DSHOW)
 
     # change to the translated langauge
     def languages_selector_changed(self):
@@ -140,7 +140,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.FinishFlag = True
                 cv2.imshow('Cropped Frame', self.Recognition.crop_img)
                 print('Recognition text : ', self.Recognition.text)
-                print(type(self.Recognition.text))
                 self.result_box.setText(self.Recognition.text)
         else:
             self.FinishFlag = False
