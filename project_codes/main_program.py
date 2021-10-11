@@ -19,15 +19,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.setupUi(self)
         self.setWindowTitle('Hand Recognition')
         self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
-        
+
         # Recognition program
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
-        
+
         # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
         self.triggerCount = 0
-        
+
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
         self.camera_selector.addItems(camera_array)
@@ -35,10 +35,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # Language setting(index 15 means Chinese Traditional)
         self.lang = 'zh-tw'
         self.translator = Translator()
-        self.languages_key_array,self.languages_value_array = langauge_data()
+        self.languages_key_array, self.languages_value_array = langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
-        
+
         # Timer setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
@@ -46,23 +46,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # result & translated box setting
         self.revise_textbox.setFocus()
-        self.result_box.textChanged.connect(self.translate) 
+        self.result_box.textChanged.connect(self.translate)
         self.translated_box.setReadOnly(True)
 
         # Button trigger setting
         self.confirm_btn.clicked.connect(self.add_btn_click)
         self.clear_btn.clicked.connect(self.clear_btn_click)
         self.exit_btn.clicked.connect(sys.exit)
-        
+
         # Combobox trigger setting
-        self.camera_selector.currentTextChanged.connect(self.camera_selector_changed)
-        self.language_selector.currentTextChanged.connect(self.languages_selector_changed)
+        self.camera_selector.currentTextChanged.connect(
+            self.camera_selector_changed)
+        self.language_selector.currentTextChanged.connect(
+            self.languages_selector_changed)
 
     # add clear the box and set the box that revise_textbox typed
     def add_btn_click(self):
         self.result_box.setText(self.revise_textbox.text())
         self.revise_textbox.clear()
-        
+
     # clear all box
     def clear_btn_click(self):
         self.result_box.clear()
@@ -72,25 +74,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     # translate english text to translated language(too many request the translate function will be disable)
     def translate(self):
         self.triggerCount = self.triggerCount + 1
-        if self.triggerCount >= 5 or self.FinishFlag == True : 
+        if self.triggerCount >= 5 or self.FinishFlag == True:
             self.triggerCount = 0
             text = self.result_box.toPlainText()
-            try :
-                print('googletrans triggered!')
-                self.translated_box.clear()
-                self.revise_textbox.clear()
-                result = self.translator.translate(text,dest=self.lang,timeout=3).text
+            print('googletrans triggered!')
+            self.translated_box.clear()
+            self.revise_textbox.clear()
+            try:
+                if text == "":
+                    result = ""
+                else:
+                    result = self.translator.translate(
+                        text, dest=self.lang, timeout=3).text
                 self.translated_box.setText(result)
-            except :
-                return 
+            except:
+                pass
 
-    # change camera to the choosen one 
+    # change camera to the choosen one
     def camera_selector_changed(self):
         index = self.camera_selector.currentIndex()
-        if index == 0 :
+        if index == 0:
             self.Recognition.cap = cv2.VideoCapture(0)
-        else :
-            self.Recognition.cap = cv2.VideoCapture(index,cv2.CAP_DSHOW)       
+        else:
+            self.Recognition.cap = cv2.VideoCapture(index)
 
     # change to the translated langauge
     def languages_selector_changed(self):
@@ -101,12 +107,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     # flip the camera frame
     def frame_flip_check(self):
         self.frame = self.Recognition.output_img
-        if self.frameHorizontal_btn.isChecked() :
-            self.frame = cv2.flip(self.frame,1)
-        elif self.frameVertical_btn.isChecked() :
-            self.frame = cv2.flip(self.frame,0)
-        elif self.frameInverse_btn.isChecked() :
-            self.frame = cv2.flip(self.frame,-1)
+        if self.frameHorizontal_btn.isChecked():
+            self.frame = cv2.flip(self.frame, 1)
+        elif self.frameVertical_btn.isChecked():
+            self.frame = cv2.flip(self.frame, 0)
+        elif self.frameInverse_btn.isChecked():
+            self.frame = cv2.flip(self.frame, -1)
 
     # insert recognition text to result box
     def text_to_result_box(self):
@@ -129,25 +135,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.state_label.setText('現在狀態:' + str(self.Recognition.now_state))
 
         # Finish recognition and add text to result list
-        if self.Recognition.now_state == STATE.FinishRecognition :
+        if self.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                cv2.imshow('Cropped Frame',self.Recognition.crop_img)
-                print('Recognition text : ',self.Recognition.text)
+                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
+                print('Recognition text : ', self.Recognition.text)
+                print(type(self.Recognition.text))
                 self.result_box.setText(self.Recognition.text)
-        else :
+        else:
             self.FinishFlag = False
 
-        # Lightness warning 
+        # Lightness warning
         if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過亮')
         elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
             self.warning_label.setStyleSheet("color:red")
-            self.warning_label.setText('光線狀態:光線過暗') 
+            self.warning_label.setText('光線狀態:光線過暗')
         else:
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

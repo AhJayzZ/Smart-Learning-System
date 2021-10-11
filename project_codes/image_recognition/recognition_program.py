@@ -58,6 +58,7 @@ NUM_DIMENSION = 3
 
 HD_SIZE = 720
 
+
 def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
         resized_rate = HD_SIZE/height
@@ -104,7 +105,7 @@ class RecognitionProgram:
 
         self._selected_camera = 0
         self.cap = VideoSource(self._selected_camera)
-        
+
         self._tolerance = 0
         self._flag_change_state = False
 
