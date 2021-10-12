@@ -1,16 +1,15 @@
-import re
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from GUI.Ui_GUI import *
 from image_recognition.recognition_program import *
 
+from image_recognition import text_to_speech
 from googletrans import Translator
-from GUI.languages import langauge_data 
+from GUI import languages
 import cv2
+import numpy
 import sys
-
-
 
 # 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
 class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
@@ -34,10 +33,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.brightness_scrollbar.setValue(0)
         self.brightness_scrollbar.setMinimum(-100)
         self.brightness_scrollbar.setMaximum(100)
-        self.contrast_scrollbar.setValue(1)
-        self.contrast_scrollbar.setSingleStep(0.1)
-        self.contrast_scrollbar.setMinimum(-5)
-        self.contrast_scrollbar.setMaximum(5)
+        self.contrast_scrollbar.setValue(100)
+        self.contrast_scrollbar.setMinimum(0)
+        self.contrast_scrollbar.setMaximum(300)
 
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
@@ -46,7 +44,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # Language setting(index 15 means Chinese Traditional)
         self.lang = 'zh-tw'
         self.translator = Translator()
-        self.languages_key_array, self.languages_value_array = langauge_data()
+        self.languages_key_array, self.languages_value_array = languages.langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
 
@@ -119,8 +117,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
     # flip the camera frame
     def frame_flip_check(self):
-        self.frame = self.Recognition.output_img
-        self.frame = cv2.convertScaleAbs(self.frame,alpha=self.contrast,beta=self.brightness)
+        self.frame = cv2.convertScaleAbs(self.Recognition.output_img,alpha=self.contrast,beta=self.brightness)
+        self.average_gray_value = numpy.mean(self.frame)
         if self.frameHorizontal_btn.isChecked():
             self.frame = cv2.flip(self.frame, 1)
         elif self.frameVertical_btn.isChecked():
@@ -130,8 +128,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     
     # setting contrast and brightness of frame
     def frame_contrast_brightness_check(self):
-        self.contrast = int(self.contrast_scrollbar.value())
-        self.brightness = int(self.brightness_scrollbar.value())
+        self.contrast = self.contrast_scrollbar.value() / 100
+        self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
         
@@ -159,17 +157,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if self.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
                 print('Recognition text : ', self.Recognition.text)
+                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
+                text_to_speech.TextToSpeech(self.Recognition.text)
                 self.result_box.setText(self.Recognition.text)
         else:
             self.FinishFlag = False
 
         # Lightness warning
-        if self.Recognition.state_lightness == STATE_LIGHTNESS.TooBright:
+        if self.average_gray_value > self.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過亮')
-        elif self.Recognition.state_lightness == STATE_LIGHTNESS.TooDim:
+        elif self.average_gray_value < self.Recognition.MIN_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過暗')
         else:
