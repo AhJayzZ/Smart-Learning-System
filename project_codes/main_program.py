@@ -17,13 +17,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.setWindowTitle('Hand Recognition')
+        self.setWindowTitle('Smart Learning System v1.0')
         self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
 
         # Recognition program
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
-        self.contrast,self.brightness = 1,0
+        self.contrast = 1
+        self.brightness = 0
 
         # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
@@ -54,7 +55,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.timer.start(10)
 
         # result & translated box setting
-        self.revise_textbox.setFocus()
         self.result_box.textChanged.connect(self.translate)
         self.translated_box.setReadOnly(True)
 
@@ -94,9 +94,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 if text == "":
                     result = ""
                 else:
-                    print('googletrans triggered!')
-                    result = self.translator.translate(
-                        text, dest=self.lang, timeout=3).text
+                    print('googletrans triggered')
+                    result = self.translator.translate(text, dest=self.lang, timeout=3).text
                 self.translated_box.setText(result)
             except:
                 pass
@@ -115,8 +114,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.lang = self.languages_key_array[index]
         self.translate()
 
-    # flip the camera frame
-    def frame_flip_check(self):
+    # GUI camera frame check
+    def frame_check(self):
         self.frame = cv2.convertScaleAbs(self.Recognition.output_img,alpha=self.contrast,beta=self.brightness)
         self.average_gray_value = numpy.mean(self.frame)
         if self.frameHorizontal_btn.isChecked():
@@ -132,39 +131,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
-        
-    # insert recognition text to result box
-    def text_to_result_box(self):
-        self.result_box.setText(self.Recognition.text)
 
-    def refresh(self):
-        self.frame_flip_check()
-        converted_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
-
-        # PyQt image format
-        height, width = converted_frame.shape[:2]
-        pyqt_img = QImage(converted_frame, width, height, QImage.Format_RGB888)
-        pyqt_img = QPixmap.fromImage(pyqt_img)
-
-        # Camera label changed to video frame
-        self.camera_label.setPixmap(pyqt_img)
-        self.camera_label.setScaledContents(True)
-
-        # Show now state
-        self.state_label.setText('現在狀態:' + str(self.Recognition.now_state))
-
-        # Finish recognition and add text to result list
-        if self.Recognition.now_state == STATE.FinishRecognition:
-            if self.FinishFlag == False:
-                self.FinishFlag = True
-                print('Recognition text : ', self.Recognition.text)
-                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
-                text_to_speech.TextToSpeech(self.Recognition.text)
-                self.result_box.setText(self.Recognition.text)
-        else:
-            self.FinishFlag = False
-
-        # Lightness warning
+    # frame lightness check and update lightness state
+    def lightness_check(self):
         if self.average_gray_value > self.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過亮')
@@ -174,6 +143,36 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
+        
+    # insert recognition text to result box
+    def text_to_result_box(self):
+        self.result_box.setText(self.Recognition.text)
+
+    def refresh(self):
+        self.frame_check()
+        self.lightness_check()
+
+        # PyQt image format
+        converted_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+        height, width = converted_frame.shape[:2]
+        pyqt_img = QImage(converted_frame, width, height, QImage.Format_RGB888)
+        pyqt_img = QPixmap.fromImage(pyqt_img)
+        self.camera_label.setPixmap(pyqt_img)
+        self.camera_label.setScaledContents(True)
+
+        # Show now state
+        self.state_label.setText('現在狀態:' + str(self.Recognition.now_state))
+
+        # Finish recognition
+        if self.Recognition.now_state == STATE.FinishRecognition:
+            if self.FinishFlag == False:
+                self.FinishFlag = True
+                print('Recognition text : ', self.Recognition.text)
+                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
+                text_to_speech.TextToSpeech(self.Recognition.text)
+                self.result_box.setText(self.Recognition.text)
+        else:
+            self.FinishFlag = False
 
 
 if __name__ == "__main__":

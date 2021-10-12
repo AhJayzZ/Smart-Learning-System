@@ -10,14 +10,18 @@ def TextToSpeech(text):
 
     convert text or word to mp3 file and save to current path
     """
-    if len(text) > 0:
-        currentPath = os.path.dirname(__file__)
-        soundPath = os.path.join(currentPath,'sound.mp3')
-        tts = gTTS(str(text))
-        tts.save(soundPath)
-        playsound(soundPath)
+    try :
+        if len(text) > 0:
+            currentPath = os.path.dirname(__file__)
+            soundPath = os.path.join(currentPath,'sound.mp3')
+            tts = gTTS(str(text))
+            tts.save(soundPath)
+            playsound(soundPath)
 
-        # Avoid error(Permission denied)
-        os.remove(soundPath)
-    else :
-        print('gTTS empty word input')
+            # Avoid error(Permission denied)
+            os.remove(soundPath)
+        else :
+            print('gTTS empty text input')
+    except :
+        print('gTTS error occured')
+        pass
