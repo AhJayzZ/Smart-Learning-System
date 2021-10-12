@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1374</width>
-    <height>928</height>
+    <height>964</height>
    </rect>
   </property>
   <property name="font">
@@ -459,6 +459,80 @@
    </property>
    <property name="text">
     <string>離開</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="contrast_scrollbar">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>930</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickInterval">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="contrast_label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>920</y>
+     <width>121</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>標楷體</family>
+     <pointsize>15</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>對比(1):</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="brightness_label">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>920</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>標楷體</family>
+     <pointsize>15</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>亮度(0):</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="brightness_scrollbar">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>930</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickInterval">
+    <number>1</number>
    </property>
   </widget>
  </widget>

@@ -6,9 +6,10 @@ from GUI.Ui_GUI import *
 from image_recognition.recognition_program import *
 
 from googletrans import Translator
-from GUI.languages import langauge_data
+from GUI.languages import langauge_data 
 import cv2
 import sys
+
 
 
 # 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
@@ -23,10 +24,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # Recognition program
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
+        self.contrast,self.brightness = 1,0
 
         # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
         self.triggerCount = 0
+
+        # Constrast and brightness scrollbar setting
+        self.brightness_scrollbar.setValue(0)
+        self.brightness_scrollbar.setMinimum(-100)
+        self.brightness_scrollbar.setMaximum(100)
+        self.contrast_scrollbar.setValue(1)
+        self.contrast_scrollbar.setSingleStep(0.1)
+        self.contrast_scrollbar.setMinimum(-5)
+        self.contrast_scrollbar.setMaximum(5)
 
         # Camera setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
@@ -55,10 +66,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.exit_btn.clicked.connect(sys.exit)
 
         # Combobox trigger setting
-        self.camera_selector.currentTextChanged.connect(
-            self.camera_selector_changed)
-        self.language_selector.currentTextChanged.connect(
-            self.languages_selector_changed)
+        self.camera_selector.currentTextChanged.connect(self.camera_selector_changed)
+        self.language_selector.currentTextChanged.connect(self.languages_selector_changed)
+
+        # Scorllbar trigger setting
+        self.brightness_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
+        self.contrast_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
 
     # add clear the box and set the box that revise_textbox typed
     def add_btn_click(self):
@@ -107,13 +120,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     # flip the camera frame
     def frame_flip_check(self):
         self.frame = self.Recognition.output_img
+        self.frame = cv2.convertScaleAbs(self.frame,alpha=self.contrast,beta=self.brightness)
         if self.frameHorizontal_btn.isChecked():
             self.frame = cv2.flip(self.frame, 1)
         elif self.frameVertical_btn.isChecked():
             self.frame = cv2.flip(self.frame, 0)
         elif self.frameInverse_btn.isChecked():
             self.frame = cv2.flip(self.frame, -1)
-
+    
+    # setting contrast and brightness of frame
+    def frame_contrast_brightness_check(self):
+        self.contrast = int(self.contrast_scrollbar.value())
+        self.brightness = int(self.brightness_scrollbar.value())
+        self.contrast_label.setText('對比(' + str(self.contrast) + '):')
+        self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
+        
     # insert recognition text to result box
     def text_to_result_box(self):
         self.result_box.setText(self.Recognition.text)
