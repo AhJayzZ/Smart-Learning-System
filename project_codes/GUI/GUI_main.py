@@ -1,3 +1,4 @@
+from PIL.Image import NONE
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -11,6 +12,15 @@ from googletrans import Translator
 import cv2
 import sys
 import numpy
+import pymysql
+
+# Database setting
+DB_IP = '172.105.205.179'
+DB_USER = 'root'
+DB_PASSWORD = 'mitlab123456'
+DB_PORT = 3306
+DB_DATABASE = 'WordDB'
+
 
 # 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
 class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
@@ -20,12 +30,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
         self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
+        self.connectToDB()
 
         # Recognition program
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
-        self.contrast = 1
-        self.brightness = 0
+        self.contrast , self.brightness = 1 , 0
+        self.translate_mode = 0 # 0 = sentence mode , 1 = vocabulary mode
 
         # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
@@ -56,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.timer.start(10)
 
         # result & translated box setting
-        self.result_box.textChanged.connect(self.translate)
+        self.result_box.textChanged.connect(self.google_translate)
         self.translated_box.setReadOnly(True)
 
         # Button trigger setting
@@ -72,19 +83,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.brightness_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
         self.contrast_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
 
+
     # connect to MySQL server
     def add_btn_click(self):
-        return
+        self.insertSentenceToDB()
 
     # clear all box
     def clear_btn_click(self):
         self.result_box.clear()
         self.translated_box.clear()
 
+    def translated_mode_changed(self):
+        if self.sentenceMode_btn.isChecked():
+            self.translate_mode = 0
+        elif self.vocabularyMode_btn.isChecked():
+            self.translate_mode = 1
+
     # translate english text to translated language(too many request the translate function will be disable)
-    def translate(self):
+    def google_translate(self):
         self.triggerCount = self.triggerCount + 1
-        if self.triggerCount >= 5 or self.FinishFlag == True:
+        if self.triggerCount >= 3 or self.FinishFlag == True:
             self.triggerCount = 0
             text = self.result_box.toPlainText()
             self.translated_box.clear()
@@ -110,7 +128,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     def languages_selector_changed(self):
         index = self.language_selector.currentIndex()
         self.lang = self.languages_key_array[index]
-        self.translate()
+        self.google_translate()
 
     # GUI camera frame check
     def frame_check(self):
@@ -171,3 +189,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.result_box.setText(self.Recognition.text)
         else:
             self.FinishFlag = False
+
+
+#----------------------------------------------------------------------------------------------------------
+
+    # Connect to Mysql database
+    def connectToDB(self):
+        try :
+            self.db = pymysql.connect(host=DB_IP,port=DB_PORT,user=DB_USER,password=DB_PASSWORD,database=DB_DATABASE)
+            print('Connect to database success!')
+        except:
+            print('Database connection error!')
+
+
+    # Insert data to Mysql database
+    def insertSentenceToDB(self):
+        cursor = self.db.cursor()
+        data = self.result_box.toPlainText(),self.translated_box.toPlainText()
+        mysql  = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
+        cursor.execute(mysql)
+        self.db.commit()
+        print('Data insert to database success!\n',mysql)
