@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1374</width>
-    <height>964</height>
+    <width>1319</width>
+    <height>958</height>
    </rect>
   </property>
   <property name="font">
@@ -21,7 +21,7 @@
   <widget class="QLabel" name="result_label">
    <property name="geometry">
     <rect>
-     <x>910</x>
+     <x>860</x>
      <y>0</y>
      <width>161</width>
      <height>41</height>
@@ -29,7 +29,8 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <family>標楷體</family>
+     <pointsize>15</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -41,8 +42,8 @@
   <widget class="QPushButton" name="confirm_btn">
    <property name="geometry">
     <rect>
-     <x>910</x>
-     <y>810</y>
+     <x>870</x>
+     <y>840</y>
      <width>201</width>
      <height>51</height>
     </rect>
@@ -56,7 +57,7 @@
     </font>
    </property>
    <property name="text">
-    <string>新增</string>
+    <string>新增至資料庫</string>
    </property>
   </widget>
   <widget class="QTableWidget" name="tableWidget">
@@ -64,8 +65,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>891</width>
-     <height>691</height>
+     <width>841</width>
+     <height>711</height>
     </rect>
    </property>
   </widget>
@@ -74,8 +75,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>891</width>
-     <height>691</height>
+     <width>841</width>
+     <height>711</height>
     </rect>
    </property>
    <property name="font">
@@ -94,28 +95,11 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="revise_textbox">
-   <property name="geometry">
-    <rect>
-     <x>910</x>
-     <y>760</y>
-     <width>451</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-  </widget>
   <widget class="QComboBox" name="camera_selector">
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>710</y>
+     <y>740</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -144,7 +128,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>710</y>
+     <y>740</y>
      <width>81</width>
      <height>41</height>
     </rect>
@@ -162,8 +146,8 @@
   <widget class="QPushButton" name="clear_btn">
    <property name="geometry">
     <rect>
-     <x>1170</x>
-     <y>810</y>
+     <x>1120</x>
+     <y>840</y>
      <width>191</width>
      <height>51</height>
     </rect>
@@ -182,7 +166,7 @@
   <widget class="QTextEdit" name="result_box">
    <property name="geometry">
     <rect>
-     <x>910</x>
+     <x>860</x>
      <y>40</y>
      <width>451</width>
      <height>320</height>
@@ -199,7 +183,7 @@
   <widget class="QLabel" name="translate_label">
    <property name="geometry">
     <rect>
-     <x>910</x>
+     <x>860</x>
      <y>360</y>
      <width>181</width>
      <height>41</height>
@@ -207,7 +191,8 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <family>標楷體</family>
+     <pointsize>15</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -222,7 +207,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>910</x>
+     <x>860</x>
      <y>400</y>
      <width>451</width>
      <height>320</height>
@@ -240,7 +225,7 @@
    <property name="geometry">
     <rect>
      <x>390</x>
-     <y>710</y>
+     <y>740</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -259,7 +244,7 @@
    <property name="geometry">
     <rect>
      <x>550</x>
-     <y>710</y>
+     <y>740</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -284,31 +269,11 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="translate_label_2">
-   <property name="geometry">
-    <rect>
-     <x>910</x>
-     <y>720</y>
-     <width>181</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>文字輸入欄 :</string>
-   </property>
-  </widget>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>770</y>
+     <y>800</y>
      <width>191</width>
      <height>146</height>
     </rect>
@@ -398,9 +363,9 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>770</y>
-     <width>671</width>
-     <height>141</height>
+     <y>800</y>
+     <width>631</width>
+     <height>151</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -443,9 +408,9 @@
   <widget class="QPushButton" name="exit_btn">
    <property name="geometry">
     <rect>
-     <x>910</x>
-     <y>870</y>
-     <width>451</width>
+     <x>870</x>
+     <y>900</y>
+     <width>441</width>
      <height>51</height>
     </rect>
    </property>
@@ -464,8 +429,8 @@
   <widget class="QSlider" name="contrast_scrollbar">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>930</y>
+     <x>1010</x>
+     <y>740</y>
      <width>160</width>
      <height>22</height>
     </rect>
@@ -480,8 +445,8 @@
   <widget class="QLabel" name="contrast_label">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>920</y>
+     <x>870</x>
+     <y>730</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -501,8 +466,8 @@
   <widget class="QLabel" name="brightness_label">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>920</y>
+     <x>870</x>
+     <y>780</y>
      <width>141</width>
      <height>41</height>
     </rect>
@@ -522,8 +487,8 @@
   <widget class="QSlider" name="brightness_scrollbar">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>930</y>
+     <x>1010</x>
+     <y>790</y>
      <width>160</width>
      <height>22</height>
     </rect>
@@ -537,6 +502,66 @@
    <property name="tickInterval">
     <number>1</number>
    </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>1190</x>
+     <y>730</y>
+     <width>121</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="translate_mode_label">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>翻譯模式:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="sentenceMode_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>句子</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="vocabularyMode_btn">
+      <property name="font">
+       <font>
+        <family>標楷體</family>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>單字</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
