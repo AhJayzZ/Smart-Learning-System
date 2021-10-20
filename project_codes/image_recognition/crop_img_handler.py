@@ -1,3 +1,8 @@
+"""
+pocessing of the croped img, to be easier to recognition
+
+"""
+
 import cv2
 
 
