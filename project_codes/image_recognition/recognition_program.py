@@ -337,10 +337,11 @@ class RecognitionProgram:
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.FinishCropping:
-            if self.state_lightness == STATE_LIGHTNESS.Fine:
-                self.next_state = STATE.GetText
-            else:
-                self.next_state = STATE.DoingCropping
+            self.next_state = STATE.GetText
+            # if self.state_lightness == STATE_LIGHTNESS.Fine:
+            #    self.next_state = STATE.GetText
+            # else:
+            #    self.next_state = STATE.DoingCropping
 
         elif self.now_state == STATE.GetText:
             self.next_state = STATE.FinishRecognition
@@ -377,16 +378,12 @@ class RecognitionProgram:
 
         run_program to update input_img, hand_results, text
         """
-
         with mp_hands.Hands(
                 static_image_mode=False,
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5,
                 max_num_hands=1)as hands:
-
-            #self.cap = VideoSource(self._selected_camera)
-
-            while True:
+            for _ in iter(int, 1):
                 success, self._input_img = self.cap.read()
 
                 if success:
@@ -411,9 +408,6 @@ class RecognitionProgram:
                     self.hand_results = hands.process(img)
 
                     self._process_state_mechine()
-
-                    # debug
-                   # self._debug_print_statement()
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """

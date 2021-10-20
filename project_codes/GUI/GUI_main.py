@@ -35,8 +35,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # Recognition program
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
-        self.contrast , self.brightness = 1 , 0
-        self.translate_mode = 0 # 0 = sentence mode , 1 = vocabulary mode
+        self.contrast, self.brightness = 1, 0
+        self.translate_mode = 0  # 0 = sentence mode , 1 = vocabulary mode
 
         # Finish Flag setting(Avoid duplicated translation)
         self.FinishFlag = False
@@ -76,15 +76,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.exit_btn.clicked.connect(sys.exit)
 
         # Combobox trigger setting
-        self.camera_selector.currentTextChanged.connect(self.camera_selector_changed)
-        self.language_selector.currentTextChanged.connect(self.languages_selector_changed)
+        self.camera_selector.currentTextChanged.connect(
+            self.camera_selector_changed)
+        self.language_selector.currentTextChanged.connect(
+            self.languages_selector_changed)
 
         # Scorllbar trigger setting
-        self.brightness_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
-        self.contrast_scrollbar.valueChanged.connect(self.frame_contrast_brightness_check)
-
+        self.brightness_scrollbar.valueChanged.connect(
+            self.frame_contrast_brightness_check)
+        self.contrast_scrollbar.valueChanged.connect(
+            self.frame_contrast_brightness_check)
 
     # connect to MySQL server
+
     def add_btn_click(self):
         self.insertSentenceToDB()
 
@@ -111,7 +115,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                     result = ""
                 else:
                     print('googletrans triggered')
-                    result = self.translator.translate(text, dest=self.lang, timeout=3).text
+                    result = self.translator.translate(
+                        text, dest=self.lang, timeout=3).text
                 self.translated_box.setText(result)
             except:
                 pass
@@ -119,10 +124,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     # change camera to the choosen one
     def camera_selector_changed(self):
         index = self.camera_selector.currentIndex()
+        self.Recognition.cap.release()
+
         if index == 0:
             self.Recognition.cap = cv2.VideoCapture(0)
         else:
-            self.Recognition.cap = cv2.VideoCapture(index,cv2.CAP_DSHOW)
+            self.Recognition.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+            #self.Recognition.cap = cv2.VideoCapture(index)
 
     # change to the translated langauge
     def languages_selector_changed(self):
@@ -132,7 +140,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
     # GUI camera frame check
     def frame_check(self):
-        self.frame = cv2.convertScaleAbs(self.Recognition.output_img,alpha=self.contrast,beta=self.brightness)
+        self.frame = cv2.convertScaleAbs(
+            self.Recognition.output_img, alpha=self.contrast, beta=self.brightness)
         self.average_gray_value = numpy.mean(self.frame)
         if self.frameHorizontal_btn.isChecked():
             self.frame = cv2.flip(self.frame, 1)
@@ -140,7 +149,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.frame = cv2.flip(self.frame, 0)
         elif self.frameInverse_btn.isChecked():
             self.frame = cv2.flip(self.frame, -1)
-    
+
     # setting contrast and brightness of frame
     def frame_contrast_brightness_check(self):
         self.contrast = self.contrast_scrollbar.value() / 100
@@ -159,7 +168,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
-        
+
     # insert recognition text to result box
     def text_to_result_box(self):
         self.result_box.setText(self.Recognition.text)
@@ -191,22 +200,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.FinishFlag = False
 
 
-#----------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------
 
     # Connect to Mysql database
+
+
     def connectToDB(self):
-        try :
-            self.db = pymysql.connect(host=DB_IP,port=DB_PORT,user=DB_USER,password=DB_PASSWORD,database=DB_DATABASE)
+        try:
+            self.db = pymysql.connect(
+                host=DB_IP, port=DB_PORT, user=DB_USER, password=DB_PASSWORD, database=DB_DATABASE)
             print('Connect to database success!')
         except:
             print('Database connection error!')
 
-
     # Insert data to Mysql database
+
     def insertSentenceToDB(self):
         cursor = self.db.cursor()
-        data = self.result_box.toPlainText(),self.translated_box.toPlainText()
-        mysql  = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
+        data = self.result_box.toPlainText(), self.translated_box.toPlainText()
+        mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
         cursor.execute(mysql)
         self.db.commit()
-        print('Data insert to database success!\n',mysql)
+        print('Data insert to database success!\n', mysql)
