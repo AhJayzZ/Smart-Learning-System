@@ -1,4 +1,3 @@
-from PIL.Image import NONE
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -7,6 +6,7 @@ from . import languages
 
 from image_recognition.recognition_program import *
 from image_recognition import text_to_speech
+from word_transtale import selector_TranslateOrWord
 from googletrans import Translator
 
 import cv2
@@ -75,6 +75,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.clear_btn.clicked.connect(self.clear_btn_click)
         self.exit_btn.clicked.connect(sys.exit)
 
+        # translate trigger setting
+        self.sentenceMode_btn.clicked.connect(self.translated_mode_changed)
+        self.vocabularyMode_btn.clicked.connect(self.translated_mode_changed)
+
         # Combobox trigger setting
         self.camera_selector.currentTextChanged.connect(
             self.camera_selector_changed)
@@ -87,8 +91,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.contrast_scrollbar.valueChanged.connect(
             self.frame_contrast_brightness_check)
 
-    # connect to MySQL server
 
+    # confirm to add word to database
     def add_btn_click(self):
         self.insertSentenceToDB()
 
@@ -98,6 +102,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.translated_box.clear()
 
     def translated_mode_changed(self):
+        result = selector_TranslateOrWord.selector_TranslateOrWord(self.result_box.toPlainText())
+        print('result:',result)
         if self.sentenceMode_btn.isChecked():
             self.translate_mode = 0
         elif self.vocabularyMode_btn.isChecked():
@@ -125,12 +131,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     def camera_selector_changed(self):
         index = self.camera_selector.currentIndex()
         self.Recognition.cap.release()
-
         if index == 0:
             self.Recognition.cap = cv2.VideoCapture(0)
         else:
             self.Recognition.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
-            #self.Recognition.cap = cv2.VideoCapture(index)
 
     # change to the translated langauge
     def languages_selector_changed(self):
@@ -142,7 +146,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
     def frame_check(self):
         self.frame = cv2.convertScaleAbs(
             self.Recognition.output_img, alpha=self.contrast, beta=self.brightness)
-        self.average_gray_value = numpy.mean(self.frame)
         if self.frameHorizontal_btn.isChecked():
             self.frame = cv2.flip(self.frame, 1)
         elif self.frameVertical_btn.isChecked():
@@ -159,6 +162,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
     # frame lightness check and update lightness state
     def lightness_check(self):
+        self.average_gray_value = np.mean(self.frame)
         if self.average_gray_value > self.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過亮')
@@ -203,22 +207,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 # ----------------------------------------------------------------------------------------------------------
 
     # Connect to Mysql database
-
-
     def connectToDB(self):
         try:
             self.db = pymysql.connect(
                 host=DB_IP, port=DB_PORT, user=DB_USER, password=DB_PASSWORD, database=DB_DATABASE)
             print('Connect to database success!')
         except:
-            print('Database connection error!')
+            print('Conncet to database failed!')
+
 
     # Insert data to Mysql database
-
     def insertSentenceToDB(self):
-        cursor = self.db.cursor()
-        data = self.result_box.toPlainText(), self.translated_box.toPlainText()
-        mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
-        cursor.execute(mysql)
-        self.db.commit()
-        print('Data insert to database success!\n', mysql)
+        try :
+            cursor = self.db.cursor()
+            data = self.result_box.toPlainText(), self.translated_box.toPlainText()
+            mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
+            cursor.execute(mysql)
+            self.db.commit()
+            print('Insert data to database success!\n')
+        except:
+            print('Insert data to database failed')

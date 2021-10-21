@@ -1,5 +1,5 @@
-from get_word_info import get_word_info
-from translate_fromENtoCN import translator
+from .get_word_info import get_word_info
+from .translate_fromENtoCN import translator
 
 #input: text_str
 #output: translated_text_str or text_info_dict
