@@ -15,8 +15,12 @@ def check_if_one_word(text_str):
     return 1
 
 
-def selector_TranslateOrWord(text_str):
-    if check_if_one_word(text_str):
-        return get_word_info(text_str)
+def selector_TranslateOrWord(text_str, src="en", dest="zh-tw"):
+    if text_str == "":
+        # do something if you want
+        pass
     else:
-        return translator(text_str)
+        if check_if_one_word(text_str):
+            return get_word_info(text_str)
+        else:
+            return translator(text_str, src="en", dest="zh-tw")
