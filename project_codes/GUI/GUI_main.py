@@ -109,21 +109,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if input_text == "":
             pass
         else:
-            sentenceOrWord = selector_TranslateOrWord.check_if_one_word(input_text)
-            output_translation = selector_TranslateOrWord.selector_TranslateOrWord(input_text,src='en',dest=self.lang)
+            self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(input_text)
+            self.translation_output = selector_TranslateOrWord.selector_TranslateOrWord(input_text,src='en',dest=self.lang)
             text_to_speech.TextToSpeech(input_text)
-            if sentenceOrWord == 0:
-                print('sentence')
-                self.translate_box.setText(output_translation)
-            else :
-                print('word')
+            if self.sentenceOrWord == 0: # Sentence
+                self.translate_box.setText(self.translation_output)
+            else :                       # Word
                 try:
-                    output_format = '定義:\n' + output_translation['defination'] + '\n\n' + \
-                                    '音標:\n' + output_translation['eng_pr'] + ',' + output_translation['ame_pr'] + '\n\n' + \
-                                    '時態:\n' + output_translation['tenses']
+                    output_format = '定義:\n' + self.translation_output['defination'] + '\n\n' + \
+                                    '音標:\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
+                                    '時態:\n' + self.translation_output['tenses']
                     self.translate_box.setText(output_format)
                 except:
-                    self.translate_box.setText(output_translation['defination'])
+                    self.translate_box.setText(self.translation_output['defination'])
             
     def camera_selector_changed(self):
         """
@@ -230,8 +228,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         Insert data to Mysql database
         """
         try :
+            if self.sentenceOrWord == 0: # Sentence
+                data = self.result_box.toPlainText(), self.translation_output
+            else:                       # Word
+                data = self.result_box.toPlainText(), self.translation_output['defination']
+                
             cursor = self.db.cursor()
-            data = self.result_box.toPlainText(), self.translate_box.toPlainText()
             mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
             cursor.execute(mysql)
             self.db.commit()
