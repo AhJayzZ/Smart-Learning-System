@@ -36,13 +36,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.Recognition = RecognitionProgram()
         self.frame = self.Recognition.output_img
         self.contrast, self.brightness = 1, 0
-        self.translate_mode = 0  # 0 = sentence mode , 1 = vocabulary mode
 
-        # Finish Flag setting(Avoid duplicated translation)
+        # FinishFlag setting(Avoid duplicated translation)
         self.FinishFlag = False
-        self.triggerCount = 0
 
-        # Constrast and brightness scrollbar setting
+        # Constrast and brightness scrollbar default setting
         self.brightness_scrollbar.setValue(0)
         self.brightness_scrollbar.setMinimum(-100)
         self.brightness_scrollbar.setMaximum(100)
@@ -50,85 +48,87 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.contrast_scrollbar.setMinimum(0)
         self.contrast_scrollbar.setMaximum(300)
 
-        # Camera setting
+        # Camera default setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
         self.camera_selector.addItems(camera_array)
 
-        # Language setting(index 15 means Chinese Traditional)
-        self.lang = 'zh-tw'
-        self.translator = Translator()
+        # Language default setting(index 15 means Chinese Traditional)
         self.languages_key_array, self.languages_value_array = languages.langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
-
-        # Timer setting
+        self.lang = 'zh-tw'
+        
+        # Timer default setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
         self.timer.start(10)
 
-        # result & translated box setting
-        self.result_box.textChanged.connect(self.google_translate)
-        self.translated_box.setReadOnly(True)
+        # result & translate box default setting
+        self.translate_box.setReadOnly(True)
 
-        # Button trigger setting
-        self.confirm_btn.clicked.connect(self.add_btn_click)
+        # Button trigger default setting
+        self.add_btn.clicked.connect(self.add_btn_click)
+        self.translate_btn.clicked.connect(self.translate)
         self.clear_btn.clicked.connect(self.clear_btn_click)
         self.exit_btn.clicked.connect(sys.exit)
 
-        # translate trigger setting
-        self.sentenceMode_btn.clicked.connect(self.translated_mode_changed)
-        self.vocabularyMode_btn.clicked.connect(self.translated_mode_changed)
-
-        # Combobox trigger setting
+        # Combobox trigger default setting
         self.camera_selector.currentTextChanged.connect(
             self.camera_selector_changed)
         self.language_selector.currentTextChanged.connect(
             self.languages_selector_changed)
 
-        # Scorllbar trigger setting
+        # Scorllbar trigger default setting
         self.brightness_scrollbar.valueChanged.connect(
             self.frame_contrast_brightness_check)
         self.contrast_scrollbar.valueChanged.connect(
             self.frame_contrast_brightness_check)
 
-
-    # confirm to add word to database
+    
     def add_btn_click(self):
-        self.insertSentenceToDB()
+        """
+        # add word or sentence to database
+        """
+        self.insertDataToDB()
 
-    # clear all box
     def clear_btn_click(self):
+        """
+        clear all box
+        """
         self.result_box.clear()
-        self.translated_box.clear()
+        self.translate_box.clear()
 
-    def translated_mode_changed(self):
-        result = selector_TranslateOrWord.selector_TranslateOrWord(self.result_box.toPlainText())
-        print('result:',result)
-        if self.sentenceMode_btn.isChecked():
-            self.translate_mode = 0
-        elif self.vocabularyMode_btn.isChecked():
-            self.translate_mode = 1
 
-    # translate english text to translated language(too many request the translate function will be disable)
-    def google_translate(self):
-        self.triggerCount = self.triggerCount + 1
-        if self.triggerCount >= 3 or self.FinishFlag == True:
-            self.triggerCount = 0
-            text = self.result_box.toPlainText()
-            self.translated_box.clear()
-            try:
-                if text == "":
-                    result = ""
-                else:
-                    print('googletrans triggered')
-                    result = self.translator.translate(
-                        text, dest=self.lang, timeout=3).text
-                self.translated_box.setText(result)
-            except:
-                pass
-
-    # change camera to the choosen one
+    def translate(self):
+        """
+        translate function, wordOrSentence = 0(Sentence),1(Word)
+        if wordOrSentence = 0,use googletrans,
+        if wordOrSentence = 1,use webscraper to catch data from website
+        """
+        input_text = self.result_box.toPlainText()
+        if input_text == "":
+            pass
+        else:
+            sentenceOrWord = selector_TranslateOrWord.check_if_one_word(input_text)
+            output_translation = selector_TranslateOrWord.selector_TranslateOrWord(input_text,src='en',dest=self.lang)
+            text_to_speech.TextToSpeech(input_text)
+            if sentenceOrWord == 0:
+                print('sentence')
+                self.translate_box.setText(output_translation)
+            else :
+                print('word')
+                output_format = '定義:\n' + output_translation['defination'] + '\n\n' + \
+                                '音標:\n' + output_translation['eng_pr'] + ',' + output_translation['ame_pr'] + '\n\n' + \
+                                '時態:\n' + output_translation['tenses']
+                try:
+                    self.translate_box.setText(output_format)
+                except:
+                    self.translate_box.setText(output_translation['defination'])
+            
     def camera_selector_changed(self):
+        """
+        change camera to the choosen one
+        """
         index = self.camera_selector.currentIndex()
         self.Recognition.cap.release()
         if index == 0:
@@ -136,14 +136,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.Recognition.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
 
-    # change to the translated langauge
+    
     def languages_selector_changed(self):
+        """
+        change to the new translate langauge and update the translation
+        """
         index = self.language_selector.currentIndex()
         self.lang = self.languages_key_array[index]
-        self.google_translate()
+        self.translate()
 
     # GUI camera frame check
     def frame_check(self):
+        """
+        change GUI frame  if frame flip or frame be lighten
+        """
         self.frame = cv2.convertScaleAbs(
             self.Recognition.output_img, alpha=self.contrast, beta=self.brightness)
         if self.frameHorizontal_btn.isChecked():
@@ -153,16 +159,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         elif self.frameInverse_btn.isChecked():
             self.frame = cv2.flip(self.frame, -1)
 
-    # setting contrast and brightness of frame
     def frame_contrast_brightness_check(self):
+        """
+        update frame brightness, frame contrast and setting labelshow 
+        """
         self.contrast = self.contrast_scrollbar.value() / 100
         self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
 
-    # frame lightness check and update lightness state
     def lightness_check(self):
-        self.average_gray_value = np.mean(self.frame)
+        """
+        check and update frame brightness status
+        """
+        self.average_gray_value = numpy.mean(self.frame)
         if self.average_gray_value > self.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:光線過亮')
@@ -173,11 +183,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
 
-    # insert recognition text to result box
-    def text_to_result_box(self):
-        self.result_box.setText(self.Recognition.text)
-
     def refresh(self):
+        """
+        refresh every 10ms trigger by clock
+        """
         self.frame_check()
         self.lightness_check()
 
@@ -197,17 +206,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             if self.FinishFlag == False:
                 self.FinishFlag = True
                 print('Recognition text : ', self.Recognition.text)
-                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
-                text_to_speech.TextToSpeech(self.Recognition.text)
                 self.result_box.setText(self.Recognition.text)
+                self.translate()
+                cv2.imshow('Cropped Frame', self.Recognition.crop_img)
         else:
             self.FinishFlag = False
 
-
 # ----------------------------------------------------------------------------------------------------------
 
-    # Connect to Mysql database
     def connectToDB(self):
+        """
+        Connect to Mysql database
+        """
         try:
             self.db = pymysql.connect(
                 host=DB_IP, port=DB_PORT, user=DB_USER, password=DB_PASSWORD, database=DB_DATABASE)
@@ -217,13 +227,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
 
     # Insert data to Mysql database
-    def insertSentenceToDB(self):
+    def insertDataToDB(self):
         try :
             cursor = self.db.cursor()
-            data = self.result_box.toPlainText(), self.translated_box.toPlainText()
+            data = self.result_box.toPlainText(), self.translate_box.toPlainText()
             mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
             cursor.execute(mysql)
             self.db.commit()
-            print('Insert data to database success!\n')
+            print('Insert data to database success!')
         except:
-            print('Insert data to database failed')
+            print('Insert data to database failed!')

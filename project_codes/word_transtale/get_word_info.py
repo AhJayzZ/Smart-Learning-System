@@ -104,7 +104,7 @@ def get_word_info(word_str):
     return wordInfo_dict
 
 
-if __name__ == "__main__":
-    word_str = "feeling"
-    wordInfo_dict = get_word_info(word_str)
-    print(wordInfo_dict)
+# if __name__ == "__main__":
+#     word_str = "feeling"
+#     wordInfo_dict = get_word_info(word_str)
+#     print(wordInfo_dict)

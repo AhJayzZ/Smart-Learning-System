@@ -14,13 +14,11 @@ def check_if_one_word(text_str):
 
     return 1
 
-
 def selector_TranslateOrWord(text_str, src="en", dest="zh-tw"):
     if text_str == "":
-        # do something if you want
         pass
     else:
         if check_if_one_word(text_str):
             return get_word_info(text_str)
         else:
-            return translator(text_str, src="en", dest="zh-tw")
+            return translator(text_str, src, dest)

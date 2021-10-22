@@ -3,9 +3,9 @@
 # output: WordTranslated_str
 # usage: translator(WordToTranslate_str)
 
-def translator(WordToTranslate_str, src="en", dest="zh-tw"):
+def translator(WordToTranslate_str, src, dest):
     from googletrans import Translator
     translator = Translator()
     translation = translator.translate(
-        WordToTranslate_str, src, dest='zh-tw').text
+        WordToTranslate_str, src=src, dest=dest).text
     return translation
