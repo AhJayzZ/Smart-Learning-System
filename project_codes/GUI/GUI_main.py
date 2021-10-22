@@ -117,10 +117,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.translate_box.setText(output_translation)
             else :
                 print('word')
-                output_format = '定義:\n' + output_translation['defination'] + '\n\n' + \
-                                '音標:\n' + output_translation['eng_pr'] + ',' + output_translation['ame_pr'] + '\n\n' + \
-                                '時態:\n' + output_translation['tenses']
                 try:
+                    output_format = '定義:\n' + output_translation['defination'] + '\n\n' + \
+                                    '音標:\n' + output_translation['eng_pr'] + ',' + output_translation['ame_pr'] + '\n\n' + \
+                                    '時態:\n' + output_translation['tenses']
                     self.translate_box.setText(output_format)
                 except:
                     self.translate_box.setText(output_translation['defination'])
@@ -225,9 +225,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         except:
             print('Conncet to database failed!')
 
-
-    # Insert data to Mysql database
     def insertDataToDB(self):
+        """
+        Insert data to Mysql database
+        """
         try :
             cursor = self.db.cursor()
             data = self.result_box.toPlainText(), self.translate_box.toPlainText()
