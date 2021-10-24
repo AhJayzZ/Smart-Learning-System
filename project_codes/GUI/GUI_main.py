@@ -7,7 +7,6 @@ from . import languages
 from image_recognition.recognition_program import *
 from image_recognition import text_to_speech
 from word_transtale import selector_TranslateOrWord
-from googletrans import Translator
 
 import cv2
 import sys
@@ -22,8 +21,10 @@ DB_PORT = 3306
 DB_DATABASE = 'WordDB'
 
 
-# 建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
 class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
+    """
+    建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
+    """
     def __init__(self, parent=None):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__(parent)
@@ -85,6 +86,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.frame_contrast_brightness_check)
 
     
+# -----------------------------------------Widgets function-----------------------------------------
+
     def add_btn_click(self):
         """
         # add word or sentence to database
@@ -98,7 +101,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.result_box.clear()
         self.translate_box.clear()
 
-
     def translate(self):
         """
         translate function, wordOrSentence = 0(Sentence),1(Word)
@@ -111,7 +113,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(input_text)
             self.translation_output = selector_TranslateOrWord.selector_TranslateOrWord(input_text,src='en',dest=self.lang)
-            text_to_speech.TextToSpeech(input_text)
             if self.sentenceOrWord == 0: # Sentence
                 self.translate_box.setText(self.translation_output)
             else :                       # Word
@@ -122,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                     self.translate_box.setText(output_format)
                 except:
                     self.translate_box.setText(self.translation_output['defination'])
+            text_to_speech.TextToSpeech(input_text)
             
     def camera_selector_changed(self):
         """
@@ -210,7 +212,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.FinishFlag = False
 
-# ----------------------------------------------------------------------------------------------------------
+# -----------------------------------------Database-----------------------------------------
 
     def connectToDB(self):
         """
@@ -240,3 +242,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             print('Insert data to database success!')
         except:
             print('Insert data to database failed!')
+
+
+# -----------------------------------------Threading-----------------------------------------
+
+class frame_thread(QThread):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        return
+
+
+class gTTS_thread(QThread):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        return
+
+class translation_thread(QThread):
+    def __init__(seself,parent=None):
+        super().__init__(parent)
+        return
+
+class DBconnection_thread(QThread):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        return
+
