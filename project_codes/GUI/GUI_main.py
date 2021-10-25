@@ -32,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
-        self.setWindowIcon(QtGui.QIcon('project_codes/GUI/GUI_icon.png'))
+        self.setWindowIcon(QtGui.QIcon('project_codes/GUI/images/GUI_icon.png'))
         self.connectToDB()
 
         # Recognition program
@@ -40,8 +40,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.average_gray_value = 0
         self.Recognition = RecognitionProgram()
         self.frame_thread = frame_Thread(self.Recognition)
-        self.frame_thread.start()
         self.frame_thread.frame_callback.connect(self.frame_refresh)
+        self.frame_thread.start()
+        
 
         # FinishFlag setting(Avoid duplicated translation)
         self.FinishFlag = False
@@ -92,7 +93,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.contrast_scrollbar.valueChanged.connect(
             self.frame_contrast_brightness_check)
 
-
+        # Menubar trigger default setting
+        self.settingAction = QAction('&設定',self)
+        self.settingAction.triggered.connect(self.settingAction_triggered)
+        self.guideAction = QAction('&使用手冊',self)
+        self.guideAction.triggered.connect(self.guideAction_triggered)
+        self.historyAction = QAction('&翻譯歷史',self)
+        self.historyAction.triggered.connect(self.historyAction_triggerred)
+        self.openWordFileAction = QAction('&打開單字本',self)
+        self.openWordFileAction.triggered.connect(self.openWordFileAction_triggered)
+        self.menubar.addAction(self.settingAction)
+        self.menubar.addAction(self.guideAction)
+        self.menubar.addAction(self.historyAction)
+        self.menubar.addAction(self.openWordFileAction)
+    
 # -----------------------------------------Widgets function-----------------------------------------
 
     def insertDataToDB(self):
@@ -172,11 +186,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         change camera to the choosen one
         """
         index = self.camera_selector.currentIndex()
-        self.frame_thread.cap.release()
+        self.frame_thread.Recognition.cap.release()
         if index == 0:
-            self.frame_thread.cap = cv2.VideoCapture(0)
+            self.frame_thread.Recognition.cap = cv2.VideoCapture(0)
         else:
-            self.frame_thread.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+            self.frame_thread.Recognition.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+        self.frame_thread.start()
 
     def languages_selector_changed(self):
         """
@@ -271,6 +286,33 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             print('Conncet to database failed!')
 
 
+# -----------------------------------------Menubar-----------------------------------------
+
+    def settingAction_triggered(self):
+        """
+        settingAction triggered
+        """
+        print('settingAction_triggered')
+
+    def guideAction_triggered(self):
+        """
+        guideAction_triggered
+        """
+        print('guideAction_triggered')
+
+    def historyAction_triggerred(self):
+        """
+        historyAction_triggerred
+        """
+        print('historyAction_triggerred')
+    
+    def openWordFileAction_triggered(self):
+        """
+        openWordFileAction_triggered
+        """
+        print('openWordFileAction_triggered')
+
+
 # -----------------------------------------Threading-----------------------------------------
 
 class frame_Thread(QThread):
@@ -281,14 +323,13 @@ class frame_Thread(QThread):
     def __init__(self,Recognition,parent=None):
         super().__init__(parent)
         self.Recognition = Recognition
-        self.cap = self.Recognition.cap
         self.frame = self.Recognition._input_img
 
     def run(self):
-        while self.cap.isOpened():
+        while self.Recognition.cap.isOpened():
             self.frame = self.Recognition._input_img
             self.frame_callback.emit(1)
-            time.sleep(0.001)
+            time.sleep(0.01)
             
 
 class gTTS_Thread(QThread):

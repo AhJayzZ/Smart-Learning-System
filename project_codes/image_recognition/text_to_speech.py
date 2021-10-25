@@ -19,7 +19,10 @@ def TextToSpeech(text):
             playsound(soundPath)
 
             # Avoid error(Permission denied)
-            os.remove(soundPath)
+            try:
+                os.remove(soundPath)
+            except:
+                pass
         else :
             print('gTTS empty text input')
     except :
