@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1319</width>
-    <height>958</height>
+    <height>965</height>
    </rect>
   </property>
   <property name="font">
@@ -429,7 +429,7 @@
   <widget class="QSlider" name="contrast_scrollbar">
    <property name="geometry">
     <rect>
-     <x>1010</x>
+     <x>1030</x>
      <y>740</y>
      <width>160</width>
      <height>22</height>
@@ -468,7 +468,7 @@
     <rect>
      <x>870</x>
      <y>780</y>
-     <width>141</width>
+     <width>151</width>
      <height>41</height>
     </rect>
    </property>
@@ -487,7 +487,7 @@
   <widget class="QSlider" name="brightness_scrollbar">
    <property name="geometry">
     <rect>
-     <x>1010</x>
+     <x>1030</x>
      <y>790</y>
      <width>160</width>
      <height>22</height>
@@ -503,7 +503,7 @@
     <number>1</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="clear_btn">
+  <widget class="QPushButton" name="sound_btn">
    <property name="geometry">
     <rect>
      <x>870</x>
@@ -520,7 +520,7 @@
     </font>
    </property>
    <property name="text">
-    <string>清除</string>
+    <string>發音</string>
    </property>
   </widget>
  </widget>
