@@ -305,4 +305,4 @@ class Ui_SmartLearningSystemGUI(object):
         self.add_btn.setText(_translate("SmartLearningSystemGUI", "新增至資料庫"))
         self.sound_btn.setText(_translate("SmartLearningSystemGUI", "發音"))
         self.language_label.setText(_translate("SmartLearningSystemGUI", "翻譯語言:"))
-        self.init_btn.setText(_translate("SmartLearningSystemGUI", "預設值"))
+        self.init_btn.setText(_translate("SmartLearningSystemGUI", "設定初始化"))

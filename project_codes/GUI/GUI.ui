@@ -536,7 +536,7 @@
      </font>
     </property>
     <property name="text">
-     <string>預設值</string>
+     <string>設定初始化</string>
     </property>
    </widget>
    <zorder>tableWidget</zorder>
