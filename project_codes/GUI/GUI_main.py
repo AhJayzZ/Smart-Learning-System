@@ -124,7 +124,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             sys.exit()
         else:
             event.ignore()
-        
     
 # -----------------------------------------Widgets function-----------------------------------------
 
