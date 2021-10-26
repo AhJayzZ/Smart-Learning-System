@@ -69,8 +69,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         
         # Timer default setting
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.autoTranslate)
-        self.timer.start(5000)
+        self.timer.timeout.connect(self.translate)
+        self.result_box.textChanged.connect(self.translateTimeCount)
         self.previousResult = ""
 
         # Result & translate box default setting
@@ -109,7 +109,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addAction(self.guideAction)
         self.menubar.addAction(self.historyAction)
         self.menubar.addAction(self.openWordFileAction)
-
+    
 # -----------------------------------------Window event--------------------------------------------
     def closeEvent(self,event):
         """
@@ -197,22 +197,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         if wordOrSentence = 1,use webscraper to catch data from website
         """
         self.input_text = self.result_box.toPlainText()
-        self.previousResult = self.input_text
         if self.input_text == "":
+            self.result_box.clear()
             self.translate_box.clear()
-            pass
         else:
-            self.translation_thread = translation_Thread(self.input_text,self.lang)
-            self.translation_thread.start()
-            self.translation_thread.translation_finished.connect(self.set_output_format)
+            if self.previousResult != self.input_text:
+                print('triggered')
+                self.translation_thread = translation_Thread(self.input_text,self.lang)
+                self.translation_thread.start()
+                self.translation_thread.translation_finished.connect(self.set_output_format)
+        self.previousResult = self.input_text
     
-    def autoTranslate(self):
+    def translateTimeCount(self):
         """
-        auto translate if result box text change 
+        triggered counting for translation function
         """
-        if self.previousResult != self.result_box.toPlainText():
-            self.translate()
-        self.previousResult = self.result_box.toPlainText()
+        self.timer.start(3000)
 
     def camera_selector_changed(self):
         """
