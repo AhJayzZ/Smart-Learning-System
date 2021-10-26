@@ -70,10 +70,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         # Timer default setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.translate)
-        self.result_box.textChanged.connect(self.translateTimeCount)
         self.previousResult = ""
 
         # Result & translate box default setting
+        self.result_box.textChanged.connect(self.translateTimeCount)
         self.translate_box.setReadOnly(True)
 
         # Button trigger default setting
@@ -202,7 +202,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.translate_box.clear()
         else:
             if self.previousResult != self.input_text:
-                print('triggered')
                 self.translation_thread = translation_Thread(self.input_text,self.lang)
                 self.translation_thread.start()
                 self.translation_thread.translation_finished.connect(self.set_output_format)
