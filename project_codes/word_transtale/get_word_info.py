@@ -21,6 +21,22 @@ from googletrans import Translator
     print(wordInfo_dict)
 '''
 
+dict_replace_str = {
+    "1.": ".1.",
+    "2.": ".2.",
+    "3.": ".3.",
+    "4.": ".4.",
+    "5.": ".5.",
+    "6.": ".6.",
+    "7.": ".7.",
+    "8.": ".8.",
+    "9.": ".9.",
+    ".": ". ",
+    ". . ": ". ",
+    ". ,": ".,",
+    "  ": ""
+}
+
 
 class DictRstParser:
     def soup_context(self, word_str):
@@ -71,8 +87,8 @@ class DictRstParser:
             list_raw.append(row.text)
 
         for index in range(len(list_raw)):
-            list_raw[index] = list_raw[index].replace(".", ". ")
-            list_raw[index] = list_raw[index].replace("  ", " ")
+            for key, value in dict_replace_str.items():
+                list_raw[index] = list_raw[index].replace(key, value)
 
         return list_raw
 
@@ -126,6 +142,6 @@ def get_word_info(word_str):
 
 
 if __name__ == "__main__":
-    word_str = "fish"
+    word_str = "feeling"
     wordInfo_dict = get_word_info(word_str)
     print(wordInfo_dict)
