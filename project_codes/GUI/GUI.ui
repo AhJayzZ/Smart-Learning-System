@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1319</width>
+    <width>1318</width>
     <height>1007</height>
    </rect>
   </property>
@@ -146,7 +146,7 @@
    <widget class="QPushButton" name="exit_btn">
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1110</x>
       <y>900</y>
       <width>200</width>
       <height>50</height>
@@ -203,7 +203,7 @@
    <widget class="QPushButton" name="translate_btn">
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1110</x>
       <y>840</y>
       <width>200</width>
       <height>50</height>
@@ -519,6 +519,26 @@
      <string>翻譯語言:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="init_btn">
+    <property name="geometry">
+     <rect>
+      <x>1200</x>
+      <y>740</y>
+      <width>111</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>預設值</string>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>brightness_label</zorder>
    <zorder>camera_label</zorder>
@@ -539,13 +559,14 @@
    <zorder>sound_btn</zorder>
    <zorder>brightness_scrollbar</zorder>
    <zorder>language_label</zorder>
+   <zorder>init_btn</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1319</width>
+     <width>1318</width>
      <height>25</height>
     </rect>
    </property>

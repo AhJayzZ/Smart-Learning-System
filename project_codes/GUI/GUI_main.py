@@ -75,6 +75,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_box.setReadOnly(True)
 
         # Button trigger default setting
+        self.init_btn.clicked.connect(self.initialize)
         self.add_btn.clicked.connect(self.insertDataToDB)
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
@@ -108,6 +109,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addAction(self.openWordFileAction)
     
 # -----------------------------------------Widgets function-----------------------------------------
+
+    def initialize(self):
+        """
+        Initialize all setting configuration
+        """
+        self.frame_thread.Recognition.cap = cv2.VideoCapture(0)
+        self.camera_selector.setCurrentIndex(0)
+        self.result_box.clear()
+        self.translate_box.clear()
+        self.contrast , self.brightness = 1 , 0
+        self.brightness_scrollbar.setValue(0)
+        self.contrast_scrollbar.setValue(100)
+        self.language_selector.setCurrentIndex(15)
+        self.lang = 'zh-tw'
+        self.frameDefault_btn.setChecked(True)
 
     def insertDataToDB(self):
         """
@@ -175,9 +191,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         auto translate if result box text change 
         """
-        if self.previousResult == self.result_box.toPlainText():
-            return
-        else:
+        if self.previousResult != self.result_box.toPlainText():
             self.translate()
         self.previousResult = self.result_box.toPlainText()
 
