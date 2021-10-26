@@ -71,7 +71,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.timer.start(5000)
         self.previousResult = ""
 
-        # result & translate box default setting
+        # Result & translate box default setting
         self.translate_box.setReadOnly(True)
 
         # Button trigger default setting
@@ -80,7 +80,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
-        self.exit_btn.clicked.connect(sys.exit)
+        self.back_btn.clicked.connect(sys.exit) # Back to login page(unfinished)
 
         # Combobox trigger default setting
         self.camera_selector.currentTextChanged.connect(
@@ -107,6 +107,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addAction(self.guideAction)
         self.menubar.addAction(self.historyAction)
         self.menubar.addAction(self.openWordFileAction)
+
+# -----------------------------------------Window event--------------------------------------------
+    def closeEvent(self,event):
+        """
+        PyQt window close event
+        """
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setWindowTitle('離開程式')
+        msgBox.setText('是否離開本程式?')
+        msgBox.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
+        reply = msgBox.exec_()
+        if reply == QMessageBox.Yes:
+            event.accept()
+            sys.exit()
+        else:
+            event.ignore()
+        
     
 # -----------------------------------------Widgets function-----------------------------------------
 
@@ -251,7 +269,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
 
-
     def frame_refresh(self):
         """
         refresh frame and check frame flip and brightness
@@ -285,7 +302,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
         else:
             self.FinishFlag = False
-        
+
 # -----------------------------------------Database-----------------------------------------
 
     def connectToDB(self):
@@ -375,4 +392,3 @@ class translation_Thread(QThread):
         self.translation_finished.emit(1)
 
     
- 

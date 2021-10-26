@@ -143,7 +143,7 @@
      <string>辨識結果 :</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="exit_btn">
+   <widget class="QPushButton" name="back_btn">
     <property name="geometry">
      <rect>
       <x>1110</x>
@@ -161,7 +161,7 @@
      </font>
     </property>
     <property name="text">
-     <string>離開</string>
+     <string>返回</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="result_box">
@@ -546,7 +546,7 @@
    <zorder>translate_box</zorder>
    <zorder>translate_label</zorder>
    <zorder>result_label</zorder>
-   <zorder>exit_btn</zorder>
+   <zorder>back_btn</zorder>
    <zorder>result_box</zorder>
    <zorder>camera_select_label</zorder>
    <zorder>translate_btn</zorder>
