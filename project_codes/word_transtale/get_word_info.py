@@ -5,7 +5,14 @@ from googletrans import Translator
 # 輸入單詞，取得單詞相關資料
 # input: word_str
 # output: wordInfo_dict，
-#   including ['word','eng_pr',eng_pr_url,'ame_pr',ame_pr_url,'tenses','defination']
+#   including [
+#              'word',
+#              'eng_pr',
+#              'ame_pr',
+#              'tenses',
+#              'defination' # had translated from 'zh-cn'to 'zh-tw'
+#              'def_eng'
+#             ]
 #   all in str
 '''
     usage e.g.:
@@ -57,6 +64,18 @@ class DictRstParser:
             print("get url_mp3 failed")
             pass
 
+    def get_def_eng(self):
+        def_eng_raw = self.soup.find_all(id='homoid')[0]
+        list_raw = []
+        for row in def_eng_raw.find_all('tr'):
+            list_raw.append(row.text)
+
+        for index in range(len(list_raw)):
+            list_raw[index] = list_raw[index].replace(".", ". ")
+            list_raw[index] = list_raw[index].replace("  ", " ")
+
+        return list_raw
+
     def __init__(self, word_str):
         try:
             self.soup = self.soup_context(word_str)
@@ -80,13 +99,15 @@ class DictRstParser:
                         self.word_info_dict[k], src='zh-cn', dest='zh-tw')
                     self.word_info_dict[k] = translation.text
 
-            [self.word_info_dict['ame_pr_url'],
-                self.word_info_dict['eng_pr_url']] = self.get_url_mp3()
+            # [self.word_info_dict['ame_pr_url'],
+            #    self.word_info_dict['eng_pr_url']] = self.get_url_mp3()
 
             self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
                 "網絡", "網絡：", 1)
             self.word_info_dict['defination'] = self.word_info_dict['defination'].replace(
                 "\n", " | ")
+            self.word_info_dict['def_eng'] = self.get_def_eng()
+
         except:
             print("Try another word")
             self.word_info_dict = None
@@ -104,7 +125,7 @@ def get_word_info(word_str):
     return wordInfo_dict
 
 
-# if __name__ == "__main__":
-#     word_str = "feeling"
-#     wordInfo_dict = get_word_info(word_str)
-#     print(wordInfo_dict)
+if __name__ == "__main__":
+    word_str = "fish"
+    wordInfo_dict = get_word_info(word_str)
+    print(wordInfo_dict)
