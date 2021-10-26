@@ -32,7 +32,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
-        self.setWindowIcon(QtGui.QIcon('project_codes/GUI/images/GUI_icon.png'))
+        self.setWindowIcon(QtGui.QIcon('./project_codes/GUI/images/GUI_icon.png'))
+        self.sound_btn.setIcon(QtGui.QIcon('./project_codes/GUI/images/sound_icon.png'))
+        self.translate_btn.setIcon(QtGui.QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.connectToDB()
 
         # Recognition program

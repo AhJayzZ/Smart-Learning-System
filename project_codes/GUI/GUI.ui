@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1318</width>
-    <height>1007</height>
+    <height>1006</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,9 +88,9 @@
     <property name="geometry">
      <rect>
       <x>860</x>
-      <y>400</y>
+      <y>410</y>
       <width>451</width>
-      <height>320</height>
+      <height>310</height>
      </rect>
     </property>
     <property name="font">
@@ -106,7 +106,7 @@
      <rect>
       <x>860</x>
       <y>360</y>
-      <width>181</width>
+      <width>151</width>
       <height>41</height>
      </rect>
     </property>
@@ -146,9 +146,9 @@
    <widget class="QPushButton" name="back_btn">
     <property name="geometry">
      <rect>
-      <x>1110</x>
+      <x>859</x>
       <y>900</y>
-      <width>200</width>
+      <width>441</width>
       <height>50</height>
      </rect>
     </property>
@@ -170,7 +170,7 @@
       <x>860</x>
       <y>40</y>
       <width>451</width>
-      <height>320</height>
+      <height>310</height>
      </rect>
     </property>
     <property name="font">
@@ -203,10 +203,10 @@
    <widget class="QPushButton" name="translate_btn">
     <property name="geometry">
      <rect>
-      <x>1110</x>
-      <y>840</y>
-      <width>200</width>
-      <height>50</height>
+      <x>1150</x>
+      <y>360</y>
+      <width>100</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
@@ -217,7 +217,7 @@
      </font>
     </property>
     <property name="text">
-     <string>翻譯</string>
+     <string> 翻譯</string>
     </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -464,10 +464,10 @@
    <widget class="QPushButton" name="sound_btn">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>900</y>
-      <width>200</width>
-      <height>50</height>
+      <x>1020</x>
+      <y>360</y>
+      <width>100</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
@@ -478,7 +478,7 @@
      </font>
     </property>
     <property name="text">
-     <string>發音</string>
+     <string>  發音</string>
     </property>
    </widget>
    <widget class="QSlider" name="brightness_scrollbar">
@@ -522,10 +522,10 @@
    <widget class="QPushButton" name="init_btn">
     <property name="geometry">
      <rect>
-      <x>1200</x>
-      <y>740</y>
-      <width>111</width>
-      <height>71</height>
+      <x>1100</x>
+      <y>840</y>
+      <width>200</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="font">
