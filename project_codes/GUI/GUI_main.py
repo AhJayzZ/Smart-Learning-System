@@ -1,3 +1,4 @@
+from os import path
 from re import S
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -115,12 +116,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         PyQt window close event
         """
-        msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setWindowTitle('離開程式')
-        msgBox.setText('是否離開本程式?')
-        msgBox.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
-        reply = msgBox.exec_()
+        reply = QMessageBox(icon=QMessageBox.Warning,
+                            windowIcon=QtGui.QIcon('./project_codes/GUI/images/exit_icon.png'),
+                            windowTitle='離開程式',
+                            text='是否離開本程式?',
+                            standardButtons=(QMessageBox.Yes|QMessageBox.No)).exec_()
+
         if reply == QMessageBox.Yes:
             event.accept()
             sys.exit()
@@ -203,8 +204,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             if self.previousResult != self.input_text:
                 self.translation_thread = translation_Thread(self.input_text,self.lang)
-                self.translation_thread.start()
                 self.translation_thread.translation_finished.connect(self.set_output_format)
+                self.translation_thread.start()
+                
         self.previousResult = self.input_text
     
     def translateTimeCount(self):
@@ -327,9 +329,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
     def guideAction_triggered(self):
         """
-        guideAction_triggered
+        open user guide message box
         """
-        print('guideAction_triggered')
+        guideText = open(file='./project_codes/GUI/guide.txt',mode='r',encoding='utf-8')
+        QMessageBox(icon=QMessageBox.Information,
+                    windowIcon=QtGui.QIcon('./project_codes/GUI/images/guide_icon.png'),
+                    windowTitle='使用說明',
+                    text=guideText.read(),
+                    standardButtons=(QMessageBox.Yes)).exec_()
+        guideText.close()
 
     def historyAction_triggerred(self):
         """
@@ -383,8 +391,6 @@ class translation_Thread(QThread):
         super().__init__(parent)
         self.input_text = input_text
         self.translated_lang = translated_lang
-        self.sentenceOrWord = -1
-        self.translation_output = ""
 
     def run(self):
         self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(self.input_text)
