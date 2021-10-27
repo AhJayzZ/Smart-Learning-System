@@ -33,9 +33,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
-        self.setWindowIcon(QtGui.QIcon('./project_codes/GUI/images/GUI_icon.png'))
-        self.sound_btn.setIcon(QtGui.QIcon('./project_codes/GUI/images/sound_icon.png'))
-        self.translate_btn.setIcon(QtGui.QIcon('./project_codes/GUI/images/translate_icon.png'))
+        self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
+        self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
+        self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.connectToDB()
 
         # Recognition program
@@ -98,13 +98,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.frame_contrast_brightness_check)
 
         # Menubar trigger default setting
-        self.settingAction = QAction('&設定',self)
+        self.settingAction = QAction(parent=self,text='設定')
         self.settingAction.triggered.connect(self.settingAction_triggered)
-        self.guideAction = QAction('&使用手冊',self)
+        self.guideAction = QAction(parent=self,text='使用手冊')
         self.guideAction.triggered.connect(self.guideAction_triggered)
-        self.historyAction = QAction('&翻譯歷史',self)
+        self.historyAction = QAction(parent=self,text='翻譯歷史')
         self.historyAction.triggered.connect(self.historyAction_triggerred)
-        self.openWordFileAction = QAction('&打開單字本',self)
+        self.openWordFileAction = QAction(parent=self,text='打開單字本')
         self.openWordFileAction.triggered.connect(self.openWordFileAction_triggered)
         self.menubar.addAction(self.settingAction)
         self.menubar.addAction(self.guideAction)
@@ -117,7 +117,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         PyQt window close event
         """
         reply = QMessageBox(icon=QMessageBox.Warning,
-                            windowIcon=QtGui.QIcon('./project_codes/GUI/images/exit_icon.png'),
+                            windowIcon=QIcon('./project_codes/GUI/images/exit_icon.png'),
                             windowTitle='離開程式',
                             text='是否離開本程式?',
                             standardButtons=(QMessageBox.Yes|QMessageBox.No)).exec_()
@@ -333,7 +333,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         guideText = open(file='./project_codes/GUI/guide.txt',mode='r',encoding='utf-8')
         QMessageBox(icon=QMessageBox.Information,
-                    windowIcon=QtGui.QIcon('./project_codes/GUI/images/guide_icon.png'),
+                    windowIcon=QIcon('./project_codes/GUI/images/guide_icon.png'),
                     windowTitle='使用說明',
                     text=guideText.read(),
                     standardButtons=(QMessageBox.Yes)).exec_()
