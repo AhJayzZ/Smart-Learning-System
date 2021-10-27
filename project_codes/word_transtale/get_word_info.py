@@ -6,12 +6,12 @@ from googletrans import Translator
 # input: word_str
 # output: wordInfo_dict，
 #   including [
-#              'word',
-#              'eng_pr',
-#              'ame_pr',
-#              'tenses',
-#              'defination' # had translated from 'zh-cn'to 'zh-tw'
-#              'def_eng'
+#              'word', #format in str
+#              'eng_pr', #format in str
+#              'ame_pr', #format in str
+#              'tenses', #format in str
+#              'defination' #format in str, had translated from 'zh-cn'to 'zh-tw'
+#              'def_eng' #format in dict
 #             ]
 #   all in str
 '''
