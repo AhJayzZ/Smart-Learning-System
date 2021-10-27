@@ -161,7 +161,7 @@
      </font>
     </property>
     <property name="text">
-     <string>返回</string>
+     <string>返回主頁面</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="result_box">
@@ -241,7 +241,7 @@
         </font>
        </property>
        <property name="text">
-        <string>影像顯示:</string>
+        <string>顯示模式:</string>
        </property>
       </widget>
      </item>
