@@ -219,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.translation_thread.translation_finished.connect(self.set_output_format)
                 self.translation_thread.start()
 
-                #Avoid duplicated bug(still fixing)
+                #Avoid duplicated bug
                 self.translate_btn.setEnabled(False)
                 
         self.previousResult = self.input_text
@@ -237,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
             self.historyAction[self.historyIndex % 10].setText(self.input_text)
         self.historyIndex = self.historyIndex + 1
 
-        #Avoid duplicated bug(still fixing)
+        #Avoid duplicated bug
         self.translate_btn.setEnabled(True)
 
         
