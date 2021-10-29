@@ -143,6 +143,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         Initialize all setting configuration
         """
+        self.translate_btn.setEnabled(True)
         self.frame_thread.Recognition.cap = cv2.VideoCapture(0)
         self.camera_selector.setCurrentIndex(0)
         self.result_box.clear()
@@ -177,7 +178,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         play .mp3 file of result_box text
         """
         self.input_text = self.result_box.toPlainText()
-        self.gTTS_thread = gTTS_Thread(self.input_text).start()
+        self.gTTS_thread = gTTS_Thread(self.input_text)
         self.gTTS_thread.start()
 
     def set_output_format(self):
@@ -186,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.sentenceOrWord = self.translation_thread.sentenceOrWord
         self.translation_output = self.translation_thread.translation_output
-
+        
         if self.sentenceOrWord == 0: # Sentence
             self.translate_box.setText(self.translation_output)
         else :                       # Word
@@ -217,14 +218,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.translation_thread = translation_Thread(self.input_text,self.lang)
                 self.translation_thread.translation_finished.connect(self.set_output_format)
                 self.translation_thread.start()
-            
+
+                #Avoid duplicated bug(still fixing)
+                self.translate_btn.setEnabled(False)
+                
         self.previousResult = self.input_text
 
     def addTranslateHistory(self):
         """
         add the  action of translate history into menubar
         """
-        print(self.historyIndex)
         self.translateTimer.stop()
         self.historyDict[self.input_text] = self.translate_box.toPlainText()
         if self.historyIndex < 10:
@@ -233,6 +236,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.historyAction[self.historyIndex % 10].setText(self.input_text)
         self.historyIndex = self.historyIndex + 1
+
+        #Avoid duplicated bug(still fixing)
+        self.translate_btn.setEnabled(True)
+
         
     def translateTimeCount(self):
         """
