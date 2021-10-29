@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\AhJayzZ\Desktop\NTUST Assignment\Project\Smart-Learning-System\project_codes\GUI\GUI.ui'
+# Form implementation generated from reading ui file 'c:\Users\AhJayzZ\Desktop\NTUST\Project\Smart-Learning-System\project_codes\GUI\GUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -302,7 +302,7 @@ class Ui_SmartLearningSystemGUI(object):
         self.frameInverse_btn.setText(_translate("SmartLearningSystemGUI", "影像水平垂直反轉"))
         self.state_label.setText(_translate("SmartLearningSystemGUI", "現在狀態:Initial"))
         self.warning_label.setText(_translate("SmartLearningSystemGUI", "光線狀態:正常"))
-        self.add_btn.setText(_translate("SmartLearningSystemGUI", "新增至資料庫"))
+        self.add_btn.setText(_translate("SmartLearningSystemGUI", "新增至單字本"))
         self.sound_btn.setText(_translate("SmartLearningSystemGUI", "  發音"))
         self.language_label.setText(_translate("SmartLearningSystemGUI", "句子翻譯語言:"))
         self.init_btn.setText(_translate("SmartLearningSystemGUI", "設定初始化"))

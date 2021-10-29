@@ -458,7 +458,7 @@
      </font>
     </property>
     <property name="text">
-     <string>新增至資料庫</string>
+     <string>新增至單字本</string>
     </property>
    </widget>
    <widget class="QPushButton" name="sound_btn">

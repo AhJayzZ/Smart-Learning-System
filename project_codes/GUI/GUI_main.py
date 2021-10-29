@@ -81,7 +81,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
         # Button trigger default setting
         self.init_btn.clicked.connect(self.initialize)
-        self.add_btn.clicked.connect(self.insertDataToDB)
+        self.add_btn.clicked.connect(self.addToDict)
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
@@ -154,24 +154,39 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.language_selector.setCurrentIndex(15)
         self.lang = 'zh-tw'
         self.frameDefault_btn.setChecked(True)
+    
+    def addToDict(self):
+        currentPath = os.path.dirname(__file__)
+        dirPath = os.path.split(currentPath)[0]    
+        filePath = os.path.join(dirPath,'localDict.txt')
+        if not os.path.exists(filePath):
+            open(filePath,'w',encoding='utf-8')
 
-    def insertDataToDB(self):
-        """
-        Insert data to Mysql database
-        """
-        try :
-            if self.sentenceOrWord == 0: # Sentence
-                data = self.result_box.toPlainText(), self.translation_output
-            else:                       # Word
-                data = self.result_box.toPlainText(), self.translation_output['defination']
-                
-            cursor = self.connectDB_thread.db.cursor()
-            mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
-            cursor.execute(mysql)
-            self.connectDB_thread.db.commit()
-            print('Insert data to database success!')
+        try:
+            with open(filePath,'a',encoding='utf-8') as file:   
+                lines = [self.input_text,',',self.translation_output['defination'],'\n']
+                file.writelines(lines)
+                file.close()
         except:
-            print('Insert data to database failed!')
+            print('add to localDict failed')
+
+    # def insertDataToDB(self):
+    #     """
+    #     Insert data to Mysql database
+    #     """
+    #     try :
+    #         if self.sentenceOrWord == 0: # Sentence
+    #             data = self.result_box.toPlainText(), self.translation_output
+    #         else:                       # Word
+    #             data = self.result_box.toPlainText(), self.translation_output['defination']
+                
+    #         cursor = self.connectDB_thread.db.cursor()
+    #         mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
+    #         cursor.execute(mysql)
+    #         self.connectDB_thread.db.commit()
+    #         print('Insert data to database success!')
+    #     except:
+    #         print('Insert data to database failed!')
 
     def playSound(self):
         """
@@ -428,9 +443,6 @@ class connectDB_Thread(QThread):
     """
     def __init__(self,parent=None):
         super().__init__(parent)
-        self.currentPath = os.path.dirname(__file__)
-        self.dirPath = os.path.split(self.currentPath)[0]    
-        self.filePath = os.path.join(self.dirPath,'localDict.txt')
 
     def run(self):
         try:
@@ -453,7 +465,7 @@ class localFileOpen_Thread(QThread):
 
     def run(self):
         if not os.path.exists(self.filePath):
-            open(self.filePath,'w')
+            open(self.filePath,'w',encoding='utf-8')
                
         try :
             os.system(self.filePath)
