@@ -1,10 +1,8 @@
-from genericpath import isfile
-from os import path
-from re import S
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .Ui_GUI import *
+from .Ui_settingPage import *
 from . import languages
 
 from image_recognition.recognition_program import *
@@ -17,16 +15,29 @@ import sys,os
 import pymysql
 import time
 
-# Database setting
+# Database Configuration
 DB_IP = '172.105.205.179'
 DB_USER = 'root'
 DB_PASSWORD = 'mitlab123456'
 DB_PORT = 3306
 DB_DATABASE = 'WordDB'
 
-class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
+# Path Configuration
+currentPath = os.path.dirname(__file__) # GUI
+dirPath = os.path.split(currentPath)[0] # ../ => project_code
+
+class SettingWindow(QDialog,Ui_settingPage):
     """
-    建立類別來繼承 Ui_SmartLearningSystemGUI 介面程式
+    Ui_settingPage(unfinished)
+    """
+    def __init__(self,parent=None):
+        super(SettingWindow,self).__init__(parent)
+        self.setupUi(self)
+        
+
+class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
+    """
+    Ui_SmartLearningSystemGUI 
     """
     def __init__(self, parent=None):
         # 繼承Ui_Gui.py
@@ -36,21 +47,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
         self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
+        self.settinPage_thread = settingPage_Thread()
         self.connectDB_thread = connectDB_Thread()
         self.connectDB_thread.start()
 
         # Recognition program
-        self.contrast,self.brightness=1,0
-        self.average_gray_value = 0
-        self.frameFlip = False
+        self.FinishFlag = False
         self.Recognition = RecognitionProgram()
         self.frame_thread = frame_Thread(self.Recognition)
         self.frame_thread.frame_callback.connect(self.frame_refresh)
         self.frame_thread.start()
-        
 
-        # FinishFlag setting(Avoid duplicated translation)
-        self.FinishFlag = False
+        # Frame default setting
+        self.contrast,self.brightness=1,0
+        self.average_gray_value = 0
+        self.frameFlip = False
 
         # Constrast and brightness scrollbar default setting
         self.brightness_scrollbar.setValue(0)
@@ -64,42 +75,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
         self.camera_selector.addItems(camera_array)
 
-        # Language default setting(index 15 means Chinese Traditional)
+        # Language default setting(index 15 means Chinese Traditional(zh-tw))
         self.languages_key_array, self.languages_value_array = languages.langauge_data()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
         self.lang = 'zh-tw'
         
-        # Timer default setting
-        self.translateTimer = QTimer(self)
-        self.translateTimer.timeout.connect(self.translate)
+        # Translte timer default setting
+        self.translateTimer = QTimer(self,timeout=self.translate)
         self.previousResult = ""
 
-        # Result & translate box default setting
+        # Result and translate box default setting
         self.result_box.textChanged.connect(self.translateTimeCount)
         self.translate_box.setReadOnly(True)
 
-        # Button trigger default setting
+        # Button clicked event default setting
         self.init_btn.clicked.connect(self.initialize)
-        self.add_btn.clicked.connect(self.addToDict)
+        self.add_btn.clicked.connect(self.addToDictionary)
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
         self.back_btn.clicked.connect(sys.exit) # Back to login page(unfinished)
 
-        # RadioButtin trigger default setting
+        # RadioButtin clicked event default setting
         self.frameDefault_btn.clicked.connect(self.frameMode_check)
         self.frameHorizontal_btn.clicked.connect(self.frameMode_check)
         self.frameVertical_btn.clicked.connect(self.frameMode_check)
         self.frameInverse_btn.clicked.connect(self.frameMode_check)
 
-        # Combobox trigger default setting
+        # Combobox clicked event default setting
         self.camera_selector.currentTextChanged.connect(
             self.camera_selector_changed)
         self.language_selector.currentTextChanged.connect(
             self.languages_selector_changed)
 
-        # Scorllbar trigger default setting
+        # Scorllbar scroll event default setting
         self.brightness_scrollbar.valueChanged.connect(
             self.frame_contrast_brightness_check)
         self.contrast_scrollbar.valueChanged.connect(
@@ -113,9 +123,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addAction(self.guideAction)
         self.menubar.addAction(self.openWordFileAction)
         
+        # Translate history default setting
         self.historyDict={}
         self.historyAction = []
-        self.historyIndex = 0
+        self.historyIndex,self.historyIndexMaximum = 0, 10
         self.historyMenu = QMenu(parent=self,title='翻譯紀錄')
         self.menubar.addMenu(self.historyMenu)
         
@@ -143,32 +154,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         Initialize all setting configuration
         """
-        self.translate_btn.setEnabled(True)
         self.frame_thread.Recognition.cap = cv2.VideoCapture(0)
-        self.camera_selector.setCurrentIndex(0)
-        self.result_box.clear()
-        self.translate_box.clear()
         self.contrast , self.brightness = 1 , 0
-        self.brightness_scrollbar.setValue(0)
-        self.contrast_scrollbar.setValue(100)
+        self.camera_selector.setCurrentIndex(0)
         self.language_selector.setCurrentIndex(15)
         self.lang = 'zh-tw'
+        self.brightness_scrollbar.setValue(0)
+        self.contrast_scrollbar.setValue(100)
         self.frameDefault_btn.setChecked(True)
+        self.translate_btn.setEnabled(True)
+        self.result_box.clear()
+        self.translate_box.clear()
+        self.historyAction.clear()
+        self.historyDict.clear()
+        self.historyIndex = 0
     
-    def addToDict(self):
+    def addToDictionary(self):
+        """
+        add translate data to localDictionary
+        """
         currentPath = os.path.dirname(__file__)
         dirPath = os.path.split(currentPath)[0]    
-        filePath = os.path.join(dirPath,'localDict.txt')
+        filePath = os.path.join(dirPath,'localDictionary.txt')
         if not os.path.exists(filePath):
             open(filePath,'w',encoding='utf-8')
 
         try:
             with open(filePath,'a',encoding='utf-8') as file:   
-                lines = [self.input_text,',',self.translation_output['defination'],'\n']
+                if self.sentenceOrWord == 0:
+                    lines = [self.input_text,',',self.translation_output,'\n']
+                else :
+                    lines = [self.input_text,',',self.translation_output['defination'],'\n']
                 file.writelines(lines)
                 file.close()
         except:
-            print('add to localDict failed')
+            print('add to localDictionary failed')
 
     # def insertDataToDB(self):
     #     """
@@ -234,9 +254,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
                 self.translation_thread.translation_finished.connect(self.set_output_format)
                 self.translation_thread.start()
 
-                #Avoid duplicated bug
+                # Avoid translate history preemption
                 self.translate_btn.setEnabled(False)
-                
+    
         self.previousResult = self.input_text
 
     def addTranslateHistory(self):
@@ -245,17 +265,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.translateTimer.stop()
         self.historyDict[self.input_text] = self.translate_box.toPlainText()
-        if self.historyIndex < 10:
+        if self.historyIndex < self.historyIndexMaximum:
             self.historyAction.append(QAction(parent=self,text=self.input_text,triggered=self.historyAction_triggerred))
             self.historyMenu.addAction(self.historyAction[self.historyIndex])
         else:
-            self.historyAction[self.historyIndex % 10].setText(self.input_text)
+            self.historyAction[self.historyIndex % self.historyIndexMaximum].setText(self.input_text)
         self.historyIndex = self.historyIndex + 1
-
-        #Avoid duplicated bug
+        # Avoid translate history preemption 
         self.translate_btn.setEnabled(True)
 
-        
     def translateTimeCount(self):
         """
         triggered counting for translation function
@@ -326,7 +344,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         refresh frame and check frame flip and brightness
         """
         self.frame_thread.frame = cv2.convertScaleAbs(self.frame_thread.Recognition._input_img,alpha=self.contrast,beta=self.brightness)
-        self.frame_thread.Recognition.output_img = self.frame_thread.frame
+        self.frame_thread.Recognition.output_img = cv2.flip(self.frame_thread.frame,1)
 
         # frame checking(flip,lightness)
         if self.frameFlip :
@@ -364,6 +382,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
         settingAction triggered
         """
         print('settingAction_triggered')
+        self.settinPage_thread.start()
 
     def guideAction_triggered(self):
         """
@@ -378,7 +397,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_SmartLearningSystemGUI):
 
     def historyAction_triggerred(self):
         """
-        setting result_box and translate_box to translate history 
+        set result_box and translate_box to translate history record
         """        
         actionText = self.sender().text()
         self.result_box.setText(actionText)
@@ -401,7 +420,6 @@ class frame_Thread(QThread):
     def __init__(self,Recognition,parent=None):
         super().__init__(parent)
         self.Recognition = Recognition
-        self.frame = self.Recognition._input_img
 
     def run(self):
         while self.Recognition.cap.isOpened():
@@ -459,9 +477,7 @@ class localFileOpen_Thread(QThread):
     """
     def __init__(self,parent=None):
         super().__init__(parent)
-        self.currentPath = os.path.dirname(__file__)
-        self.dirPath = os.path.split(self.currentPath)[0]    
-        self.filePath = os.path.join(self.dirPath,'localDict.txt')
+        self.filePath = os.path.join(dirPath,'localDictionary.txt')
 
     def run(self):
         if not os.path.exists(self.filePath):
@@ -472,3 +488,17 @@ class localFileOpen_Thread(QThread):
         except:
             print('Open file error!')
 
+
+class settingPage_Thread(QThread):
+    """
+    setting page threading (unfinished)
+    """
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        print('Setting page is not finished yet!')
+
+    def run(self):
+        self.app = QtWidgets.QApplication(sys.argv)
+        self.settingPage = SettingWindow()
+        self.settingPage.show()
+        sys.exit(self.app.exec_())

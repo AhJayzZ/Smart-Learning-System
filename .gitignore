@@ -112,7 +112,7 @@ venv.bak/
 dmypy.json
 
 # local word dictionary
-localDict.txt
+localDictionary.txt
 
 # Pyre type checker
 .pyre/
