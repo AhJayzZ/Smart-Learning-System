@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .Ui_GUI import *
 from .Ui_settingPage import *
+from .GUI_CSS import *
 from . import languages
 
 from image_recognition.recognition_program import *
@@ -39,16 +40,22 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     """
     Ui_SmartLearningSystemGUI 
     """
-    def __init__(self, parent=None):
+    def __init__(self):
         # 繼承Ui_Gui.py
-        super(MainWindow, self).__init__(parent)
+        super(MainWindow, self).__init__()
+        #setupCSS.__init__(self) #still unfinished
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
+
         self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
+        self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
+        self.init_btn.setIcon(QIcon('./project_codes/GUI/images/init_icon.png'))
+        self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
+
         self.settinPage_thread = settingPage_Thread()
-        self.connectDB_thread = connectDB_Thread()
+        self.connectDB_thread = connectDB_Thread()  
         self.connectDB_thread.start()
 
         # Recognition program
@@ -129,7 +136,20 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.historyIndex,self.historyIndexMaximum = 0, 10
         self.historyMenu = QMenu(parent=self,title='翻譯紀錄')
         self.menubar.addMenu(self.historyMenu)
-        
+
+        # CSS 
+        button_style = "border-image:url(./project_codes/GUI/images/button.png) 0 0 0 0 stretch stretch;\
+                                    color:black"
+        textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
+        self.setStyleSheet("background-color:#D3FFF3")
+        self.menubar.setStyleSheet("background-color:#E9C46A;color:black")
+        self.add_btn.setStyleSheet(button_style)
+        self.back_btn.setStyleSheet(button_style)
+        self.init_btn.setStyleSheet(button_style)
+        self.translate_btn.setStyleSheet(button_style)
+        self.sound_btn.setStyleSheet(button_style)
+        self.translate_box.setStyleSheet(textbox_style)
+        self.result_box.setStyleSheet(textbox_style)
     
 # -----------------------------------------Window event--------------------------------------------
     def closeEvent(self,event):
@@ -349,7 +369,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # frame checking(flip,lightness)
         if self.frameFlip :
             self.frame_thread.frame = cv2.flip(self.frame_thread.frame, self.frameMode)
-
         self.lightness_check()
 
         # PyQt image format
@@ -367,10 +386,10 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                print('Recognition text : ', self.frame_thread.Recognition.text)
                 self.result_box.setText(self.frame_thread.Recognition.text)
                 self.translate()
                 self.playSound()
+                print('Recognition text : ', self.frame_thread.Recognition.text)
                 cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
         else:
             self.FinishFlag = False
@@ -381,7 +400,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         settingAction triggered
         """
-        print('settingAction_triggered')
         self.settinPage_thread.start()
 
     def guideAction_triggered(self):
@@ -495,7 +513,6 @@ class settingPage_Thread(QThread):
     """
     def __init__(self,parent=None):
         super().__init__(parent)
-        print('Setting page is not finished yet!')
 
     def run(self):
         self.app = QtWidgets.QApplication(sys.argv)
