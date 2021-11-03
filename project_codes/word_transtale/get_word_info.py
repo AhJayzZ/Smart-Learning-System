@@ -105,7 +105,7 @@ class DictRstParser:
             }
 
             self.word_info_dict = {}
-            converter = opencc.OpenCC('s2t.json')
+            converter = opencc.OpenCC('s2twp')
             self.related_divs = self.soup.select('div.lf_area > div')
             for k, v in self.word_info_selector_dict.items():
                 self.word_info_dict[k] = self.get_content(
@@ -140,7 +140,8 @@ def get_word_info(word_str):
     return wordInfo_dict
 
 
+# testing
 if __name__ == "__main__":
-    word_str = "feeling"
+    word_str = "fish"
     wordInfo_dict = get_word_info(word_str)
     print(wordInfo_dict)
