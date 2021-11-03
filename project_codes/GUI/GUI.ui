@@ -6,18 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1318</width>
+    <width>1370</width>
     <height>1006</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">color:black</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="brightness_label">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>870</x>
       <y>780</y>
       <width>141</width>
       <height>41</height>
@@ -40,7 +43,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>841</width>
+      <width>821</width>
       <height>711</height>
      </rect>
     </property>
@@ -49,6 +52,12 @@
       <family>Agency FB</family>
       <pointsize>20</pointsize>
      </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Panel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
      <string>ThisLabelWillBeChangedToVideoFrame</string>
@@ -63,7 +72,7 @@
    <widget class="QLabel" name="contrast_label">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>870</x>
       <y>730</y>
       <width>151</width>
       <height>41</height>
@@ -87,9 +96,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>840</x>
       <y>410</y>
-      <width>451</width>
+      <width>521</width>
       <height>310</height>
      </rect>
     </property>
@@ -104,7 +113,7 @@
    <widget class="QLabel" name="translate_label">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>840</x>
       <y>360</y>
       <width>151</width>
       <height>41</height>
@@ -119,13 +128,13 @@
      </font>
     </property>
     <property name="text">
-     <string>翻譯結果 :</string>
+     <string>翻譯結果 </string>
     </property>
    </widget>
    <widget class="QLabel" name="result_label">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>840</x>
       <y>0</y>
       <width>161</width>
       <height>41</height>
@@ -140,13 +149,13 @@
      </font>
     </property>
     <property name="text">
-     <string>辨識結果 :</string>
+     <string>辨識結果 </string>
     </property>
    </widget>
    <widget class="QPushButton" name="back_btn">
     <property name="geometry">
      <rect>
-      <x>859</x>
+      <x>870</x>
       <y>900</y>
       <width>441</width>
       <height>50</height>
@@ -161,15 +170,15 @@
      </font>
     </property>
     <property name="text">
-     <string>返回主頁面</string>
+     <string> 返回主頁面</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="result_box">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>840</x>
       <y>40</y>
-      <width>451</width>
+      <width>521</width>
       <height>310</height>
      </rect>
     </property>
@@ -203,7 +212,7 @@
    <widget class="QPushButton" name="translate_btn">
     <property name="geometry">
      <rect>
-      <x>1150</x>
+      <x>1060</x>
       <y>360</y>
       <width>100</width>
       <height>40</height>
@@ -313,7 +322,7 @@
    <widget class="QSlider" name="contrast_scrollbar">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1030</x>
       <y>740</y>
       <width>160</width>
       <height>22</height>
@@ -360,7 +369,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>841</width>
+      <width>821</width>
       <height>711</height>
      </rect>
     </property>
@@ -443,10 +452,10 @@
    <widget class="QPushButton" name="add_btn">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>840</y>
-      <width>200</width>
-      <height>50</height>
+      <x>1170</x>
+      <y>360</y>
+      <width>191</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
@@ -458,13 +467,13 @@
      </font>
     </property>
     <property name="text">
-     <string>新增至資料庫</string>
+     <string> 新增至單字本</string>
     </property>
    </widget>
    <widget class="QPushButton" name="sound_btn">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>950</x>
       <y>360</y>
       <width>100</width>
       <height>40</height>
@@ -484,7 +493,7 @@
    <widget class="QSlider" name="brightness_scrollbar">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1030</x>
       <y>790</y>
       <width>160</width>
       <height>22</height>
@@ -522,9 +531,9 @@
    <widget class="QPushButton" name="init_btn">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>870</x>
       <y>840</y>
-      <width>200</width>
+      <width>441</width>
       <height>50</height>
      </rect>
     </property>
@@ -536,7 +545,7 @@
      </font>
     </property>
     <property name="text">
-     <string>設定初始化</string>
+     <string> 設定初始化</string>
     </property>
    </widget>
    <zorder>tableWidget</zorder>
@@ -566,7 +575,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1318</width>
+     <width>1370</width>
      <height>25</height>
     </rect>
    </property>
