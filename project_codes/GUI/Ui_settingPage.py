@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_settingPage(object):
     def setupUi(self, settingPage):
         settingPage.setObjectName("settingPage")
-        settingPage.resize(274, 452)
+        settingPage.resize(274, 494)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(settingPage)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.language_label = QtWidgets.QLabel(settingPage)
@@ -146,6 +146,15 @@ class Ui_settingPage(object):
         self.frameInverse_btn.setObjectName("frameInverse_btn")
         self.frameShow_layout.addWidget(self.frameInverse_btn)
         self.verticalLayout_2.addLayout(self.frameShow_layout)
+        self.init_btn = QtWidgets.QPushButton(settingPage)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.init_btn.setFont(font)
+        self.init_btn.setStyleSheet("")
+        self.init_btn.setObjectName("init_btn")
+        self.verticalLayout_2.addWidget(self.init_btn)
 
         self.retranslateUi(settingPage)
         self.language_selector.setCurrentIndex(-1)
@@ -164,3 +173,4 @@ class Ui_settingPage(object):
         self.frameHorizontal_btn.setText(_translate("settingPage", "影像水平反轉"))
         self.frameVertical_btn.setText(_translate("settingPage", "影像垂直反轉"))
         self.frameInverse_btn.setText(_translate("settingPage", "影像水平垂直反轉"))
+        self.init_btn.setText(_translate("settingPage", " 設定初始化"))
