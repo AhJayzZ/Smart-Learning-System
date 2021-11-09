@@ -35,7 +35,7 @@
      </font>
     </property>
     <property name="text">
-     <string>亮度(0):</string>
+     <string> 亮度(0):</string>
     </property>
    </widget>
    <widget class="QLabel" name="camera_label">
@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="text">
-     <string>對比(1):</string>
+     <string> 對比(1.0):</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="translate_box">
@@ -322,7 +322,7 @@
    <widget class="QSlider" name="contrast_scrollbar">
     <property name="geometry">
      <rect>
-      <x>1030</x>
+      <x>1040</x>
       <y>740</y>
       <width>160</width>
       <height>22</height>
@@ -493,7 +493,7 @@
    <widget class="QSlider" name="brightness_scrollbar">
     <property name="geometry">
      <rect>
-      <x>1030</x>
+      <x>1040</x>
       <y>790</y>
       <width>160</width>
       <height>22</height>

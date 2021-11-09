@@ -137,12 +137,12 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.historyMenu = QMenu(parent=self,title='翻譯紀錄')
         self.menubar.addMenu(self.historyMenu)
 
-        # CSS 
-        button_style = "border-image:url(./project_codes/GUI/images/button.png) 0 0 0 0 stretch stretch;\
-                                    color:black"
+        # CSS Style default setting
+        button_style = "QPushButton {background-color:#FFB01F;border-radius:20px;}\
+                        QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #F7F7FF)}"
         textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
-        self.setStyleSheet("background-color:#D3FFF3")
-        self.menubar.setStyleSheet("background-color:#E9C46A;color:black")
+        self.setStyleSheet("background-color:#4D9358")
+        self.menubar.setStyleSheet("background-color:#87C08E;")
         self.add_btn.setStyleSheet(button_style)
         self.back_btn.setStyleSheet(button_style)
         self.init_btn.setStyleSheet(button_style)
@@ -150,7 +150,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.setStyleSheet(button_style)
         self.translate_box.setStyleSheet(textbox_style)
         self.result_box.setStyleSheet(textbox_style)
-    
+
 # -----------------------------------------Window event--------------------------------------------
     def closeEvent(self,event):
         """
@@ -513,9 +513,9 @@ class settingPage_Thread(QThread):
     """
     def __init__(self,parent=None):
         super().__init__(parent)
+        self.settingPage = SettingWindow()
 
     def run(self):
         self.app = QtWidgets.QApplication(sys.argv)
-        self.settingPage = SettingWindow()
         self.settingPage.show()
         sys.exit(self.app.exec_())
