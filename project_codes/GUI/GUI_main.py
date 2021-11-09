@@ -45,9 +45,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
         self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
-        self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png'))
+        self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png')) 
         self.clear_btn.setFlat(True)
-        
 
         self.connectDB_thread = connectDB_Thread()  
         self.connectDB_thread.start()
@@ -95,7 +94,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                         QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #F7F7FF)}"
         textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
         self.setStyleSheet("background-color:#4D9358")
-        self.menubar.setStyleSheet("background-color:#87C08E;")
         self.add_btn.setStyleSheet(button_style)
         self.back_btn.setStyleSheet(button_style)
         self.translate_btn.setStyleSheet(button_style)
@@ -341,7 +339,7 @@ class frame_Thread(QThread):
         while self.Recognition.cap.isOpened():
             self.frame = self.Recognition._input_img
             self.frame_callback.emit(1)
-            time.sleep(0.001)
+            time.sleep(0.01)
             
 class gTTS_Thread(QThread):
     """

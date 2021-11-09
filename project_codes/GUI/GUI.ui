@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1370</width>
-    <height>897</height>
+    <height>842</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -117,7 +117,7 @@
     <property name="geometry">
      <rect>
       <x>840</x>
-      <y>730</y>
+      <y>740</y>
       <width>521</width>
       <height>50</height>
      </rect>
@@ -180,52 +180,6 @@
       <height>711</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>730</y>
-      <width>631</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="state_layout">
-     <item>
-      <widget class="QLabel" name="state_label">
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>現在狀態:Initial</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="warning_label">
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>光線狀態:正常</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
    <widget class="QPushButton" name="add_btn">
     <property name="geometry">
@@ -295,6 +249,52 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="state_label">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>720</y>
+      <width>511</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>現在狀態:Initial</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="warning_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>720</y>
+      <width>241</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>光線狀態:正常</string>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>camera_label</zorder>
    <zorder>translate_box</zorder>
@@ -303,10 +303,11 @@
    <zorder>back_btn</zorder>
    <zorder>result_box</zorder>
    <zorder>translate_btn</zorder>
-   <zorder>verticalLayoutWidget_2</zorder>
    <zorder>add_btn</zorder>
    <zorder>sound_btn</zorder>
    <zorder>clear_btn</zorder>
+   <zorder>state_label</zorder>
+   <zorder>warning_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
