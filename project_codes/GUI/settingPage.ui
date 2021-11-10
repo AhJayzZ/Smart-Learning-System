@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>452</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -244,6 +244,23 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="init_btn">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string> 設定初始化</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
