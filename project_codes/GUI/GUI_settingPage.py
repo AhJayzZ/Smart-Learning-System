@@ -120,7 +120,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         """
         update frame brightness, frame contrast and setting labelshow 
         """
-        self.contrast = self.contrast_scrollbar.value() / 100
+        self.contrast = float(self.contrast_scrollbar.value() / 100)
         self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
