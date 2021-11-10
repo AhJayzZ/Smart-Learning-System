@@ -81,7 +81,6 @@ class SettingWindow(QDialog,Ui_settingPage):
         self.contrast_scrollbar.setValue(100)
         self.frameDefault_btn.setChecked(True)
 
-     # GUI camera frame check
     def frameMode_check(self):
         """
         change GUI frame  if frame flip or frame be lighten
