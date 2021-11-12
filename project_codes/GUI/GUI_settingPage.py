@@ -13,7 +13,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         super(SettingWindow,self).__init__()
         self.setupUi(self)
         self.mainWindow = mainWindow
-        self.setWindowTitle("Setting Page")
+        self.setWindowTitle("Setting")
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
 
         # Button default setting
@@ -69,6 +69,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         self.mainWindow.translate_btn.setEnabled(True)
         self.mainWindow.result_box.clear()
         self.mainWindow.translate_box.clear()
+        self.mainWindow.historyMenu.clear()
         self.mainWindow.historyAction.clear()
         self.mainWindow.historyDict.clear()
         self.mainWindow.historyIndex = 0

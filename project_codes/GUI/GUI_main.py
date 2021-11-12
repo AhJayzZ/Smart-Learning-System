@@ -214,6 +214,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
 
                 # Avoid translate history preemption
                 self.translate_btn.setEnabled(False)
+                self.add_btn.setEnabled(False)
         self.previousLang = self.settingPage.lang
         self.previousResult = self.input_text
 
@@ -231,6 +232,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.historyIndex = self.historyIndex + 1
         # Avoid translate history preemption 
         self.translate_btn.setEnabled(True)
+        self.add_btn.setEnabled(True)
 
     def translateTimeCount(self):
         """
