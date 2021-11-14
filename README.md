@@ -7,15 +7,15 @@
 ----------------------------------------
 
 ## 環境設定 Environment
-- 1.本系統由**Python 3.7.8開發**
+- 1.開發環境:**Python 3.7.8**
 - 2.在終端機執行 ```pip install -r requirements.txt``` 安裝會使用到的套件
-- 3.使用工具
-    - 手部特徵點API ：```Mediapipe```
-    - 文字辨識API   ：```Pytesseract```
-    - 文字校正API: ```language_tool_python```
-    - 影像處理API：```OpenCV```
-    - 翻譯API：```googletrans```
-    - 文字轉語言API：```gTTS(Google Text-to-Speech)```
+- 3.使用工具:
+    - 手部辨識 ：```Mediapipe```
+    - 文字辨識：```Pytesseract```
+    - 文字校正: ```language_tool_python```
+    - 影像處理：```OpenCV```
+    - 句意翻譯：```googletrans```
+    - 文字轉語言：```gTTS(Google Text-to-Speech)```
     - 容器化工具：```Docker```
     - 爬蟲工具：```BeautifulSoup、Selenium``` 
     - 網站框架：```Django```
@@ -24,7 +24,6 @@
     - 資料庫：```MySQL 8.0.26```
     - 資料庫管理工具：```phpMyAdmin 5.1.1```
     - 函數關係圖輸出工具：```pycallgraph```
-
 
 ----------------------------------------
 
