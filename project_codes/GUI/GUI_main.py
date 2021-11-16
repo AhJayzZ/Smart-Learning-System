@@ -61,6 +61,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # Translte timer default setting
         self.translateTimer = QTimer(self,timeout=self.translate)
         self.previousResult = ""
+        self.previousLang = ""
 
         # Result and translate box default setting
         self.result_box.textChanged.connect(self.translateTimeCount)
@@ -206,14 +207,15 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.result_box.clear()
             self.translate_box.clear()
         else:
-            if self.previousResult != self.input_text:
+            if self.previousResult != self.input_text or self.previousLang != self.settingPage.lang:
                 self.translation_thread = translation_Thread(self.input_text,self.settingPage.lang)
                 self.translation_thread.translation_finished.connect(self.set_output_format)
                 self.translation_thread.start()
 
                 # Avoid translate history preemption
                 self.translate_btn.setEnabled(False)
-    
+                self.add_btn.setEnabled(False)
+        self.previousLang = self.settingPage.lang
         self.previousResult = self.input_text
 
     def addTranslateHistory(self):
@@ -230,6 +232,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.historyIndex = self.historyIndex + 1
         # Avoid translate history preemption 
         self.translate_btn.setEnabled(True)
+        self.add_btn.setEnabled(True)
 
     def translateTimeCount(self):
         """
@@ -294,7 +297,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
 
     def settingAction_triggered(self):
         """
-        settingAction triggered
+        open setting page 
         """
         self.settingPage.show()
 

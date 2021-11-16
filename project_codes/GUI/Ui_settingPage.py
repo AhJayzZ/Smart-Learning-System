@@ -166,7 +166,7 @@ class Ui_settingPage(object):
         settingPage.setWindowTitle(_translate("settingPage", "Dialog"))
         self.language_label.setText(_translate("settingPage", "句子翻譯語言:"))
         self.camera_select_label.setText(_translate("settingPage", "鏡頭:"))
-        self.contrast_label.setText(_translate("settingPage", "對比(1):"))
+        self.contrast_label.setText(_translate("settingPage", "對比(1.0):"))
         self.brightness_label.setText(_translate("settingPage", "亮度(0):"))
         self.frameshow_label.setText(_translate("settingPage", "顯示模式:"))
         self.frameDefault_btn.setText(_translate("settingPage", "影像正常顯示"))

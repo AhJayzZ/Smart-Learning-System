@@ -13,7 +13,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         super(SettingWindow,self).__init__()
         self.setupUi(self)
         self.mainWindow = mainWindow
-        self.setWindowTitle("Setting Page")
+        self.setWindowTitle("Setting")
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
 
         # Button default setting
@@ -69,6 +69,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         self.mainWindow.translate_btn.setEnabled(True)
         self.mainWindow.result_box.clear()
         self.mainWindow.translate_box.clear()
+        self.mainWindow.historyMenu.clear()
         self.mainWindow.historyAction.clear()
         self.mainWindow.historyDict.clear()
         self.mainWindow.historyIndex = 0
@@ -81,7 +82,6 @@ class SettingWindow(QDialog,Ui_settingPage):
         self.contrast_scrollbar.setValue(100)
         self.frameDefault_btn.setChecked(True)
 
-     # GUI camera frame check
     def frameMode_check(self):
         """
         change GUI frame  if frame flip or frame be lighten
@@ -120,7 +120,7 @@ class SettingWindow(QDialog,Ui_settingPage):
         """
         update frame brightness, frame contrast and setting labelshow 
         """
-        self.contrast = self.contrast_scrollbar.value() / 100
+        self.contrast = float(self.contrast_scrollbar.value() / 100)
         self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
