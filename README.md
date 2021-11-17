@@ -38,9 +38,9 @@
     
 - ### 手勢辨識演算法 Gesture Algorithm
     - #### **通過判斷手指彎曲判斷為何種手勢**
-        - 正面
-            ![](https://i.imgur.com/pMEwfZp.png)
-        - 側面
+        - #### 正面
+            ![](https://i.imgur.com/t9dasjc.png)
+        - #### 側面
             ![](https://i.imgur.com/vIMCe2b.png)
 
 - ### 主要檔案 Files
