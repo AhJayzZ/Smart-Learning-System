@@ -174,15 +174,15 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.translate_box.setText(self.translation_output)
         else :                       # Word
             try:
-                output_format = '定義:\n' + self.translation_output['defination'] + '\n\n' + \
+                outputFormat = '定義:\n' + self.translation_output['defination'] + '\n\n' + \
                                 '音標:\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
                                 '時態:\n' + self.translation_output['tenses']
-                self.translate_box.setText(output_format)
+                self.translate_box.setText(outputFormat)
             except:
                 try :
                     self.translate_box.setText('定義:\n' + self.translation_output['defination'])
                 except:
-                    self.translate_box.setText('Find Nothing,please try again!') 
+                    self.translate_box.setText('Find nothing,please try again!') 
         self.addTranslateHistory() 
                     
     def translate(self):
@@ -233,50 +233,48 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         check and update frame brightness status
         """
-        self.average_gray_value = numpy.mean(self.frame_thread.frame)
-        if self.average_gray_value > self.frame_thread.Recognition.MAX_AVERAGE_GRAY_VALUE:
+        self.averageGrayValue = numpy.mean(self.frame_thread.frame)
+        if self.averageGrayValue > self.frame_thread.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:過亮')
-        elif self.average_gray_value < self.frame_thread.Recognition.MIN_AVERAGE_GRAY_VALUE:
+        elif self.averageGrayValue < self.frame_thread.Recognition.MIN_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線狀態:過暗')
         else:
-            self.warning_label.setStyleSheet("color:blue")
-            self.warning_label.setText('光線狀態:正常!')
+            self.warning_label.setStyleSheet("color:black")
+            self.warning_label.setText('光線狀態:正常')
 
     def frameRefresh(self):
         """
         refresh frame and check frame flip and brightness
         """
+        # frame adjust(flip,contrast,brightness)
+        if self.settingPage.frameFlip:
+            self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame,flipCode=self.settingPage.frameMode)
+
         self.frame_thread.frame = cv2.convertScaleAbs(src=self.frame_thread.Recognition._input_img,
                                                         alpha=self.settingPage.contrast,
                                                         beta=self.settingPage.brightness)
-
-        self.frame_thread.Recognition.output_img = cv2.flip(self.frame_thread.frame,1)
-
-        # frame checking(flip,lightness)
-        if self.settingPage.frameFlip:
-            self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame, flipCode=self.settingPage.frameMode)
         self.lightnessCheck()
 
         # PyQt image format
-        converted_frame = cv2.cvtColor(self.frame_thread.frame, cv2.COLOR_BGR2RGB)
-        height, width = converted_frame.shape[:2]
-        pyqt_img = QImage(converted_frame, width, height, QImage.Format_RGB888)
-        pyqt_img = QPixmap.fromImage(pyqt_img)
-        self.camera_label.setPixmap(pyqt_img)
+        convertedFrame = cv2.cvtColor(self.frame_thread.frame, cv2.COLOR_BGR2RGB)
+        height, width = convertedFrame.shape[:2]
+        pyqtImg = QImage(convertedFrame, width, height, QImage.Format_RGB888)
+        pyqtImg = QPixmap.fromImage(pyqtImg)
+        self.camera_label.setPixmap(pyqtImg)
         self.camera_label.setScaledContents(True)
 
-        # Show now state
+        # Show state
         self.state_label.setText('現在狀態:' + str(self.frame_thread.Recognition.now_state))
 
         # Finish recognition
         if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                self.result_box.setText(self.frame_thread.Recognition.text)
                 self.translate()
                 self.playSound()
+                self.result_box.setText(self.frame_thread.Recognition.text)
                 print('Recognition text : ', self.frame_thread.Recognition.text)
                 cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
         else:

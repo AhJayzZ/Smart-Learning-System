@@ -173,7 +173,7 @@ class Ui_SmartLearningSystemGUI(object):
         self.camera_label.setText(_translate("SmartLearningSystemGUI", "ThisLabelWillBeChangedToVideoFrame"))
         self.translate_label.setText(_translate("SmartLearningSystemGUI", "翻譯結果 "))
         self.result_label.setText(_translate("SmartLearningSystemGUI", "辨識結果 "))
-        self.back_btn.setText(_translate("SmartLearningSystemGUI", " 返回主頁面"))
+        self.back_btn.setText(_translate("SmartLearningSystemGUI", " 返回登入頁面"))
         self.translate_btn.setText(_translate("SmartLearningSystemGUI", " 翻譯"))
         self.add_btn.setText(_translate("SmartLearningSystemGUI", " 新增至單字本"))
         self.sound_btn.setText(_translate("SmartLearningSystemGUI", "  發音"))

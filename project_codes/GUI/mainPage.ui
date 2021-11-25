@@ -131,7 +131,7 @@
      </font>
     </property>
     <property name="text">
-     <string> 返回主頁面</string>
+     <string> 返回登入頁面</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="result_box">
