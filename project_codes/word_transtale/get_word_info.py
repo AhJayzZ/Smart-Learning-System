@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import opencc
 
 # 輸入單詞，取得單詞相關資料
 # input: word_str

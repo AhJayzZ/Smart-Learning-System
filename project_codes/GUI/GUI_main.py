@@ -16,14 +16,6 @@ import sys,os
 import pymysql
 import time
 
-
-# Database Configuration
-DB_IP = '172.105.205.179'
-DB_USER = 'root'
-DB_PASSWORD = 'mitlab123456'
-DB_PORT = 3306
-DB_DATABASE = 'WordDB'
-
 # Path Configuration
 currentPath = os.path.dirname(__file__) # GUI
 dirPath = os.path.split(currentPath)[0] # ../ => project_code
