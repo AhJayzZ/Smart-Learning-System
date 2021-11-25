@@ -295,6 +295,27 @@
      <string>光線狀態:正常</string>
     </property>
    </widget>
+   <widget class="QLabel" name="connectionLabel">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>5</y>
+      <width>301</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>標楷體</family>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Connection:Initializing</string>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>camera_label</zorder>
    <zorder>translate_box</zorder>
@@ -308,6 +329,7 @@
    <zorder>clear_btn</zorder>
    <zorder>state_label</zorder>
    <zorder>warning_label</zorder>
+   <zorder>connectionLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

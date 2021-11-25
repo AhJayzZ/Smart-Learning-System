@@ -1,4 +1,5 @@
 import requests
+import opencc
 from bs4 import BeautifulSoup
 
 # 輸入單詞，取得單詞相關資料

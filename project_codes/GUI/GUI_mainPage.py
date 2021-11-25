@@ -2,19 +2,19 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-#from GUI_CSS import *
-from .GUI_settingPage import *
-from .Ui_GUI import *
+from .GUI_settingPage import SettingPage
+from .Ui_mainPage import *
 
 from image_recognition.recognition_program import *
 from image_recognition import text_to_speech
 from word_transtale import selector_TranslateOrWord
 
+import requests
 import numpy
 import cv2
 import sys,os
-import pymysql
 import time
+
 
 # Path Configuration
 currentPath = os.path.dirname(__file__) # GUI
@@ -24,11 +24,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     """
     Ui_SmartLearningSystemGUI 
     """
-    def __init__(self):
+    def __init__(self,loginPage):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__()
-        self.settingPage = SettingWindow(mainWindow=self)
-        #setupCSS.__init__(self) #still unfinished
+        self.loginPage = loginPage
+        self.settingPage = SettingPage(mainWindow=self)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
@@ -40,17 +40,16 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png')) 
         self.clear_btn.setFlat(True)
 
-        self.connectDB_thread = connectDB_Thread()  
-        self.connectDB_thread.start()
-
         # Recognition program
         self.FinishFlag = False
         self.Recognition = RecognitionProgram()
         self.frame_thread = frame_Thread(self.Recognition)
-        self.frame_thread.frame_callback.connect(self.frame_refresh)
+        self.frame_thread.frame_callback.connect(self.frameRefresh)
         self.frame_thread.start()
         
         # Translte timer default setting
+        self.connectionCheck_thread = connectCheck_Thread(self)
+        self.connectionTimer = QTimer(self,timeout=self.connectionCheck).start(1000)
         self.translateTimer = QTimer(self,timeout=self.translate)
         self.previousResult = ""
         self.previousLang = ""
@@ -65,7 +64,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
-        self.back_btn.clicked.connect(sys.exit) # Back to login page(unfinished)
+        self.back_btn.clicked.connect(self.backToLoginPage) # Back to login page(unfinished)
 
         # Menubar trigger default setting
         self.settingAction = QAction(parent=self,text='設定',triggered=self.settingAction_triggered)
@@ -82,9 +81,9 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.historyMenu = QMenu(parent=self,title='翻譯紀錄')
         self.menubar.addMenu(self.historyMenu)
 
-        # CSS Style default setting
-        button_style = "QPushButton {background-color:#FFB01F;border-radius:20px;}\
-                        QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #F7F7FF)}"
+        # Widget style default setting
+        button_style = "QPushButton {background-color:#FFC43D;border-radius:20px;}\
+                        QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #9CAEA9)}"
         textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
         self.setStyleSheet("background-color:#4D9358")
         self.add_btn.setStyleSheet(button_style)
@@ -94,6 +93,9 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_box.setStyleSheet(textbox_style)
         self.result_box.setStyleSheet(textbox_style)
         
+        # Run program
+        self.show()
+        self.Recognition.run_program()
 # -----------------------------------------Window event--------------------------------------------
     def closeEvent(self,event):
         """
@@ -111,7 +113,20 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             event.ignore()
     
+    def backToLoginPage(self):
+        """
+        back to login page
+        """
+        self.Recognition.cap.release()
+        self.hide()
+        self.loginPage.show()
+    
 # -----------------------------------------Widgets function-----------------------------------------
+    def connectionCheck(self):
+        """
+        check network connection
+        """
+        self.connectionCheck_thread.start()
 
     def clear(self):
         """
@@ -140,24 +155,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         except:
             print('add to localDictionary failed')
 
-    # def insertDataToDB(self):
-    #     """
-    #     Insert data to Mysql database
-    #     """
-    #     try :
-    #         if self.sentenceOrWord == 0: # Sentence
-    #             data = self.result_box.toPlainText(), self.translation_output
-    #         else:                       # Word
-    #             data = self.result_box.toPlainText(), self.translation_output['defination']
-                
-    #         cursor = self.connectDB_thread.db.cursor()
-    #         mysql = "INSERT  INTO  SentenceTable (sentence,translation) VALUE ('%s','%s')" % data
-    #         cursor.execute(mysql)
-    #         self.connectDB_thread.db.commit()
-    #         print('Insert data to database success!')
-    #     except:
-    #         print('Insert data to database failed!')
-
     def playSound(self):
         """
         play .mp3 file of result_box text
@@ -166,7 +163,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.gTTS_thread = gTTS_Thread(self.input_text)
         self.gTTS_thread.start()
 
-    def set_output_format(self):
+    def setOutputFormat(self):
         """
         setting output data format
         """
@@ -201,7 +198,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             if self.previousResult != self.input_text or self.previousLang != self.settingPage.lang:
                 self.translation_thread = translation_Thread(self.input_text,self.settingPage.lang)
-                self.translation_thread.translation_finished.connect(self.set_output_format)
+                self.translation_thread.translation_finished.connect(self.setOutputFormat)
                 self.translation_thread.start()
 
                 # Avoid translate history preemption
@@ -232,7 +229,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.translateTimer.start(3000)
 
-    def lightness_check(self):
+    def lightnessCheck(self):
         """
         check and update frame brightness status
         """
@@ -247,7 +244,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.warning_label.setStyleSheet("color:blue")
             self.warning_label.setText('光線狀態:正常!')
 
-    def frame_refresh(self):
+    def frameRefresh(self):
         """
         refresh frame and check frame flip and brightness
         """
@@ -260,7 +257,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # frame checking(flip,lightness)
         if self.settingPage.frameFlip:
             self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame, flipCode=self.settingPage.frameMode)
-        self.lightness_check()
+        self.lightnessCheck()
 
         # PyQt image format
         converted_frame = cv2.cvtColor(self.frame_thread.frame, cv2.COLOR_BGR2RGB)
@@ -362,22 +359,6 @@ class translation_Thread(QThread):
         self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(self.input_text)
         self.translation_output = selector_TranslateOrWord.selector_TranslateOrWord(self.input_text,src='en',dest=self.translated_lang)
         self.translation_finished.emit(1)
-
-class connectDB_Thread(QThread):
-    """
-    connect to database threading
-    """
-    def __init__(self,parent=None):
-        super().__init__(parent)
-
-    def run(self):
-        try:
-            self.db = pymysql.connect(
-                host=DB_IP, port=DB_PORT, user=DB_USER, password=DB_PASSWORD, database=DB_DATABASE)
-            print('Connect to database success!')
-        except:
-            print('Conncet to database failed!')
-
     
 class localFileOpen_Thread(QThread):
     """
@@ -395,3 +376,21 @@ class localFileOpen_Thread(QThread):
             os.system(self.filePath)
         except:
             print('Open file error!')
+
+class connectCheck_Thread(QThread):
+    """
+    connection check thread
+    """
+    def __init__(self,mainWindow):
+        super().__init__(parent=None)
+        self.url = 'http://www.google.com'
+        self.mainWindow = mainWindow
+
+    def run(self):
+        try:
+            requests.get(url=self.url,timeout=1)
+            self.mainWindow.connectionLabel.setStyleSheet('color:blue')
+            self.mainWindow.connectionLabel.setText('Connection: Success')
+        except requests.exceptions.ConnectionError:
+            self.mainWindow.connectionLabel.setStyleSheet('color:red')
+            self.mainWindow.connectionLabel.setText('Connection: Failed')
