@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-from googletrans import Translator
 
 # 輸入單詞，取得單詞相關資料
 # input: word_str
@@ -105,15 +104,14 @@ class DictRstParser:
             }
 
             self.word_info_dict = {}
-            translator = Translator()
+            converter = opencc.OpenCC('s2twp')
             self.related_divs = self.soup.select('div.lf_area > div')
             for k, v in self.word_info_selector_dict.items():
                 self.word_info_dict[k] = self.get_content(
                     self.related_divs[0], v)
                 if(self.word_info_dict[k] != None):
-                    translation = translator.translate(
-                        self.word_info_dict[k], src='zh-cn', dest='zh-tw')
-                    self.word_info_dict[k] = translation.text
+                    translation = converter.convert(self.word_info_dict[k])
+                    self.word_info_dict[k] = translation
 
             # [self.word_info_dict['ame_pr_url'],
             #    self.word_info_dict['eng_pr_url']] = self.get_url_mp3()
@@ -141,7 +139,8 @@ def get_word_info(word_str):
     return wordInfo_dict
 
 
+# testing
 if __name__ == "__main__":
-    word_str = "feeling"
+    word_str = "fish"
     wordInfo_dict = get_word_info(word_str)
     print(wordInfo_dict)

@@ -120,7 +120,7 @@ class RecognitionProgram:
         self.hand_results = None
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
-        self.handedness = HAND.NO
+        #self.handedness = HAND.NO
         self._only_index_finger = False
         self._only_indexNmiddle_finger = False
 
@@ -179,7 +179,7 @@ class RecognitionProgram:
         """
         update: handedness, list_point_hand, index_finger_point
         """
-        self.handedness = get_handedness(self.hand_results.multi_handedness)
+        #self.handedness = get_handedness(self.hand_results.multi_handedness)
         self._update_whole_hand_point()
         self._update_index_finger_point()
 
@@ -323,16 +323,19 @@ class RecognitionProgram:
         change_next_state by singal(s) with each state
         """
         if self.now_state == STATE.WaitingSignal:
-            if self.handedness == USER.HANDEDNESS and self._only_index_finger:
+            # if self.handedness == USER.HANDEDNESS and self._only_index_finger:
+            if self._only_index_finger:
                 self.next_state = STATE.StartCropping
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.StartCropping:
             self.next_state = STATE.DoingCropping
         elif self.now_state == STATE.DoingCropping:
-            if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
+            # if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
+            if self._only_indexNmiddle_finger:
                 self.next_state = STATE.FinishCropping
-            elif self.handedness == USER.HANDEDNESS and self._only_index_finger:
+            # elif self.handedness == USER.HANDEDNESS and self._only_index_finger:
+            elif self._only_index_finger:
                 self.next_state = STATE.DoingCropping
             else:
                 self.next_state = STATE.WaitingSignal

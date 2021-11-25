@@ -240,8 +240,8 @@ def if_only_index_finger(list):
     thumb, index_finger, middle_finger, ring_finger, pinky = finger_trigger(
         list)
 
-    only_index_finger = (index_finger) and not (
-        thumb and middle_finger and ring_finger and pinky)
+    only_index_finger = (index_finger == True) and (
+        thumb == False and middle_finger == False and ring_finger == False and pinky == False)
 
     return only_index_finger
 
@@ -260,7 +260,7 @@ def if_indexNmiddle_finger(list):
     thumb, index_finger, middle_finger, ring_finger, pinky = finger_trigger(
         list)
 
-    only_indexNmiddle_finger = (index_finger and middle_finger) and not (
-        thumb and ring_finger and pinky)
+    only_indexNmiddle_finger = (index_finger == True and middle_finger == True) and (
+        thumb == False and ring_finger == False and pinky == False)
 
     return only_indexNmiddle_finger
