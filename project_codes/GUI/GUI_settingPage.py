@@ -1,16 +1,17 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+
 from .Ui_settingPage import *
 from . import languages
 import cv2
 
-class SettingWindow(QDialog,Ui_settingPage):
+class SettingPage(QDialog,Ui_settingPage):
     """
     Ui_settingPage
     """
     def __init__(self,mainWindow=None):
-        super(SettingWindow,self).__init__()
+        super(SettingPage,self).__init__()
         self.setupUi(self)
         self.mainWindow = mainWindow
         self.setWindowTitle("Setting")
@@ -66,6 +67,8 @@ class SettingWindow(QDialog,Ui_settingPage):
         """
         Initialize all setting configuration
         """
+        self.mainWindow.connectionLabel.setText("Connection:Initializing")
+        self.mainWindow.connectionLabel.setStyleSheet('color:black')
         self.mainWindow.translate_btn.setEnabled(True)
         self.mainWindow.result_box.clear()
         self.mainWindow.translate_box.clear()

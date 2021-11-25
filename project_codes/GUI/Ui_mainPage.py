@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\AhJayzZ\Desktop\NTUST\Project\Smart-Learning-System\project_codes\GUI\GUI.ui'
+# Form implementation generated from reading ui file 'c:\Users\AhJayzZ\Desktop\NTUST\Project\Smart-Learning-System\project_codes\GUI\mainPage.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -132,6 +132,15 @@ class Ui_SmartLearningSystemGUI(object):
         self.warning_label.setFont(font)
         self.warning_label.setAutoFillBackground(False)
         self.warning_label.setObjectName("warning_label")
+        self.connectionLabel = QtWidgets.QLabel(self.centralwidget)
+        self.connectionLabel.setGeometry(QtCore.QRect(990, 5, 301, 31))
+        font = QtGui.QFont()
+        font.setFamily("標楷體")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.connectionLabel.setFont(font)
+        self.connectionLabel.setObjectName("connectionLabel")
         self.tableWidget.raise_()
         self.camera_label.raise_()
         self.translate_box.raise_()
@@ -145,6 +154,7 @@ class Ui_SmartLearningSystemGUI(object):
         self.clear_btn.raise_()
         self.state_label.raise_()
         self.warning_label.raise_()
+        self.connectionLabel.raise_()
         SmartLearningSystemGUI.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(SmartLearningSystemGUI)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1370, 25))
@@ -169,3 +179,4 @@ class Ui_SmartLearningSystemGUI(object):
         self.sound_btn.setText(_translate("SmartLearningSystemGUI", "  發音"))
         self.state_label.setText(_translate("SmartLearningSystemGUI", "現在狀態:Initial"))
         self.warning_label.setText(_translate("SmartLearningSystemGUI", "光線狀態:正常"))
+        self.connectionLabel.setText(_translate("SmartLearningSystemGUI", "Connection:Initializing"))
