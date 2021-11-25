@@ -272,11 +272,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                self.translate()
-                self.playSound()
                 self.result_box.setText(self.frame_thread.Recognition.text)
                 print('Recognition text : ', self.frame_thread.Recognition.text)
                 cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
+                self.translate()
+                self.playSound()
         else:
             self.FinishFlag = False
 
