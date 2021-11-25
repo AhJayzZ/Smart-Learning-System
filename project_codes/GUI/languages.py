@@ -1,6 +1,7 @@
 
-# googletrans python lib languages
-
+"""
+python googletrans supported languages
+"""
 LANGUAGES = {
     'af': 'afrikaans',
     'sq': 'albanian',
@@ -111,11 +112,5 @@ LANGUAGES = {
     'zu': 'zulu',
 }
 
-SPECIAL_CASES = {
-    'ee': 'et',
-}
-
-def langauge_data():
-    languages_value_array = list(LANGUAGES.values())
-    languages_key_array = list(LANGUAGES.keys())
-    return languages_key_array,languages_value_array
+def langaugeData():
+    return list(LANGUAGES.values()),list(LANGUAGES.keys())

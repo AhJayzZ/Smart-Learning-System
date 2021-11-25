@@ -24,7 +24,6 @@ class SettingPage(QDialog,Ui_settingPage):
         # Frame default setting
         self.cap = cv2.VideoCapture(0)
         self.contrast,self.brightness=1,0
-        self.average_gray_value = 0
         self.frameFlip = False
 
         # Camera default setting
@@ -32,7 +31,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.camera_selector.addItems(camera_array)
 
         # Language default setting(index 15 means Chinese Traditional(zh-tw))
-        self.languages_key_array, self.languages_value_array = languages.langauge_data()
+        self.languages_key_array, self.languages_value_array = languages.langaugeData()
         self.language_selector.addItems(self.languages_value_array)
         self.language_selector.setCurrentIndex(15)
         self.lang = 'zh-tw'
@@ -46,22 +45,22 @@ class SettingPage(QDialog,Ui_settingPage):
         self.contrast_scrollbar.setMaximum(300)
 
         # RadioButtin clicked event default setting
-        self.frameDefault_btn.clicked.connect(self.frameMode_check)
-        self.frameHorizontal_btn.clicked.connect(self.frameMode_check)
-        self.frameVertical_btn.clicked.connect(self.frameMode_check)
-        self.frameInverse_btn.clicked.connect(self.frameMode_check)
+        self.frameDefault_btn.clicked.connect(self.updateFrameMode)
+        self.frameHorizontal_btn.clicked.connect(self.updateFrameMode)
+        self.frameVertical_btn.clicked.connect(self.updateFrameMode)
+        self.frameInverse_btn.clicked.connect(self.updateFrameMode)
 
         # Scorllbar scroll event default setting
         self.brightness_scrollbar.valueChanged.connect(
-            self.frame_contrast_brightness_check)
+            self.updateContrastAndBrightness)
         self.contrast_scrollbar.valueChanged.connect(
-            self.frame_contrast_brightness_check)
+            self.updateContrastAndBrightness)
 
         # Combobox clicked event default setting
         self.camera_selector.currentTextChanged.connect(
-            self.camera_selector_changed)
+            self.updateCamera)
         self.language_selector.currentTextChanged.connect(
-            self.languages_selector_changed)
+            self.updateLanguage)
 
     def initialize(self):
         """
@@ -85,7 +84,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.contrast_scrollbar.setValue(100)
         self.frameDefault_btn.setChecked(True)
 
-    def frameMode_check(self):
+    def updateFrameMode(self):
         """
         change GUI frame  if frame flip or frame be lighten
         """
@@ -99,19 +98,19 @@ class SettingPage(QDialog,Ui_settingPage):
         else:
             self.frameFlip = False
 
-    def camera_selector_changed(self):
+    def updateCamera(self):
         """
         change camera to the choosen one
         """
         index = self.camera_selector.currentIndex()
-        self.mainWindow.frame_thread.Recognition.cap
+        self.mainWindow.frame_thread.Recognition.cap.release()
         if index == 0:
             self.mainWindow.frame_thread.Recognition.cap = cv2.VideoCapture(0)
         else:
             self.mainWindow.frame_thread.Recognition.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
         self.mainWindow.frame_thread.start()
 
-    def languages_selector_changed(self):
+    def updateLanguage(self):
         """
         change to the new translate langauge and update the translation
         """
@@ -119,7 +118,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.lang = self.languages_key_array[index]
         self.mainWindow.translate()
 
-    def frame_contrast_brightness_check(self):
+    def updateContrastAndBrightness(self):
         """
         update frame brightness, frame contrast and setting labelshow 
         """
