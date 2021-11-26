@@ -236,10 +236,10 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         check and update frame brightness status
         """
         self.averageGrayValue = numpy.mean(self.frame_thread.frame)
-        if self.averageGrayValue > self.frame_thread.mainWindow.Recognition.MAX_AVERAGE_GRAY_VALUE:
+        if self.averageGrayValue > self.frame_thread.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線:過亮')
-        elif self.averageGrayValue < self.frame_thread.mainWindow.Recognition.MIN_AVERAGE_GRAY_VALUE:
+        elif self.averageGrayValue < self.frame_thread.Recognition.MIN_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線:過暗')
         else:
@@ -262,15 +262,15 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_label.setScaledContents(True)
 
         # Show state
-        self.state_label.setText('辨識狀態:' + str(self.frame_thread.mainWindow.Recognition.now_state))
+        self.state_label.setText('辨識狀態:' + str(self.frame_thread.Recognition.now_state))
 
         # Finish recognition
-        if self.frame_thread.mainWindow.Recognition.now_state == STATE.FinishRecognition:
+        if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                self.result_box.setText(self.frame_thread.mainWindow.Recognition.text)
-                print('Recognition text : ', self.frame_thread.mainWindow.Recognition.text)
-                cv2.imshow('Cropped Frame', self.frame_thread.mainWindow.Recognition.crop_img)
+                self.result_box.setText(self.frame_thread.Recognition.text)
+                print('Recognition text : ', self.frame_thread.Recognition.text)
+                cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
                 self.translate()
                 self.playSound()
         else:
@@ -320,10 +320,11 @@ class frame_Thread(QThread):
     def __init__(self,mainWindow):
         super().__init__()
         self.mainWindow = mainWindow
+        self.Recognition = mainWindow.Recognition
 
     def run(self):
-        while self.mainWindow.Recognition.cap.isOpened():
-            self.frame = self.mainWindow.Recognition._input_img
+        while self.Recognition.cap.isOpened():
+            self.frame = self.Recognition._input_img
             self.contrast = self.mainWindow.settingPage.contrast
             self.brightness = self.mainWindow.settingPage.brightness
             self.frameFlip = self.mainWindow.settingPage.frameFlip
