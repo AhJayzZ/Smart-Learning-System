@@ -32,7 +32,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
-
         self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
@@ -43,11 +42,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # Recognition program
         self.FinishFlag = False
         self.Recognition = RecognitionProgram()
-        self.frame_thread = frame_Thread(self.Recognition)
+        self.frame_thread = frame_Thread(self)
         self.frame_thread.frame_callback.connect(self.frameRefresh)
         self.frame_thread.start()
         
-        # Translte timer default setting
+        # Timer default setting
         self.connectionCheck_thread = connectCheck_Thread(self)
         self.connectionTimer = QTimer(self,timeout=self.connectionCheck).start(1000)
         self.translateTimer = QTimer(self,timeout=self.translate)
@@ -64,7 +63,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
-        self.back_btn.clicked.connect(self.backToLoginPage) # Back to login page(unfinished)
+        self.back_btn.clicked.connect(self.backToLoginPage)
 
         # Menubar trigger default setting
         self.settingAction = QAction(parent=self,text='設定',triggered=self.settingAction_triggered)
@@ -96,7 +95,9 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # Run program
         self.show()
         self.Recognition.run_program()
+
 # -----------------------------------------Window event--------------------------------------------
+
     def closeEvent(self,event):
         """
         PyQt window close event
@@ -121,7 +122,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.hide()
         self.loginPage.show()
     
-# -----------------------------------------Widgets function-----------------------------------------
+# -----------------------------------------Functions-----------------------------------------
+
     def connectionCheck(self):
         """
         check network connection
@@ -234,26 +236,21 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         check and update frame brightness status
         """
         self.averageGrayValue = numpy.mean(self.frame_thread.frame)
-        if self.averageGrayValue > self.frame_thread.Recognition.MAX_AVERAGE_GRAY_VALUE:
+        if self.averageGrayValue > self.frame_thread.mainWindow.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
-            self.warning_label.setText('光線狀態:過亮')
-        elif self.averageGrayValue < self.frame_thread.Recognition.MIN_AVERAGE_GRAY_VALUE:
+            self.warning_label.setText('光線:過亮')
+        elif self.averageGrayValue < self.frame_thread.mainWindow.Recognition.MIN_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
-            self.warning_label.setText('光線狀態:過暗')
+            self.warning_label.setText('光線:過暗')
         else:
             self.warning_label.setStyleSheet("color:black")
-            self.warning_label.setText('光線狀態:正常')
+            self.warning_label.setText('光線:正常')
 
     def frameRefresh(self):
         """
-        refresh frame and check frame flip and brightness
+        refresh frame and update state,also check lightness
         """
-        # frame adjust(flip,contrast,brightness)
-        self.frame_thread.frame = cv2.convertScaleAbs(src=self.frame_thread.Recognition._input_img,
-                                                        alpha=self.settingPage.contrast,
-                                                        beta=self.settingPage.brightness)
-        if self.settingPage.frameFlip:
-            self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame,flipCode=self.settingPage.frameMode)
+        # Lightness check
         self.lightnessCheck()
 
         # PyQt image format
@@ -265,15 +262,15 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_label.setScaledContents(True)
 
         # Show state
-        self.state_label.setText('現在狀態:' + str(self.frame_thread.Recognition.now_state))
+        self.state_label.setText('辨識狀態:' + str(self.frame_thread.mainWindow.Recognition.now_state))
 
         # Finish recognition
-        if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
+        if self.frame_thread.mainWindow.Recognition.now_state == STATE.FinishRecognition:
             if self.FinishFlag == False:
                 self.FinishFlag = True
-                self.result_box.setText(self.frame_thread.Recognition.text)
-                print('Recognition text : ', self.frame_thread.Recognition.text)
-                cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
+                self.result_box.setText(self.frame_thread.mainWindow.Recognition.text)
+                print('Recognition text : ', self.frame_thread.mainWindow.Recognition.text)
+                cv2.imshow('Cropped Frame', self.frame_thread.mainWindow.Recognition.crop_img)
                 self.translate()
                 self.playSound()
         else:
@@ -320,13 +317,20 @@ class frame_Thread(QThread):
     frame updating threading
     """
     frame_callback = pyqtSignal(int)
-    def __init__(self,Recognition,parent=None):
-        super().__init__(parent)
-        self.Recognition = Recognition
+    def __init__(self,mainWindow):
+        super().__init__()
+        self.mainWindow = mainWindow
 
     def run(self):
-        while self.Recognition.cap.isOpened():
-            self.frame = self.Recognition._input_img
+        while self.mainWindow.Recognition.cap.isOpened():
+            self.frame = self.mainWindow.Recognition._input_img
+            self.contrast = self.mainWindow.settingPage.contrast
+            self.brightness = self.mainWindow.settingPage.brightness
+            self.frameFlip = self.mainWindow.settingPage.frameFlip
+            self.frameMode = self.mainWindow.settingPage.frameMode
+            if self.frameFlip:
+                self.frame = cv2.flip(src=self.frame,flipCode=self.frameMode)
+            self.frame = cv2.convertScaleAbs(src=self.frame,alpha=self.contrast,beta=self.brightness)
             self.frame_callback.emit(1)
             time.sleep(0.01)
             

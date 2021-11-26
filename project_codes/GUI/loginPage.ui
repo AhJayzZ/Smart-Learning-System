@@ -157,10 +157,14 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>12</pointsize>
       <weight>75</weight>
       <bold>true</bold>
+      <strikeout>false</strikeout>
      </font>
+    </property>
+    <property name="cursorPosition">
+     <number>0</number>
     </property>
    </widget>
    <widget class="QLineEdit" name="passwordTextbox">
@@ -174,7 +178,7 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>12</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>

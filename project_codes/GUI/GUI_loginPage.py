@@ -24,8 +24,11 @@ class LoginPage(QDialog,Ui_loginPage):
         self.exitButton.clicked.connect(sys.exit)
 
         # Style
+        textboxStyle = "color:white;background-color:black;"
         buttonStyle = "QPushButton {background-color:#2D7DD2;border-radius:20px;}\
                         QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #06D6A0, stop: 1 #06D6A0)}"
+        self.accountTextbox.setStyleSheet(textboxStyle)
+        self.passwordTextbox.setStyleSheet(textboxStyle)
         self.loginButton.setStyleSheet(buttonStyle)
         self.reviewWebsiteButton.setStyleSheet(buttonStyle)
         self.guideButton.setStyleSheet(buttonStyle)
@@ -39,7 +42,7 @@ class LoginPage(QDialog,Ui_loginPage):
         self.hide()
         self.account = self.accountTextbox.text()
         self.password = self.passwordTextbox.text()
-        print("account:{}   password:{}".format(self.account,self.password))
+        print("account:{} \npassword:{}".format(self.account,self.password))
         self.mainWindow = MainWindow(self)
 
     def openGuide(self):

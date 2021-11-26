@@ -25,6 +25,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.cap = cv2.VideoCapture(0)
         self.contrast,self.brightness=1,0
         self.frameFlip = False
+        self.frameMode = 0
 
         # Camera default setting
         camera_array = ['Camera 0(Webcam)', 'Camera 1(External Camera)']
