@@ -174,13 +174,13 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.translate_box.setText(self.translation_output)
         else :                       # Word
             try:
-                outputFormat = '定義:\n' + self.translation_output['defination'] + '\n\n' + \
-                                '音標:\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
-                                '時態:\n' + self.translation_output['tenses']
+                outputFormat = '【定義】\n' + self.translation_output['defination'] + '\n\n' + \
+                                '【音標】\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
+                                '【時態】\n' + self.translation_output['tenses']
                 self.translate_box.setText(outputFormat)
             except:
                 try :
-                    self.translate_box.setText('定義:\n' + self.translation_output['defination'])
+                    self.translate_box.setText('【定義】\n' + self.translation_output['defination'])
                 except:
                     self.translate_box.setText('Find nothing,please try again!') 
         self.addTranslateHistory() 
