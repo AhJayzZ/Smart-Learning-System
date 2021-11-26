@@ -249,12 +249,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         refresh frame and check frame flip and brightness
         """
         # frame adjust(flip,contrast,brightness)
-        if self.settingPage.frameFlip:
-            self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame,flipCode=self.settingPage.frameMode)
-
         self.frame_thread.frame = cv2.convertScaleAbs(src=self.frame_thread.Recognition._input_img,
                                                         alpha=self.settingPage.contrast,
                                                         beta=self.settingPage.brightness)
+        if self.settingPage.frameFlip:
+            self.frame_thread.frame = cv2.flip(src=self.frame_thread.frame,flipCode=self.settingPage.frameMode)
         self.lightnessCheck()
 
         # PyQt image format
