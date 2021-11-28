@@ -198,14 +198,14 @@ class RecognitionProgram:
 
     def _update_output_img(self):
         self.output_img = self._input_img
-        self.output_img = cv2.flip(self.output_img, 1)
+        #self.output_img = cv2.flip(self.output_img, 1)
 
     def _update_output_img_edited(self):
         self.output_img = self._input_img
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
-        self.output_img = cv2.flip(self.output_img, 1)
+        #self.output_img = cv2.flip(self.output_img, 1)
 
     def _do_WaitingSignal(self):
         if self.hand_results.multi_hand_landmarks:
@@ -244,10 +244,10 @@ class RecognitionProgram:
         if (self.Position_initial.y > self.Position_final.y):
             self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
-        self.crop_img = cv2.flip(self.output_img, 1)
-        self.crop_img = self.crop_img[self.Position_initial.y: self.Position_final.y,
-                                      self.Position_initial.x: self.Position_final.x]
-        self.crop_img = cv2.flip(self.crop_img, 1)
+        #self.crop_img = cv2.flip(self.output_img, 1)
+        self.crop_img = self.output_img[self.Position_initial.y: self.Position_final.y,
+                                        self.Position_initial.x: self.Position_final.x]
+        #self.crop_img = cv2.flip(self.crop_img, 1)
 
         self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
         self._only_index_finger = self._only_indexNmiddle_finger = False
@@ -404,7 +404,7 @@ class RecognitionProgram:
                     # print("Ignoring empty camera frame.")
                     continue
                 else:
-                    self._input_img = cv2.flip(self._input_img, 1)
+                    #self._input_img = cv2.flip(self._input_img, 1)
                     img = self._input_img
                     img = cv2.cvtColor(self._input_img, cv2.COLOR_BGR2RGB)
                     img.flags.writeable = False
