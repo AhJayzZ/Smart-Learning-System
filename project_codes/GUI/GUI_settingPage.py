@@ -15,6 +15,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.setupUi(self)
         self.mainWindow = mainWindow
         self.setWindowTitle("Setting")
+        self.setFixedSize(self.size())
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
 
         # Button default setting

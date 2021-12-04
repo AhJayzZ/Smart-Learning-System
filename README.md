@@ -35,7 +35,15 @@
 
 - ### 流程圖 Flow Chart
     ![](https://i.imgur.com/XdzdwdB.png)
-    
+
+- ### 模型圖 Model Chart
+    - #### 手部辨識
+    ![](https://i.imgur.com/Vla4Mwd.jpg)
+    - #### 文字辨識
+    ![](https://i.imgur.com/XNIX2dj.jpg)
+    - #### 結果呈現
+    ![](https://i.imgur.com/7ZeLkMM.jpg)
+
 - ### 手勢辨識演算法 Gesture Algorithm
     - #### **通過判斷手指彎曲判斷為何種手勢**
         - #### 正面

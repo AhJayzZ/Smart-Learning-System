@@ -31,6 +31,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.settingPage = SettingPage(mainWindow=self)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
+        self.setFixedSize(self.size())
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
         self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
