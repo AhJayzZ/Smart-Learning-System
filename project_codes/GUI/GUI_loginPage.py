@@ -15,8 +15,9 @@ class LoginPage(QDialog,Ui_loginPage):
         self.setupUi(self)
         self.show()
         self.setWindowTitle("Login")
+        self.setFixedSize(self.size())
         self.setWindowIcon(QIcon("./project_codes/GUI/images/login_icon.png"))
-        self.setStyleSheet("background-color:#F45D01")
+        self.setStyleSheet("background-color:#4D9358")
 
         self.loginButton.clicked.connect(self.openMainPage)
         self.guideButton.clicked.connect(self.openGuide)
