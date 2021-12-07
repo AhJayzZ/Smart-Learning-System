@@ -336,7 +336,10 @@ class RecognitionProgram:
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.StartCropping:
-            self.next_state = STATE.DoingCropping
+            if self.Position_initial.x != 0:
+                self.next_state = STATE.DoingCropping
+            else:
+                self.next_state = STATE.StartCropping
         elif self.now_state == STATE.DoingCropping:
             # if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
             if self._only_indexNmiddle_finger:
