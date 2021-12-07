@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 from finger_trigger import if_only_index_finger, if_indexNmiddle_finger
+from input_source_handler import input_source_handler
+from ROI_state_machine import ROI_state_machine
 
 mp_hands = mp.solutions.hands
 
@@ -9,6 +11,9 @@ NUM_DIMENSION = 3
 
 REFRESH_TIME = 5  # ms
 
+user_video_source = 1
+camera = input_source_handler(user_video_source)
+
 
 def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
     point = position
@@ -16,6 +21,14 @@ def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
 
     cv2.circle(
         img, point, radius=point_radius, color=point_color, thickness=point_thickness)
+
+
+def draw_frame(img, position_start, position_end, frame_color=(255, 105, 65), frame_thickness=2):
+    p1 = position_start
+    p2 = position_end
+
+    cv2.rectangle(img, p1, p2, color=frame_color,
+                  thickness=frame_thickness)
 
 
 class hand_recognition:
@@ -34,6 +47,8 @@ class hand_recognition:
 
         self._only_index_finger = False
         self._only_index_and_middle_finger = False
+
+        self._ROI_frame = [(0, 0), (0, 0)]
 
     def _refresh_hand_point_and_event(self):
         """
@@ -73,35 +88,43 @@ class hand_recognition:
 
     def get_recognited_frame(self):
         """
-            for text recognition
+            for text recognition & output frame handler
         """
         return self._frame
 
-    def if_only_index_finger(self):
+    def get_ROI(self):
+        """
+            for output frame handler
+        """
+        return self._ROI_frame
+
+    def _if_only_index_finger(self):
         """
             for state_mechine
         """
         return self._only_index_finger
 
-    def if_only_index_and_middle_finger(self):
+    def _if_only_index_and_middle_finger(self):
         """
             for state_mechine
         """
         return self._only_index_and_middle_finger
 
-    def get_index_finger_point(self):
+    def _get_index_finger_point(self):
         """
             for state_mechine
         """
         return self._index_finger_point
 
     def run(self,
-            input_source_handler,
             user_min_detection_confidence=0.7,
             user_min_tracking_confidence=0.7):  # hand_recognition.run(i_img.get_frame())
         """
             for main program: start run to update input_img, hand_results
         """
+        ROI = ROI_state_machine()
+        input_source = input_source_handler()
+
         with mp_hands.Hands(
                 static_image_mode=False,
                 max_num_hands=4,
@@ -111,18 +134,29 @@ class hand_recognition:
         )as hands:
             for _ in iter(int, 1):  # for-loop in Python is faster than while-loop
                 # bad design here: we need to know input_source_handler had those method
-                if input_source_handler.get_flag_enable_to_get_frame():  # enable to get frame
-                    self._frame = input_source_handler.get_frame()
+                if input_source.get_flag_enable_to_get_frame():  # enable to get frame
+                    self._frame = input_source.get_frame()
 
                     img_for_recognition = cv2.cvtColor(
                         self._frame, cv2.COLOR_BGR2RGB)
                     img_for_recognition.flags.writeable = False
-                    self.results = hands.process(img_for_recognition)
+                    self._results = hands.process(img_for_recognition)
 
                     self._refresh_hand_point_and_event()
-                    # self.current_state =
+                    self._ROI_frame = ROI.get_ROI(
+                        self._if_only_index_finger(),
+                        self._if_only_index_and_middle_finger(),
+                        self._get_index_finger_point()
+                    )
+
+                    cv2.imshow("output", self._frame)
 
                 else:  # loss frame
                     pass
 
                 cv2.waitKey(REFRESH_TIME)
+
+
+if __name__ == "__main__":
+    recognition = hand_recognition()
+    recognition.run()

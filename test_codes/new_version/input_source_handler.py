@@ -57,10 +57,11 @@ class input_source_handler():
 
         self._flag_change_video_source = False  # for inside using
         self._flag_enable_to_get_frame = False  # for outside using
-        self._resize_size = None
-        self._frame = []  # use get_frame for outside using
 
+        self._frame = []  # use get_frame for outside using
         self._frame_mode = 2  # defualt, don't do change
+
+        self._resize_size = self._update_resize_size()
 
     def change_video_source(self, video_source):
         """
@@ -88,6 +89,7 @@ class input_source_handler():
         """
             output for hand_recognition
         """
+        self._refresh_frame()
         return self._frame
 
     def get_flag_enable_to_get_frame(self):
@@ -96,14 +98,7 @@ class input_source_handler():
         """
         return self._flag_enable_to_get_frame
 
-    def keep_refresh_frame(self, dsize=HD_SIZE):
-        """
-            for main program
-
-            input: dsize(optional)
-            function: start refresh frame in each 1 ms
-                - resized frame to reduce recognition time
-        """
+    def _update_resize_size(self, dsize=HD_SIZE):
         for _ in iter(int, 1):  # for-loop in Python is faster than while-loop
             success, ori_frame = self._cap.read()
 
@@ -115,7 +110,15 @@ class input_source_handler():
                 # print("capture failed")
                 pass
 
-        while self._cap.isOpened():
+    def _refresh_frame(self):
+        """
+            for main program
+
+            input: dsize(optional)
+            function: start refresh frame in each 1 ms
+                - resized frame to reduce recognition time
+        """
+        if self._cap.isOpened():
             if not self._flag_change_video_source:
                 success, ori_frame = self._cap.read()
                 resize_frame = cv2.resize(ori_frame, self._resize_size)
@@ -132,6 +135,5 @@ class input_source_handler():
             else:
                 self._cap.release()
                 self._cap = VideoSource(self._input_img_source)
+                self._update_resize_size()
                 self._flag_change_video_source = False
-
-            cv2.waitKey(REFRESH_TIME)
