@@ -10,7 +10,9 @@ def text_recognition(image_for_get_text):
         image_for_get_text = cropped_img_handler(image_for_get_text)
 
         text = pytesseract.image_to_string(image_for_get_text, lang='eng')
+        # print(text)
         text = get_corrected_text(text)
+        # print(text)
         return text
     except:
         assert 0, "error with {text_recognition.__name__}"
