@@ -94,6 +94,9 @@ class RecognitionProgram:
     MAX_TOLERANCE = 5
     MAX_AVERAGE_GRAY_VALUE = 180
     MIN_AVERAGE_GRAY_VALUE = 100
+    MIN_CROP_SCALE = 10
+    MIN_DETECTION_CONFIDENCE = 0.7
+    MIN_TRACKING_CONFIDENCE = 0.7
 
     def __init__(self):
         """
@@ -145,6 +148,7 @@ class RecognitionProgram:
                 f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
             print(self.Position_initial)
             print(self.Position_final)
+            print(self.text)
         else:
             pass
 
@@ -300,7 +304,10 @@ class RecognitionProgram:
         elif self.now_state == STATE.StartCropping:
             self._check_tolerance()
         elif self.now_state == STATE.DoingCropping:
-            if (self.Position_initial.x != self.Position_final.x) and (self.Position_initial.y != self.Position_final.y):
+            diff_x = self.Position_initial.x - self.Position_final.x
+            diff_y = self.Position_initial.y - self.Position_final.y
+            # if self.MIN_CROP_SCALE < (diff_x + diff_y):
+            if 0 != diff_x + diff_y:  # means Position_initial != Position_final
                 self._check_tolerance()
             else:
                 self._flag_change_state = False
@@ -383,9 +390,10 @@ class RecognitionProgram:
         """
         with mp_hands.Hands(
                 static_image_mode=False,
-                min_detection_confidence=0.5,
-                min_tracking_confidence=0.5,
-                max_num_hands=1)as hands:
+                max_num_hands=4,
+                model_complexity=0,
+                min_detection_confidence=self.MIN_DETECTION_CONFIDENCE,
+                min_tracking_confidence=self.MIN_TRACKING_CONFIDENCE)as hands:
             for _ in iter(int, 1):
                 success, self._input_img = self.cap.read()
 
@@ -398,7 +406,7 @@ class RecognitionProgram:
                 success, self._input_img = self.cap.read()
 
                 # speed up mediapipe process, img of too large size will be slow
-                self._input_img = cv2.resize(self._input_img, dsize)
+                #self._input_img = cv2.resize(self._input_img, dsize)
 
                 if not success:
                     # print("Ignoring empty camera frame.")
@@ -411,6 +419,7 @@ class RecognitionProgram:
                     self.hand_results = hands.process(img)
 
                     self._process_state_mechine()
+                    self._debug_print_statement()
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """

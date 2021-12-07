@@ -12,19 +12,22 @@ from word_transtale import selector_TranslateOrWord
 import requests
 import numpy
 import cv2
-import sys,os
+import sys
+import os
 import time
 
 
 # Path Configuration
-currentPath = os.path.dirname(__file__) # GUI
-dirPath = os.path.split(currentPath)[0] # ../ => project_code
-    
+currentPath = os.path.dirname(__file__)  # GUI
+dirPath = os.path.split(currentPath)[0]  # ../ => project_code
+
+
 class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     """
     Ui_SmartLearningSystemGUI 
     """
-    def __init__(self,loginPage):
+
+    def __init__(self, loginPage):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__()
         self.loginPage = loginPage
@@ -33,11 +36,15 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.setWindowTitle('Smart Learning System v1.0')
         self.setFixedSize(self.size())
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
-        self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
-        self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
+        self.sound_btn.setIcon(
+            QIcon('./project_codes/GUI/images/sound_icon.png'))
+        self.translate_btn.setIcon(
+            QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
-        self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
-        self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png')) 
+        self.back_btn.setIcon(
+            QIcon('./project_codes/GUI/images/back_icon.png'))
+        self.clear_btn.setIcon(
+            QIcon('./project_codes/GUI/images/clear_icon.png'))
         self.clear_btn.setFlat(True)
 
         # Recognition program
@@ -46,11 +53,12 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.frame_thread = frame_Thread(self)
         self.frame_thread.frame_callback.connect(self.frameRefresh)
         self.frame_thread.start()
-        
+
         # Timer default setting
         self.connectionCheck_thread = connectCheck_Thread(self)
-        self.connectionTimer = QTimer(self,timeout=self.connectionCheck).start(1000)
-        self.translateTimer = QTimer(self,timeout=self.translate)
+        self.connectionTimer = QTimer(
+            self, timeout=self.connectionCheck).start(1000)
+        self.translateTimer = QTimer(self, timeout=self.translate)
         self.previousResult = ""
         self.previousLang = ""
 
@@ -67,18 +75,21 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.back_btn.clicked.connect(self.backToLoginPage)
 
         # Menubar trigger default setting
-        self.settingAction = QAction(parent=self,text='設定',triggered=self.settingAction_triggered)
-        self.guideAction = QAction(parent=self,text='使用手冊',triggered=self.guideAction_triggered)
-        self.openWordFileAction = QAction(parent=self,text='打開單字本',triggered=self.openWordFileAction_triggered)
+        self.settingAction = QAction(
+            parent=self, text='設定', triggered=self.settingAction_triggered)
+        self.guideAction = QAction(
+            parent=self, text='使用手冊', triggered=self.guideAction_triggered)
+        self.openWordFileAction = QAction(
+            parent=self, text='打開單字本', triggered=self.openWordFileAction_triggered)
         self.menubar.addAction(self.settingAction)
         self.menubar.addAction(self.guideAction)
         self.menubar.addAction(self.openWordFileAction)
-        
+
         # Translate history default setting
-        self.historyDict={}
+        self.historyDict = {}
         self.historyAction = []
-        self.historyIndex,self.historyIndexMaximum = 0, 10
-        self.historyMenu = QMenu(parent=self,title='翻譯紀錄')
+        self.historyIndex, self.historyIndexMaximum = 0, 10
+        self.historyMenu = QMenu(parent=self, title='翻譯紀錄')
         self.menubar.addMenu(self.historyMenu)
 
         # Widget style default setting
@@ -92,29 +103,30 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.setStyleSheet(button_style)
         self.translate_box.setStyleSheet(textbox_style)
         self.result_box.setStyleSheet(textbox_style)
-        
+
         # Run program
         self.show()
         self.Recognition.run_program()
 
 # -----------------------------------------Window event--------------------------------------------
 
-    def closeEvent(self,event):
+    def closeEvent(self, event):
         """
         PyQt window close event
         """
         reply = QMessageBox(icon=QMessageBox.Warning,
-                            windowIcon=QIcon('./project_codes/GUI/images/exit_icon.png'),
+                            windowIcon=QIcon(
+                                './project_codes/GUI/images/exit_icon.png'),
                             windowTitle='離開程式',
                             text='是否離開本程式?',
-                            standardButtons=(QMessageBox.Yes|QMessageBox.No)).exec_()
+                            standardButtons=(QMessageBox.Yes | QMessageBox.No)).exec_()
 
         if reply == QMessageBox.Yes:
             event.accept()
             sys.exit()
         else:
             event.ignore()
-    
+
     def backToLoginPage(self):
         """
         back to login page
@@ -122,7 +134,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.Recognition.cap.release()
         self.hide()
         self.loginPage.show()
-    
+
 # -----------------------------------------Functions-----------------------------------------
 
     def connectionCheck(self):
@@ -143,16 +155,18 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         add translate data to localDictionary
         """
         currentPath = os.path.dirname(__file__)
-        dirPath = os.path.split(currentPath)[0]    
-        filePath = os.path.join(dirPath,'localDictionary.txt')
+        dirPath = os.path.split(currentPath)[0]
+        filePath = os.path.join(dirPath, 'localDictionary.txt')
         if not os.path.exists(filePath):
-            open(filePath,'w',encoding='utf-8')
+            open(filePath, 'w', encoding='utf-8')
         try:
-            with open(filePath,'a',encoding='utf-8') as file:   
+            with open(filePath, 'a', encoding='utf-8') as file:
                 if self.sentenceOrWord == 0:
-                    lines = [self.input_text,',',self.translation_output,'\n']
-                else :
-                    lines = [self.input_text,',',self.translation_output['defination'],'\n']
+                    lines = [self.input_text, ',',
+                             self.translation_output, '\n']
+                else:
+                    lines = [self.input_text, ',',
+                             self.translation_output['defination'], '\n']
                 file.writelines(lines)
                 file.close()
         except:
@@ -165,6 +179,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.input_text = self.result_box.toPlainText()
         self.gTTS_thread = gTTS_Thread(self.input_text)
         self.gTTS_thread.start()
+        print('Recognition text : ', self.frame_thread.Recognition.text)
 
     def setOutputFormat(self):
         """
@@ -172,22 +187,24 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.sentenceOrWord = self.translation_thread.sentenceOrWord
         self.translation_output = self.translation_thread.translation_output
-        
-        if self.sentenceOrWord == 0: # Sentence
+
+        if self.sentenceOrWord == 0:  # Sentence
             self.translate_box.setText(self.translation_output)
-        else :                       # Word
+        else:                       # Word
             try:
                 outputFormat = '【定義】\n' + self.translation_output['defination'] + '\n\n' + \
-                                '【音標】\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
-                                '【時態】\n' + self.translation_output['tenses']
+                    '【音標】\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
+                    '【時態】\n' + self.translation_output['tenses']
                 self.translate_box.setText(outputFormat)
             except:
-                try :
-                    self.translate_box.setText('【定義】\n' + self.translation_output['defination'])
+                try:
+                    self.translate_box.setText(
+                        '【定義】\n' + self.translation_output['defination'])
                 except:
-                    self.translate_box.setText('Find nothing,please try again!') 
-        self.addTranslateHistory() 
-                    
+                    self.translate_box.setText(
+                        'Find nothing,please try again!')
+        self.addTranslateHistory()
+
     def translate(self):
         """
         translate function, wordOrSentence = 0(Sentence),1(Word)
@@ -200,8 +217,10 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.translate_box.clear()
         else:
             if self.previousResult != self.input_text or self.previousLang != self.settingPage.lang:
-                self.translation_thread = translation_Thread(self.input_text,self.settingPage.lang)
-                self.translation_thread.translation_finished.connect(self.setOutputFormat)
+                self.translation_thread = translation_Thread(
+                    self.input_text, self.settingPage.lang)
+                self.translation_thread.translation_finished.connect(
+                    self.setOutputFormat)
                 self.translation_thread.start()
 
                 # Avoid translate history preemption
@@ -217,12 +236,14 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translateTimer.stop()
         self.historyDict[self.input_text] = self.translate_box.toPlainText()
         if self.historyIndex < self.historyIndexMaximum:
-            self.historyAction.append(QAction(parent=self,text=self.input_text,triggered=self.historyAction_triggerred))
+            self.historyAction.append(QAction(
+                parent=self, text=self.input_text, triggered=self.historyAction_triggerred))
             self.historyMenu.addAction(self.historyAction[self.historyIndex])
         else:
-            self.historyAction[self.historyIndex % self.historyIndexMaximum].setText(self.input_text)
+            self.historyAction[self.historyIndex %
+                               self.historyIndexMaximum].setText(self.input_text)
         self.historyIndex = self.historyIndex + 1
-        # Avoid translate history preemption 
+        # Avoid translate history preemption
         self.translate_btn.setEnabled(True)
         self.add_btn.setEnabled(True)
 
@@ -255,7 +276,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.lightnessCheck()
 
         # PyQt image format
-        convertedFrame = cv2.cvtColor(self.frame_thread.frame, cv2.COLOR_BGR2RGB)
+        convertedFrame = cv2.cvtColor(
+            self.frame_thread.frame, cv2.COLOR_BGR2RGB)
         height, width = convertedFrame.shape[:2]
         pyqtImg = QImage(convertedFrame, width, height, QImage.Format_RGB888)
         pyqtImg = QPixmap.fromImage(pyqtImg)
@@ -263,7 +285,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.camera_label.setScaledContents(True)
 
         # Show state
-        self.state_label.setText('辨識狀態:' + str(self.frame_thread.Recognition.now_state))
+        self.state_label.setText(
+            '辨識狀態:' + str(self.frame_thread.Recognition.now_state))
 
         # Finish recognition
         if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
@@ -271,7 +294,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                 self.FinishFlag = True
                 self.result_box.setText(self.frame_thread.Recognition.text)
                 print('Recognition text : ', self.frame_thread.Recognition.text)
-                cv2.imshow('Cropped Frame', self.frame_thread.Recognition.crop_img)
+                cv2.imshow('Cropped Frame',
+                           self.frame_thread.Recognition.crop_img)
                 self.translate()
                 self.playSound()
         else:
@@ -289,9 +313,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         open user guide message box
         """
-        self.guideText = open(file='./project_codes/GUI/guide.txt',mode='r',encoding='utf-8')
+        self.guideText = open(
+            file='./project_codes/GUI/guide.txt', mode='r', encoding='utf-8')
         QMessageBox(icon=QMessageBox.Information,
-                    windowIcon=QIcon('./project_codes/GUI/images/guide_icon.png'),
+                    windowIcon=QIcon(
+                        './project_codes/GUI/images/guide_icon.png'),
                     windowTitle='使用說明',
                     text=self.guideText.read()).exec()
         self.guideText.close()
@@ -299,11 +325,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     def historyAction_triggerred(self):
         """
         set result_box and translate_box to translate history record
-        """        
+        """
         actionText = self.sender().text()
         self.result_box.setText(actionText)
         self.translate_box.setText(self.historyDict[actionText])
-    
+
     def openWordFileAction_triggered(self):
         """
         Open local word dictionary,if file not exist,create one
@@ -313,85 +339,98 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
 
 # -----------------------------------------Threading-----------------------------------------
 
+
 class frame_Thread(QThread):
     """
     frame updating threading
     """
     frame_callback = pyqtSignal(int)
-    def __init__(self,mainWindow):
+
+    def __init__(self, mainWindow):
         super().__init__()
         self.mainWindow = mainWindow
         self.Recognition = mainWindow.Recognition
 
     def run(self):
         while self.Recognition.cap.isOpened():
-            self.frame = self.Recognition._input_img
+            self.frame = self.Recognition.output_img
             self.contrast = self.mainWindow.settingPage.contrast
             self.brightness = self.mainWindow.settingPage.brightness
             self.frameFlip = self.mainWindow.settingPage.frameFlip
             self.frameMode = self.mainWindow.settingPage.frameMode
             if self.frameFlip:
-                self.frame = cv2.flip(src=self.frame,flipCode=self.frameMode)
-            self.frame = cv2.convertScaleAbs(src=self.frame,alpha=self.contrast,beta=self.brightness)
+                self.frame = cv2.flip(src=self.frame, flipCode=self.frameMode)
+            self.frame = cv2.convertScaleAbs(
+                src=self.frame, alpha=self.contrast, beta=self.brightness)
             self.frame_callback.emit(1)
             time.sleep(0.01)
-            
+
+
 class gTTS_Thread(QThread):
     """
     google Text To Speech threading
     """
-    def __init__(self,input_text,parent=None):
+
+    def __init__(self, input_text, parent=None):
         super().__init__(parent)
         self.input_text = input_text
-        
+
     def run(self):
         text_to_speech.TextToSpeech(self.input_text)
+
 
 class translation_Thread(QThread):
     """
     translate funtion threading
     """
     translation_finished = pyqtSignal(int)
-    def __init__(self,input_text,translated_lang,parent=None):
+
+    def __init__(self, input_text, translated_lang, parent=None):
         super().__init__(parent)
         self.input_text = input_text
         self.translated_lang = translated_lang
-        self.sentenceOrWord ,self.translation_output = -1,""
+        self.sentenceOrWord, self.translation_output = -1, ""
 
     def run(self):
-        self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(self.input_text)
-        self.translation_output = selector_TranslateOrWord.selector_TranslateOrWord(self.input_text,src='en',dest=self.translated_lang)
+        self.sentenceOrWord = selector_TranslateOrWord.check_if_one_word(
+            self.input_text)
+        self.translation_output = selector_TranslateOrWord.selector_TranslateOrWord(
+            self.input_text, src='en', dest=self.translated_lang)
         self.translation_finished.emit(1)
-    
+
+
 class localFileOpen_Thread(QThread):
     """
     local word file open threading
     """
-    def __init__(self,parent=None):
+
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.filePath = os.path.join(dirPath,'localDictionary.txt')
+        self.filePath = os.path.join(dirPath, 'localDictionary.txt')
 
     def run(self):
         if not os.path.exists(self.filePath):
-            open(self.filePath,'w',encoding='utf-8')
-               
-        try :
+            open(self.filePath, 'w', encoding='utf-8')
+
+        try:
             os.system(self.filePath)
         except:
             print('Open file error!')
+
 
 class connectCheck_Thread(QThread):
     """
     connection check thread
     """
-    def __init__(self,mainWindow):
+
+    def __init__(self, mainWindow):
         super().__init__(parent=None)
         self.url = 'http://www.google.com'
         self.mainWindow = mainWindow
 
     def run(self):
         try:
-            requests.get(url=self.url,timeout=1)
+            requests.get(url=self.url, timeout=1)
             self.mainWindow.connectionLabel.setStyleSheet('color:blue')
             self.mainWindow.connectionLabel.setText('Connection: Success')
         except requests.exceptions.ConnectionError:
