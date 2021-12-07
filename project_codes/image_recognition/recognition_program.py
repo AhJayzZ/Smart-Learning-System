@@ -7,8 +7,6 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-from .handedness_detector import get_handedness
-
 from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
 from .text_recognition import text_recognition
 from .video_source_selector import VideoSource
@@ -58,6 +56,8 @@ NUM_DIMENSION = 3
 
 HD_SIZE = 720
 
+red_color = (0, 0, 255)
+
 
 def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
@@ -74,14 +74,14 @@ class edit_img:
         cv2.putText(img, str_show_text, (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1, cv2.LINE_AA)
 
-    def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
+    def draw_point(img, position, point_color=red_color, point_radius=3):
         point = (position.x, position.y)
         point_thickness = -1  # whole point fill in point_color
 
         cv2.circle(
             img, point, radius=point_radius, color=point_color, thickness=point_thickness)
 
-    def draw_frame(img, position_start, position_end, frame_color=(255, 105, 65), frame_thickness=2):
+    def draw_frame(img, position_start, position_end, frame_color=red_color, frame_thickness=1):
         p1 = (position_start.x, position_start.y)
         p2 = (position_end.x, position_end.y)
 
