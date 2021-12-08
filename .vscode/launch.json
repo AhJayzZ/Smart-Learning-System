@@ -7,7 +7,7 @@
             "name": "Python: 目前檔案",
             "type": "python",
             "request": "launch",
-            "program": "D:\\Res\\Code\\Website\\seminar_E_learning_system\\project_codes\\main_program.py",
+            "program": "${file}",
             "console": "integratedTerminal"
         }
     ],
