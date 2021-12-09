@@ -14,6 +14,7 @@ import numpy
 import cv2
 import sys,os
 import time
+import json
 
 
 # Path Configuration
@@ -28,7 +29,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__()
         self.loginPage = loginPage
-        self.settingPage = SettingPage(mainWindow=self)
+        self.userID = self.loginPage.userID
+        self.userPassword = self.loginPage.userPassword
+        self.settingPage = SettingPage(mainWindow=self,
+                                        userID=self.userID,
+                                        userPassword=self.userPassword)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System v1.0')
         self.setFixedSize(self.size())
@@ -142,18 +147,23 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         add translate data to localDictionary
         """
-        currentPath = os.path.dirname(__file__)
-        dirPath = os.path.split(currentPath)[0]    
         filePath = os.path.join(dirPath,'localDictionary.txt')
         if not os.path.exists(filePath):
             open(filePath,'w',encoding='utf-8')
+
         try:
-            with open(filePath,'a',encoding='utf-8') as file:   
-                if self.sentenceOrWord == 0:
-                    lines = [self.input_text,',',self.translation_output,'\n']
-                else :
-                    lines = [self.input_text,',',self.translation_output['defination'],'\n']
-                file.writelines(lines)
+            with open(filePath,'r+',encoding='utf-8') as file:
+                fileContent = json.load(file)
+                wordDuplicated = False
+                for index in range(len(fileContent)):
+                    if self.input_text == fileContent[index]["word"]:
+                        wordDuplicated = True
+                        break
+                if not wordDuplicated:
+                    wordDict = {"word":self.input_text}
+                    fileContent.append(wordDict)        
+                file.seek(0)
+                json.dump(fileContent,file,ensure_ascii=False)
                 file.close()
         except:
             print('add to localDictionary failed')
@@ -177,13 +187,13 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.translate_box.setText(self.translation_output)
         else :                       # Word
             try:
-                outputFormat = '【定義】\n' + self.translation_output['defination'] + '\n\n' + \
-                                '【音標】\n' + self.translation_output['eng_pr'] + ',' + self.translation_output['ame_pr'] + '\n\n' + \
-                                '【時態】\n' + self.translation_output['tenses']
+                outputFormat = '【定義】\n' + str(self.translation_output['defination']) + '\n\n' + \
+                                '【音標】\n' + str(self.translation_output['eng_pr']) + ',' + str(self.translation_output['ame_pr']) + '\n\n' + \
+                                '【時態】\n' + str(self.translation_output['tenses'])
                 self.translate_box.setText(outputFormat)
             except:
                 try :
-                    self.translate_box.setText('【定義】\n' + self.translation_output['defination'])
+                    self.translate_box.setText('【定義】\n' + str(self.translation_output['defination']))
                 except:
                     self.translate_box.setText('Find nothing,please try again!') 
         self.addTranslateHistory() 
@@ -325,7 +335,7 @@ class frame_Thread(QThread):
 
     def run(self):
         while self.Recognition.cap.isOpened():
-            self.frame = self.Recognition._input_img
+            self.frame = self.Recognition.output_img
             self.contrast = self.mainWindow.settingPage.contrast
             self.brightness = self.mainWindow.settingPage.brightness
             self.frameFlip = self.mainWindow.settingPage.frameFlip

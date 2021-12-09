@@ -5,15 +5,29 @@ from PyQt5.QtCore import *
 from .Ui_settingPage import *
 from . import languages
 import cv2
+import pymysql
+import json
+import os
+
+
+# Path Configuration
+currentPath = os.path.dirname(__file__) # GUI
+dirPath = os.path.split(currentPath)[0] # ../ => project_code
+
+ENV_FILE = './.env'
+CONNECTION_TIMEOUT = 100
 
 class SettingPage(QDialog,Ui_settingPage):
     """
     Ui_settingPage
     """
-    def __init__(self,mainWindow=None):
+    def __init__(self,mainWindow,userID,userPassword):
         super(SettingPage,self).__init__()
         self.setupUi(self)
         self.mainWindow = mainWindow
+        self.userID = userID
+        self.userPassword = userPassword
+        print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
         self.setWindowTitle("Setting")
         self.setFixedSize(self.size())
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
@@ -21,6 +35,10 @@ class SettingPage(QDialog,Ui_settingPage):
         # Button default setting
         self.init_btn.clicked.connect(self.initialize)
         self.init_btn.setIcon(QIcon('./project_codes/GUI/images/init_icon.png'))
+        self.syncDB_btn.clicked.connect(lambda:self.syncronize(0))
+        self.syncDB_btn.setIcon(QIcon('./project_codes/GUI/images/upstream_icon.png'))
+        self.syncLocal_btn.clicked.connect(lambda:self.syncronize(1))
+        self.syncLocal_btn.setIcon(QIcon('./project_codes/GUI/images/downstream_icon.png'))
 
         # Frame default setting
         self.cap = cv2.VideoCapture(0)
@@ -128,3 +146,108 @@ class SettingPage(QDialog,Ui_settingPage):
         self.brightness = self.brightness_scrollbar.value()
         self.contrast_label.setText('對比(' + str(self.contrast) + '):')
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
+
+    def syncronize(self,syncMode):
+        # syncMode = 0 (pull database data to local)
+        # syncMode = 1 (push local data to database)
+        databaseFile = open(file=ENV_FILE,mode='r')
+        databaseData = json.loads(databaseFile.read())
+        self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
+        self.syncDB_thread.start()
+    
+
+class sync_Thread(QThread):
+    """
+    syncronize thread
+    """
+    def __init__(self,loginData,userID,syncMode):
+        super().__init__()
+        self.loginData = loginData
+        self.userID = userID
+        self.syncMode = syncMode
+        self.localFile = os.path.join(dirPath,'localDictionary.txt')
+
+    def run(self):
+        self.connectToDB()
+        if self.syncMode:
+            # Push
+            print('Push')
+            localData = self.getWordFromLocal()
+            self.writeDataToDB(localData)
+        else:
+            # pull
+            print('Pull')
+            databaseData = self.getWordFromDB()
+            self.writeDataToLocal(databaseData)
+
+    def connectToDB(self):
+        """
+        connect to database
+        """
+        try:
+            self.db = pymysql.connect(host=self.loginData['DB_HOST'],
+                                        port=self.loginData['DB_PORT'],
+                                        user=self.loginData['DB_USER'],
+                                        password=self.loginData['DB_PASSWORD'],
+                                        database=self.loginData['DB_DATABASE'],
+                                        connect_timeout=CONNECTION_TIMEOUT)
+            self.cursor = self.db.cursor()
+        except:
+            print('conncect to daatabase failed')
+            self.exit()
+
+    def getWordFromDB(self):
+        """
+        get words form database
+        """
+        userWord = []
+        sql = "SELECT user_word FROM User_Word WHERE user_id = '{}';".format(self.userID)
+        self.cursor.execute(sql)
+        sqlData = self.cursor.fetchall()
+        for word in sqlData:
+            userWord.append(word[0])
+        return sorted(userWord)
+
+    def getWordFromLocal(self):
+        """
+        get words from local file
+        """
+        localWord = []
+        with open(file=self.localFile,mode='r') as file:
+            jsonData = json.loads(file.read()) # Output should be a list
+            file.close()
+        for index in range(len(jsonData)):
+            localWord.append(jsonData[index]['word'])
+        return sorted(localWord)
+            
+    def writeDataToLocal(self,databaseData):
+        """
+        write database data to local file
+        """
+        fileData = open(file=self.localFile,mode='r').read()
+        fileDataJSON = json.loads(fileData)
+        with open(file=self.localFile,mode='r+') as file:
+            # Step 1. Delete all word in local
+            for _ in range(len(fileDataJSON)):
+                del fileDataJSON[0]
+
+            # Step 2. Add database data to local
+            for word in databaseData:
+                wordDict = {"word":word}
+                fileDataJSON.append(wordDict)
+            json.dump(fileDataJSON,file,ensure_ascii=False)
+
+    def writeDataToDB(self,localData):
+        """
+        Write local data to database
+        """
+        # Step 1. Delete all word of user_id
+        sql = "DELETE FROM User_Word WHERE user_id = '{}';".format(self.userID)
+        self.cursor.execute(sql)
+
+        # Step 2. Insert all word of local
+        for word in localData:
+            sql = "INSERT INTO User_Word (user_id,user_word) VALUES ('{}','{}');".format(self.userID,word)
+            print(sql)
+            self.cursor.execute(sql)
+        self.db.commit()

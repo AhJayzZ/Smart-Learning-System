@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>494</height>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -259,6 +259,34 @@
      </property>
      <property name="text">
       <string> 設定初始化</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="syncDB_btn">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string> 同步資料庫至本地端</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="syncLocal_btn">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string> 同步本地端至資料庫</string>
      </property>
     </widget>
    </item>

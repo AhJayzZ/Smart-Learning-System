@@ -41,9 +41,8 @@ class LoginPage(QDialog,Ui_loginPage):
         open main page
         """
         self.hide()
-        self.account = self.accountTextbox.text()
-        self.password = self.passwordTextbox.text()
-        print("account:{} \npassword:{}".format(self.account,self.password))
+        self.userID = self.accountTextbox.text()
+        self.userPassword = self.passwordTextbox.text()
         self.mainWindow = MainWindow(self)
 
     def openGuide(self):
