@@ -119,3 +119,4 @@ localDictionary.txt
 
 # other
 *.xlsx
+.vscode/launch.json

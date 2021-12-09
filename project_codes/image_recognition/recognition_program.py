@@ -1,13 +1,10 @@
 from .position import Position
 from .state import State
 
-from . import HAND
-from . import USER
 import cv2
 import mediapipe as mp
 import numpy as np
-
-from .handedness_detector import get_handedness
+import time
 
 from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
 from .text_recognition import text_recognition
@@ -58,6 +55,8 @@ NUM_DIMENSION = 3
 
 HD_SIZE = 720
 
+red_color = (0, 0, 255)
+
 
 def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
@@ -74,14 +73,14 @@ class edit_img:
         cv2.putText(img, str_show_text, (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1, cv2.LINE_AA)
 
-    def draw_point(img, position, point_color=(0, 0, 255), point_radius=3):
+    def draw_point(img, position, point_color=red_color, point_radius=3):
         point = (position.x, position.y)
         point_thickness = -1  # whole point fill in point_color
 
         cv2.circle(
             img, point, radius=point_radius, color=point_color, thickness=point_thickness)
 
-    def draw_frame(img, position_start, position_end, frame_color=(255, 105, 65), frame_thickness=2):
+    def draw_frame(img, position_start, position_end, frame_color=red_color, frame_thickness=1):
         p1 = (position_start.x, position_start.y)
         p2 = (position_end.x, position_end.y)
 
@@ -91,9 +90,12 @@ class edit_img:
 
 class RecognitionProgram:
     STATE_INITIAL = STATE.WaitingSignal
-    MAX_TOLERANCE = 5
+    MAX_TOLERANCE = 3
     MAX_AVERAGE_GRAY_VALUE = 180
     MIN_AVERAGE_GRAY_VALUE = 100
+    MIN_CROP_SCALE = 10
+    MIN_DETECTION_CONFIDENCE = 0.7
+    MIN_TRACKING_CONFIDENCE = 0.7
 
     def __init__(self):
         """
@@ -129,6 +131,14 @@ class RecognitionProgram:
 
         self.text = ""
 
+        self._flag_can_get_text = False
+
+    def has_recognited_text(self):
+        return self._flag_can_get_text
+
+    def ack_had_got_recognited_text(self):
+        self._flag_can_get_text = False
+
     def _debug_print_statement(self):
         """
         debug
@@ -139,12 +149,12 @@ class RecognitionProgram:
             print(self._tolerance)
 
         if self.now_state != self.last_state or self.next_state != self.last_state:
+            print(self.last_state, ", ", self.now_state, ", ", self.next_state)
             self.last_state = self.now_state
-            print(self.now_state, ", ", self.next_state)
-            print(
-                f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
-            print(self.Position_initial)
-            print(self.Position_final)
+            #print(f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
+            # print(self.Position_initial)
+            # print(self.Position_final)
+            print(self.text)
         else:
             pass
 
@@ -201,7 +211,7 @@ class RecognitionProgram:
         #self.output_img = cv2.flip(self.output_img, 1)
 
     def _update_output_img_edited(self):
-        self.output_img = self._input_img
+        self.output_img = self._input_img.copy()
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
@@ -245,7 +255,7 @@ class RecognitionProgram:
             self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
         #self.crop_img = cv2.flip(self.output_img, 1)
-        self.crop_img = self.output_img[self.Position_initial.y: self.Position_final.y,
+        self.crop_img = self._input_img[self.Position_initial.y: self.Position_final.y,
                                         self.Position_initial.x: self.Position_final.x]
         #self.crop_img = cv2.flip(self.crop_img, 1)
 
@@ -271,7 +281,8 @@ class RecognitionProgram:
         elif self.now_state == STATE.GetTextFailed:
             pass
         elif self.now_state == STATE.FinishRecognition:
-            pass
+            #print('from HAND: Recognition text : ', self.text, time.time_ns())
+            self._flag_can_get_text = True
         elif self.now_state == STATE.Error:
             assert 0, "error state, last state: %r" % (self.last_state)
             pass
@@ -300,7 +311,10 @@ class RecognitionProgram:
         elif self.now_state == STATE.StartCropping:
             self._check_tolerance()
         elif self.now_state == STATE.DoingCropping:
-            if (self.Position_initial.x != self.Position_final.x) and (self.Position_initial.y != self.Position_final.y):
+            diff_x = self.Position_initial.x - self.Position_final.x
+            diff_y = self.Position_initial.y - self.Position_final.y
+            # if self.MIN_CROP_SCALE < (diff_x + diff_y):
+            if 0 != diff_x + diff_y:  # means Position_initial != Position_final
                 self._check_tolerance()
             else:
                 self._flag_change_state = False
@@ -329,7 +343,10 @@ class RecognitionProgram:
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.StartCropping:
-            self.next_state = STATE.DoingCropping
+            if self.Position_initial.x != 0:
+                self.next_state = STATE.DoingCropping
+            else:
+                self.next_state = STATE.StartCropping
         elif self.now_state == STATE.DoingCropping:
             # if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
             if self._only_indexNmiddle_finger:
@@ -372,6 +389,9 @@ class RecognitionProgram:
         self._do()
         self._change_state_if_needed()
 
+    def get_recognited_text(self):
+        return self.text
+
     def run_program(self):
         """
         selected_camare:
@@ -383,9 +403,10 @@ class RecognitionProgram:
         """
         with mp_hands.Hands(
                 static_image_mode=False,
-                min_detection_confidence=0.5,
-                min_tracking_confidence=0.5,
-                max_num_hands=1)as hands:
+                max_num_hands=4,
+                model_complexity=0,
+                min_detection_confidence=self.MIN_DETECTION_CONFIDENCE,
+                min_tracking_confidence=self.MIN_TRACKING_CONFIDENCE)as hands:
             for _ in iter(int, 1):
                 success, self._input_img = self.cap.read()
 
@@ -398,7 +419,7 @@ class RecognitionProgram:
                 success, self._input_img = self.cap.read()
 
                 # speed up mediapipe process, img of too large size will be slow
-                self._input_img = cv2.resize(self._input_img, dsize)
+                #self._input_img = cv2.resize(self._input_img, dsize)
 
                 if not success:
                     # print("Ignoring empty camera frame.")
@@ -411,6 +432,7 @@ class RecognitionProgram:
                     self.hand_results = hands.process(img)
 
                     self._process_state_mechine()
+                    self._debug_print_statement()
 
                     if cv2.waitKey(1) & 0xFF == 27:
                         """
