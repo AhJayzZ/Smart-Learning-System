@@ -1,3 +1,4 @@
+from cv2 import imshow
 import pytesseract
 from .cropped_img_handler import cropped_img_handler
 from .text_correction import get_corrected_text
@@ -6,6 +7,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 
 def text_recognition(image_for_get_text):
+    imshow("text", image_for_get_text)
     try:
         image_for_get_text = cropped_img_handler(image_for_get_text)
 

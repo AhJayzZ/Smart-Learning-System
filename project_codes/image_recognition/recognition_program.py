@@ -1,11 +1,10 @@
 from .position import Position
 from .state import State
 
-from . import HAND
-from . import USER
 import cv2
 import mediapipe as mp
 import numpy as np
+import time
 
 from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
 from .text_recognition import text_recognition
@@ -91,7 +90,7 @@ class edit_img:
 
 class RecognitionProgram:
     STATE_INITIAL = STATE.WaitingSignal
-    MAX_TOLERANCE = 5
+    MAX_TOLERANCE = 3
     MAX_AVERAGE_GRAY_VALUE = 180
     MIN_AVERAGE_GRAY_VALUE = 100
     MIN_CROP_SCALE = 10
@@ -132,6 +131,14 @@ class RecognitionProgram:
 
         self.text = ""
 
+        self._flag_can_get_text = False
+
+    def has_recognited_text(self):
+        return self._flag_can_get_text
+
+    def ack_had_got_recognited_text(self):
+        self._flag_can_get_text = False
+
     def _debug_print_statement(self):
         """
         debug
@@ -142,12 +149,11 @@ class RecognitionProgram:
             print(self._tolerance)
 
         if self.now_state != self.last_state or self.next_state != self.last_state:
+            print(self.last_state, ", ", self.now_state, ", ", self.next_state)
             self.last_state = self.now_state
-            print(self.now_state, ", ", self.next_state)
-            print(
-                f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
-            print(self.Position_initial)
-            print(self.Position_final)
+            #print(f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
+            # print(self.Position_initial)
+            # print(self.Position_final)
             print(self.text)
         else:
             pass
@@ -205,7 +211,7 @@ class RecognitionProgram:
         #self.output_img = cv2.flip(self.output_img, 1)
 
     def _update_output_img_edited(self):
-        self.output_img = self._input_img
+        self.output_img = self._input_img.copy()
         edit_img.draw_frame(
             self.output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self.output_img, self.Position_final)
@@ -249,7 +255,7 @@ class RecognitionProgram:
             self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
         #self.crop_img = cv2.flip(self.output_img, 1)
-        self.crop_img = self.output_img[self.Position_initial.y: self.Position_final.y,
+        self.crop_img = self._input_img[self.Position_initial.y: self.Position_final.y,
                                         self.Position_initial.x: self.Position_final.x]
         #self.crop_img = cv2.flip(self.crop_img, 1)
 
@@ -275,7 +281,8 @@ class RecognitionProgram:
         elif self.now_state == STATE.GetTextFailed:
             pass
         elif self.now_state == STATE.FinishRecognition:
-            pass
+            #print('from HAND: Recognition text : ', self.text, time.time_ns())
+            self._flag_can_get_text = True
         elif self.now_state == STATE.Error:
             assert 0, "error state, last state: %r" % (self.last_state)
             pass
@@ -381,6 +388,9 @@ class RecognitionProgram:
         """
         self._do()
         self._change_state_if_needed()
+
+    def get_recognited_text(self):
+        return self.text
 
     def run_program(self):
         """

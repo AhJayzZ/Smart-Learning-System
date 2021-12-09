@@ -179,7 +179,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.input_text = self.result_box.toPlainText()
         self.gTTS_thread = gTTS_Thread(self.input_text)
         self.gTTS_thread.start()
-        print('Recognition text : ', self.frame_thread.Recognition.text)
 
     def setOutputFormat(self):
         """
@@ -289,11 +288,13 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             '辨識狀態:' + str(self.frame_thread.Recognition.now_state))
 
         # Finish recognition
-        if self.frame_thread.Recognition.now_state == STATE.FinishRecognition:
+        if self.frame_thread.Recognition.has_recognited_text():
             if self.FinishFlag == False:
+                self.frame_thread.Recognition.ack_had_got_recognited_text()
                 self.FinishFlag = True
+
                 self.result_box.setText(self.frame_thread.Recognition.text)
-                print('Recognition text : ', self.frame_thread.Recognition.text)
+                #print('from GUI: Recognition text : ',self.frame_thread.Recognition.text, time.time_ns())
                 cv2.imshow('Cropped Frame',
                            self.frame_thread.Recognition.crop_img)
                 self.translate()
