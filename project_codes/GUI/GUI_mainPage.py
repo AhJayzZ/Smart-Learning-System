@@ -151,8 +151,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         if not os.path.exists(filePath):
             open(filePath,'w',encoding='utf-8')
 
-        try:
-            with open(filePath,'r+',encoding='utf-8') as file:
+        with open(filePath,'r+',encoding='utf-8') as file:
+            try:
                 fileContent = json.load(file)
                 wordDuplicated = False
                 for index in range(len(fileContent)):
@@ -164,9 +164,9 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                     fileContent.append(wordDict)        
                 file.seek(0)
                 json.dump(fileContent,file,ensure_ascii=False)
-                file.close()
-        except:
-            print('add to localDictionary failed')
+            except:
+                print('add to localDictionary failed')
+            file.close()
 
     def playSound(self):
         """
