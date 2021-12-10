@@ -10,18 +10,27 @@ from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
 from .text_recognition import text_recognition
 from .video_source_selector import VideoSource
 
+state_message = {
+    "WaitingSignal": "等待截圖",
+    "StartCropping": "開始截圖",
+    "DoingCropping": "正在截圖",
+    "FinishCropping": "完成截圖",
+    "GetText": "正在辨識文字",
+    "FinishRecognition": "完成辨識"
+}
+
 
 class STATE:
-    WaitingSignal = State("Waiting signal to crop")
-    StartCropping = State("Start cropping")
-    DoingCropping = State("Doing cropping")
-    FinishCropping = State("Finish cropping")
-    GetText = State("To get text")
+    WaitingSignal = State(state_message["WaitingSignal"])
+    StartCropping = State(state_message["StartCropping"])
+    DoingCropping = State(state_message["DoingCropping"])
+    FinishCropping = State(state_message["FinishCropping"])
+    GetText = State(state_message["GetText"])
 
     GetTextFailed = State("Getting text failed")
 
     Error = State("Error")
-    FinishRecognition = State("Done with Recognition")
+    FinishRecognition = State(state_message["FinishRecognition"])
 
 
 class STATE_CROPPING:
