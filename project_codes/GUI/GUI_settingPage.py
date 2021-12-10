@@ -13,6 +13,7 @@ import os
 # Path Configuration
 currentPath = os.path.dirname(__file__) # GUI
 dirPath = os.path.split(currentPath)[0] # ../ => project_code
+localFileName = "localDictionary.txt"
 
 ENV_FILE = './.env'
 CONNECTION_TIMEOUT = 100
@@ -36,9 +37,9 @@ class SettingPage(QDialog,Ui_settingPage):
         self.init_btn.clicked.connect(self.initialize)
         self.init_btn.setIcon(QIcon('./project_codes/GUI/images/init_icon.png'))
         self.syncDB_btn.clicked.connect(lambda:self.syncronize(0))
-        self.syncDB_btn.setIcon(QIcon('./project_codes/GUI/images/upstream_icon.png'))
+        self.syncDB_btn.setIcon(QIcon('./project_codes/GUI/images/downstream_icon.png'))
         self.syncLocal_btn.clicked.connect(lambda:self.syncronize(1))
-        self.syncLocal_btn.setIcon(QIcon('./project_codes/GUI/images/downstream_icon.png'))
+        self.syncLocal_btn.setIcon(QIcon('./project_codes/GUI/images/upstream_icon.png'))
 
         # Frame default setting
         self.cap = cv2.VideoCapture(0)
@@ -148,8 +149,11 @@ class SettingPage(QDialog,Ui_settingPage):
         self.brightness_label.setText('亮度(' + str(self.brightness) + '):')
 
     def syncronize(self,syncMode):
-        # syncMode = 0 (pull database data to local)
-        # syncMode = 1 (push local data to database)
+        """
+        do local data and database data syncronize
+            syncMode = 0 (pull database data to local)
+            syncMode = 1 (push local data to database)
+        """
         databaseFile = open(file=ENV_FILE,mode='r')
         databaseData = json.loads(databaseFile.read())
         self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
@@ -159,26 +163,24 @@ class SettingPage(QDialog,Ui_settingPage):
 class sync_Thread(QThread):
     """
     syncronize thread
+        syncMode = 0 (pull database data to local)
+        syncMode = 1 (push local data to database)
     """
     def __init__(self,loginData,userID,syncMode):
         super().__init__()
         self.loginData = loginData
         self.userID = userID
         self.syncMode = syncMode
-        self.localFile = os.path.join(dirPath,'localDictionary.txt')
+        self.localFile = os.path.join(dirPath,localFileName)
 
     def run(self):
         self.connectToDB()
         if self.syncMode:
-            # Push
-            print('Push')
-            localData = self.getWordFromLocal()
-            self.writeDataToDB(localData)
+            print('Push local data to database')
+            self.writeDataToDB(self.getWordFromLocal())
         else:
-            # pull
-            print('Pull')
-            databaseData = self.getWordFromDB()
-            self.writeDataToLocal(databaseData)
+            print('Pull database data to local')
+            self.writeDataToLocal(self.getWordFromDB())
 
     def connectToDB(self):
         """
@@ -193,7 +195,7 @@ class sync_Thread(QThread):
                                         connect_timeout=CONNECTION_TIMEOUT)
             self.cursor = self.db.cursor()
         except:
-            print('conncect to daatabase failed')
+            print('conncect to database failed')
             self.exit()
 
     def getWordFromDB(self):
@@ -214,8 +216,13 @@ class sync_Thread(QThread):
         """
         localWord = []
         with open(file=self.localFile,mode='r') as file:
-            jsonData = json.loads(file.read()) # Output should be a list
-            file.close()
+            try:
+                jsonData = json.loads(file.read()) # Output should be a list
+            except:
+                QMessageBox(icon=QMessageBox.Critical,
+                            text='Loading localDictionary.txt JSON format error,please fix the file',
+                            windowTitle='File Error').exec()
+
         for index in range(len(jsonData)):
             localWord.append(jsonData[index]['word'])
         return sorted(localWord)
@@ -224,18 +231,17 @@ class sync_Thread(QThread):
         """
         write database data to local file
         """
-        fileData = open(file=self.localFile,mode='r').read()
-        fileDataJSON = json.loads(fileData)
-        with open(file=self.localFile,mode='r+') as file:
-            # Step 1. Delete all word in local
-            for _ in range(len(fileDataJSON)):
-                del fileDataJSON[0]
+        # Step 1. Clear all word in local
+        with open(file=self.localFile,mode='w') as file:
+            file.write("[]")
 
-            # Step 2. Add database data to local
+        # Step 2. Add database data to local
+        with open(file=self.localFile,mode='r+') as file:
+            fileData = []
             for word in databaseData:
                 wordDict = {"word":word}
-                fileDataJSON.append(wordDict)
-            json.dump(fileDataJSON,file,ensure_ascii=False)
+                fileData.append(wordDict)
+            json.dump(fileData,file,ensure_ascii=False)
 
     def writeDataToDB(self,localData):
         """

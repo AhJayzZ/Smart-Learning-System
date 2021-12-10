@@ -1,4 +1,3 @@
-
 from GUI.GUI_loginPage import LoginPage
 from PyQt5.QtWidgets import QApplication
 import sys

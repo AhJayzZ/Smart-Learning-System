@@ -25,9 +25,9 @@ class LoginPage(QDialog,Ui_loginPage):
         self.exitButton.clicked.connect(sys.exit)
 
         # Style
-        textboxStyle = "color:white;background-color:black;"
-        buttonStyle = "QPushButton {background-color:#2D7DD2;border-radius:20px;}\
-                        QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #06D6A0, stop: 1 #06D6A0)}"
+        textboxStyle = "color:black;background-color:white;"
+        buttonStyle = "QPushButton {background-color:#FFC43D;border-radius:20px;}\
+                        QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #9CAEA9)}"
         self.accountTextbox.setStyleSheet(textboxStyle)
         self.passwordTextbox.setStyleSheet(textboxStyle)
         self.loginButton.setStyleSheet(buttonStyle)

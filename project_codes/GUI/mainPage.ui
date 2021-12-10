@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1370</width>
+    <width>1388</width>
     <height>842</height>
    </rect>
   </property>
@@ -59,7 +59,7 @@
      <rect>
       <x>840</x>
       <y>410</y>
-      <width>521</width>
+      <width>540</width>
       <height>310</height>
      </rect>
     </property>
@@ -118,7 +118,7 @@
      <rect>
       <x>840</x>
       <y>740</y>
-      <width>521</width>
+      <width>540</width>
       <height>50</height>
      </rect>
     </property>
@@ -139,7 +139,7 @@
      <rect>
       <x>840</x>
       <y>40</y>
-      <width>521</width>
+      <width>540</width>
       <height>310</height>
      </rect>
     </property>
@@ -154,7 +154,7 @@
    <widget class="QPushButton" name="translate_btn">
     <property name="geometry">
      <rect>
-      <x>1060</x>
+      <x>1080</x>
       <y>360</y>
       <width>100</width>
       <height>40</height>
@@ -184,7 +184,7 @@
    <widget class="QPushButton" name="add_btn">
     <property name="geometry">
      <rect>
-      <x>1170</x>
+      <x>1190</x>
       <y>360</y>
       <width>191</width>
       <height>40</height>
@@ -205,7 +205,7 @@
    <widget class="QPushButton" name="sound_btn">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>970</x>
       <y>360</y>
       <width>100</width>
       <height>40</height>
@@ -225,7 +225,7 @@
    <widget class="QPushButton" name="clear_btn">
     <property name="geometry">
      <rect>
-      <x>1310</x>
+      <x>1330</x>
       <y>0</y>
       <width>51</width>
       <height>41</height>
@@ -298,22 +298,22 @@
    <widget class="QLabel" name="connectionLabel">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>5</y>
+      <x>1010</x>
+      <y>0</y>
       <width>301</width>
-      <height>31</height>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>標楷體</family>
-      <pointsize>12</pointsize>
+      <pointsize>15</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
-     <string>Connection:Initializing</string>
+     <string>連線狀態: 初始化</string>
     </property>
    </widget>
    <zorder>tableWidget</zorder>
@@ -336,7 +336,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1370</width>
+     <width>1388</width>
      <height>25</height>
     </rect>
    </property>
