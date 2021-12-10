@@ -128,6 +128,7 @@ class RecognitionProgram:
         self.output_img = self._input_img
         self.crop_img = None
 
+        self._temp = None
         self._flag_success_cropping = False
 
         self.hand_results = None
@@ -266,9 +267,9 @@ class RecognitionProgram:
             if (self.Position_initial.y > self.Position_final.y):
                 self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
-            temp = self._input_img.copy()
-            self.crop_img = temp[self.Position_initial.y: self.Position_final.y,
-                                 self.Position_initial.x: self.Position_final.x]
+            self._temp = self._input_img.copy()
+            self.crop_img = self._temp[self.Position_initial.y: self.Position_final.y,
+                                       self.Position_initial.x: self.Position_final.x]
 
             self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
             self._only_index_finger = self._only_indexNmiddle_finger = False
