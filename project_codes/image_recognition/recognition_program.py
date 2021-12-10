@@ -77,6 +77,15 @@ def get_dsize(height, weight, max_size=HD_SIZE):
     return dsize
 
 
+def get_show_size(height, weight, cut_percentage=0.06):
+    show_height_i = int(height * cut_percentage)
+    show_height_f = int(height - show_height_i)
+    show_weight_i = int(weight * cut_percentage)
+    show_weight_f = int(weight - show_weight_i)
+
+    return [show_height_i, show_height_f, show_weight_i, show_weight_f]
+
+
 class edit_img:
     def put_text(img, str_show_text, text_color=(0, 255, 255)):
         cv2.putText(img, str_show_text, (10, 20),
@@ -128,13 +137,14 @@ class RecognitionProgram:
         self.output_img = self._input_img
         self.crop_img = None
 
-        self._temp = None
+        self._temp_output_img = None
+        self._temp_crop_img = None
         self._flag_success_cropping = False
 
         self.hand_results = None
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
-        #self.handedness = HAND.NO
+        # self.handedness = HAND.NO
         self._only_index_finger = False
         self._only_indexNmiddle_finger = False
 
@@ -144,6 +154,11 @@ class RecognitionProgram:
         self.text = ""
 
         self._flag_can_get_text = False
+
+        self._show_height_i = 0
+        self._show_height_f = 0
+        self._show_weight_i = 0
+        self._show_weight_f = 0
 
     def has_recognited_text(self):
         return self._flag_can_get_text
@@ -163,7 +178,7 @@ class RecognitionProgram:
         if self.now_state != self.last_state or self.next_state != self.last_state:
             print(self.last_state, ", ", self.now_state, ", ", self.next_state)
             self.last_state = self.now_state
-            #print(f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
+            # print(f"only_index_finger: {self._only_index_finger}, only_indexNmiddle_finger:{self._only_indexNmiddle_finger}, flag_change_state: {self._flag_change_state}")
             # print(self.Position_initial)
             # print(self.Position_final)
             print(self.text)
@@ -201,7 +216,7 @@ class RecognitionProgram:
         """
         update: handedness, list_point_hand, index_finger_point
         """
-        #self.handedness = get_handedness(self.hand_results.multi_handedness)
+        # self.handedness = get_handedness(self.hand_results.multi_handedness)
         self._update_whole_hand_point()
         self._update_index_finger_point()
 
@@ -219,15 +234,18 @@ class RecognitionProgram:
             self.state_lightness = STATE_LIGHTNESS.Fine
 
     def _update_output_img(self):
-        self.output_img = self._input_img
-        #self.output_img = cv2.flip(self.output_img, 1)
+        self.output_img = self._input_img[self._show_height_i:self._show_height_f,
+                                          self._show_weight_i:self._show_weight_f]
+        # self.output_img = cv2.flip(self.output_img, 1)
 
     def _update_output_img_edited(self):
-        self.output_img = self._input_img.copy()
+        self._temp_output_img = self._input_img.copy()
         edit_img.draw_frame(
-            self.output_img, self.Position_initial, self.Position_final)
-        edit_img.draw_point(self.output_img, self.Position_final)
-        #self.output_img = cv2.flip(self.output_img, 1)
+            self._temp_output_img, self.Position_initial, self.Position_final)
+        edit_img.draw_point(self._temp_output_img, self.Position_final)
+        self.output_img = self._temp_output_img[self._show_height_i:self._show_height_f,
+                                                self._show_weight_i:self._show_weight_f]
+        # self.output_img = cv2.flip(self.output_img, 1)
 
     def _do_WaitingSignal(self):
         if self.hand_results.multi_hand_landmarks:
@@ -267,9 +285,9 @@ class RecognitionProgram:
             if (self.Position_initial.y > self.Position_final.y):
                 self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
-            self._temp = self._input_img.copy()
-            self.crop_img = self._temp[self.Position_initial.y: self.Position_final.y,
-                                       self.Position_initial.x: self.Position_final.x]
+            self._temp_crop_img = self._input_img.copy()
+            self.crop_img = self._temp_crop_img[self.Position_initial.y: self.Position_final.y,
+                                                self.Position_initial.x: self.Position_final.x]
 
             self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
             self._only_index_finger = self._only_indexNmiddle_finger = False
@@ -299,7 +317,7 @@ class RecognitionProgram:
         elif self.now_state == STATE.GetTextFailed:
             pass
         elif self.now_state == STATE.FinishRecognition:
-            #print('from HAND: Recognition text : ', self.text, time.time_ns())
+            # print('from HAND: Recognition text : ', self.text, time.time_ns())
             self._flag_can_get_text = True
         elif self.now_state == STATE.Error:
             assert 0, "error state, last state: %r" % (self.last_state)
@@ -434,19 +452,21 @@ class RecognitionProgram:
                 if success:
                     dsize = get_dsize(
                         self._input_img.shape[1], self._input_img.shape[0], max_size=HD_SIZE)
+                    [self._show_height_i, self._show_height_f, self._show_weight_i, self._show_weight_f] = get_show_size(
+                        self._input_img.shape[1], self._input_img.shape[0])
                     break
 
             while self.cap.isOpened():
                 success, self._input_img = self.cap.read()
 
                 # speed up mediapipe process, img of too large size will be slow
-                #self._input_img = cv2.resize(self._input_img, dsize)
+                # self._input_img = cv2.resize(self._input_img, dsize)
 
                 if not success:
                     # print("Ignoring empty camera frame.")
                     continue
                 else:
-                    #self._input_img = cv2.flip(self._input_img, 1)
+                    # self._input_img = cv2.flip(self._input_img, 1)
                     img = self._input_img
                     img = cv2.cvtColor(self._input_img, cv2.COLOR_BGR2RGB)
                     img.flags.writeable = False
