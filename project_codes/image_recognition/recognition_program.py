@@ -128,6 +128,8 @@ class RecognitionProgram:
         self.output_img = self._input_img
         self.crop_img = None
 
+        self._flag_success_cropping
+
         self.hand_results = None
 
         self.list_point_hand = [1] * NUM_POINT_HAND * NUM_DIMENSION
@@ -258,18 +260,24 @@ class RecognitionProgram:
         """
         output: crop_img
         """
-        if self.Position_initial.x > self.Position_final.x:
-            self.Position_initial.x, self.Position_final.x = self.Position_final.x, self.Position_initial.x
-        if (self.Position_initial.y > self.Position_final.y):
-            self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
+        try:
+            if self.Position_initial.x > self.Position_final.x:
+                self.Position_initial.x, self.Position_final.x = self.Position_final.x, self.Position_initial.x
+            if (self.Position_initial.y > self.Position_final.y):
+                self.Position_initial.y, self.Position_final.y = self.Position_final.y, self.Position_initial.y
 
-        #self.crop_img = cv2.flip(self.output_img, 1)
-        self.crop_img = self._input_img[self.Position_initial.y: self.Position_final.y,
-                                        self.Position_initial.x: self.Position_final.x]
-        #self.crop_img = cv2.flip(self.crop_img, 1)
+            temp = self._input_img.copy()
+            self.crop_img = temp[self.Position_initial.y: self.Position_final.y,
+                                 self.Position_initial.x: self.Position_final.x]
 
-        self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
-        self._only_index_finger = self._only_indexNmiddle_finger = False
+            self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
+            self._only_index_finger = self._only_indexNmiddle_finger = False
+            if self.crop_img.shape[1] != 0:
+                self._flag_success_cropping = True
+            else:
+                self._flag_success_cropping = False
+        except:
+            self._flag_success_cropping = False
 
     def _do(self):
         """
@@ -329,7 +337,10 @@ class RecognitionProgram:
                 self._flag_change_state = False
 
         elif self.now_state == STATE.FinishCropping:
-            self._flag_change_state = True
+            if self._flag_success_cropping:
+                self._flag_change_state = True
+            else:
+                self._flag_change_state = False
         elif self.now_state == STATE.GetText:
             self._flag_change_state = True
         elif self.now_state == STATE.GetTextFailed:
