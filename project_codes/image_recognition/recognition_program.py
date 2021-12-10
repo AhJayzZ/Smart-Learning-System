@@ -128,7 +128,7 @@ class RecognitionProgram:
         self.output_img = self._input_img
         self.crop_img = None
 
-        self._flag_success_cropping
+        self._flag_success_cropping = False
 
         self.hand_results = None
 
