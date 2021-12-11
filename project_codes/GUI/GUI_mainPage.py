@@ -98,7 +98,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addMenu(self.historyMenu)
 
         # Widget style default setting
-        button_style = "QPushButton {background-color:#FFC43D;border-radius:20px;}\
+        button_style = "QPushButton {background-color:#FFC43D;border-radius:30px;}\
                         QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #9CAEA9)}"
         textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
         self.setStyleSheet("background-color:#4D9358")

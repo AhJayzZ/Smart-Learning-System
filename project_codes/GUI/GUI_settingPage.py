@@ -30,8 +30,8 @@ class SettingPage(QDialog,Ui_settingPage):
         self.userPassword = userPassword
         print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
         self.setWindowTitle("Setting")
-        self.setFixedSize(self.size())
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
+        self.setFixedSize(self.size())
 
         # Button default setting
         self.init_btn.clicked.connect(self.initialize)
@@ -219,9 +219,11 @@ class sync_Thread(QThread):
             try:
                 jsonData = json.loads(file.read()) # Output should be a list
             except:
-                QMessageBox(icon=QMessageBox.Critical,
-                            text='Loading localDictionary.txt JSON format error,please fix the file',
-                            windowTitle='File Error').exec()
+                pass
+                # This is a bug not fixed
+                # QMessageBox(icon=QMessageBox.Critical,
+                #             text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
+                #             windowTitle='檔案錯誤').exec()
 
         for index in range(len(jsonData)):
             localWord.append(jsonData[index]['word'])
