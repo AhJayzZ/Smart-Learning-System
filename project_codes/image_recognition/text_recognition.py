@@ -17,5 +17,5 @@ def text_recognition(image_for_get_text):
         return text
     except:
         assert 0, "error with {text_recognition.__name__}"
-        #print("empty frame")
+        print("empty frame")
         pass
