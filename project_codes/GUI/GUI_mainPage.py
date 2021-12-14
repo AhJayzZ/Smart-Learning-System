@@ -38,19 +38,16 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                                        userID=self.userID,
                                        userPassword=self.userPassword)
         self.setupUi(self)
-        self.setWindowTitle('Smart Learning System v1.0')
+        self.setWindowTitle('Smart Learning System')
         self.setFixedSize(self.size())
         self.setWindowIcon(QIcon('./project_codes/GUI/images/GUI_icon.png'))
-        self.sound_btn.setIcon(
-            QIcon('./project_codes/GUI/images/sound_icon.png'))
-        self.translate_btn.setIcon(
-            QIcon('./project_codes/GUI/images/translate_icon.png'))
+        self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/rightexpand_icon.png'))
+        self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
+        self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
-        self.back_btn.setIcon(
-            QIcon('./project_codes/GUI/images/back_icon.png'))
-        self.clear_btn.setIcon(
-            QIcon('./project_codes/GUI/images/clear_icon.png'))
-        self.clear_btn.setFlat(True)
+        self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
+        self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png'))
+        self.removeWord_btn.setIcon(QIcon('./project_codes/GUI/images/remove_icon.png'))
 
         # Recognition program
         self.FinishFlag = False
@@ -77,7 +74,12 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.translate_btn.clicked.connect(self.translate)
         self.translate_btn.clicked.connect(self.playSound)
         self.sound_btn.clicked.connect(self.playSound)
+        self.expand_btn.clicked.connect(self.expandPage)
+        self.removeWord_btn.clicked.connect(self.wordRemove)
         self.back_btn.clicked.connect(self.backToLoginPage)
+
+        # List widget default setting
+        self.wordList.currentItemChanged.connect(self.wordListSelected)
 
         # Menubar trigger default setting
         self.settingAction = QAction(
@@ -98,20 +100,81 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.menubar.addMenu(self.historyMenu)
 
         # Widget style default setting
+        self.expandFlag = False
         button_style = "QPushButton {background-color:#FFC43D;border-radius:20px;}\
                         QPushButton:pressed{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1 ,stop: 0 #BDD5EA, stop: 1 #9CAEA9)}"
         textbox_style = "border-image:url(./project_codes/GUI/images/textbox.jpg) 0 0 0 0 stretch stretch;"
         self.setStyleSheet("background-color:#4D9358")
+        self.wordList.setStyleSheet("background-color:white")
         self.add_btn.setStyleSheet(button_style)
         self.back_btn.setStyleSheet(button_style)
         self.translate_btn.setStyleSheet(button_style)
         self.sound_btn.setStyleSheet(button_style)
+        self.clear_btn.setStyleSheet(button_style)
+        self.expand_btn.setStyleSheet(button_style)
+        self.removeWord_btn.setStyleSheet(button_style)
         self.translate_box.setStyleSheet(textbox_style)
         self.result_box.setStyleSheet(textbox_style)
-
+        
         # Run program
         self.show()
+        self.loadWordList()
         self.Recognition.run_program()
+
+# -----------------------------------------Word List--------------------------------------------
+    def expandPage(self):
+        """
+        expand main page
+        """
+        EXPAND_SIZE = 320
+        if self.expandFlag == False:
+            self.expandFlag = True
+            self.setFixedSize(self.width()+EXPAND_SIZE,self.height())
+            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/leftexpand_icon.png'))
+        else:
+            self.expandFlag = False  
+            self.setFixedSize(self.width()-EXPAND_SIZE,self.height())
+            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/rightexpand_icon.png'))
+
+    def loadWordList(self):
+        """
+        load local dictionary to wordlist
+        """
+        self.wordList.clear()
+        filePath = os.path.join(dirPath,localFileName)
+        with open(file=filePath,mode='r') as file:
+            try:
+                for word in json.loads(file.read()):
+                    self.wordList.addItem(word["word"])
+            except:
+                print("load local file error")
+                pass
+    
+    def wordRemove(self):
+        """
+        remove word from local dictionary and wordlist
+        """
+        filePath = os.path.join(dirPath,localFileName)
+        wordSelected = self.wordList.currentItem()
+        if not wordSelected: return
+        else:
+            itemIndex = self.wordList.row(wordSelected) 
+            with open(file=filePath,mode='r',encoding='utf-8') as file:
+                fileContent = json.load(file)
+            with open(file=filePath,mode='w',encoding='utf-8') as file:
+                if wordSelected.text() in fileContent[itemIndex].values():
+                    self.wordList.takeItem(itemIndex)
+                    del fileContent[itemIndex]
+                    json.dump(fileContent,file,ensure_ascii=False) 
+
+    def wordListSelected(self):
+        """
+        set word to result box when wordlist selection changed
+        """
+        if self.wordList.currentItem():
+            self.result_box.setText(self.wordList.currentItem().text())
+            self.translate()
+            self.playSound()
 
 # -----------------------------------------Window event--------------------------------------------
 
@@ -168,6 +231,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # Avoid loading error
         try:
             self.inputText = self.result_box.toPlainText()
+            self.wordList.addItem(self.inputText)
             if self.inputText != "":
                 with open(filePath,'r+',encoding='utf-8') as file:
                     fileContent = json.loads(file.read())
@@ -180,6 +244,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                         file.seek(0)
                         fileContent.append({"word": self.inputText})
                         json.dump(fileContent,file,ensure_ascii=False)
+                
             else:
                 print('Empty text')
         except:
@@ -233,6 +298,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                 # Avoid translate history preemption
                 self.translate_btn.setEnabled(False)
                 self.add_btn.setEnabled(False)
+                self.wordList.setEnabled(False)
         self.previousLang = self.settingPage.lang
         self.previousResult = self.inputText
 
@@ -253,6 +319,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         # Avoid translate history preemption
         self.translate_btn.setEnabled(True)
         self.add_btn.setEnabled(True)
+        self.wordList.setEnabled(True)
 
     def translateTimeCount(self):
         """
@@ -304,7 +371,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
 
                 self.inputText = self.frame_thread.Recognition.text
                 self.result_box.setText(self.inputText)
-                cv2.imshow('Cropped Frame',self.frame_thread.Recognition.crop_img)
                 self.translate()
                 self.playSound()
         else:
