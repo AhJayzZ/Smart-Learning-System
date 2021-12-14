@@ -56,8 +56,8 @@
   <widget class="QPushButton" name="reviewWebsiteButton">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>140</y>
+     <x>400</x>
+     <y>200</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -70,7 +70,7 @@
     </font>
    </property>
    <property name="text">
-    <string>複習網頁</string>
+    <string>網頁複習系統</string>
    </property>
   </widget>
   <widget class="QLabel" name="titleLabel">
@@ -98,11 +98,11 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="guideButton">
+  <widget class="QPushButton" name="registerButton">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>200</y>
+     <x>570</x>
+     <y>140</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -115,7 +115,7 @@
     </font>
    </property>
    <property name="text">
-    <string>使用說明</string>
+    <string>註冊</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
@@ -241,7 +241,7 @@
   <zorder>exitButton</zorder>
   <zorder>reviewWebsiteButton</zorder>
   <zorder>titleLabel</zorder>
-  <zorder>guideButton</zorder>
+  <zorder>registerButton</zorder>
  </widget>
  <resources/>
  <connections/>

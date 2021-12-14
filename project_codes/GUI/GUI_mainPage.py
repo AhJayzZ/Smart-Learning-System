@@ -227,11 +227,8 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         if not os.path.exists(filePath):
            with open(filePath, 'w', encoding='utf-8') as file:
                file.write("[]")
-        
-        # Avoid loading error
         try:
             self.inputText = self.result_box.toPlainText()
-            self.wordList.addItem(self.inputText)
             if self.inputText != "":
                 with open(filePath,'r+',encoding='utf-8') as file:
                     fileContent = json.loads(file.read())
@@ -242,15 +239,14 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                             break
                     if not wordDuplicated:
                         file.seek(0)
+                        self.wordList.addItem(self.inputText)
                         fileContent.append({"word": self.inputText})
                         json.dump(fileContent,file,ensure_ascii=False)
-                
-            else:
-                print('Empty text')
         except:
             QMessageBox(icon=QMessageBox.Critical,
+                        windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
                         text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
-                        windowTitle='File Error').exec()
+                        windowTitle='檔案錯誤').exec()
 
     def playSound(self):
         """

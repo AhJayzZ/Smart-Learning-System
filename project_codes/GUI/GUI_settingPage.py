@@ -16,7 +16,7 @@ dirPath = os.path.split(currentPath)[0] # ../ => project_code
 localFileName = "localDictionary.txt"
 
 ENV_FILE = './.env'
-CONNECTION_TIMEOUT = 100
+CONNECTION_TIMEOUT = 10
 
 class SettingPage(QDialog,Ui_settingPage):
     """
@@ -158,10 +158,32 @@ class SettingPage(QDialog,Ui_settingPage):
             databaseData = json.loads(databaseFile.read())
             self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
             self.syncDB_thread.processFinish.connect(self.mainWindow.loadWordList)
+            self.syncDB_thread.connectFailed.connect(self.connectFailedMsg)
+            self.syncDB_thread.loadFileError.connect(self.loadFileErrorMsg)
             self.syncDB_thread.start()
+    
+    def connectFailedMsg(self):
+        """
+        connect to database failed message
+        """
+        QMessageBox(icon=QMessageBox.Critical,
+                    windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
+                    text='無法連線到資料庫，可能是連線問題或是資料庫維護中',
+                    windowTitle='連線錯誤').exec()
+
+    def loadFileErrorMsg(self):
+        """
+        load local file error
+        """
+        QMessageBox(icon=QMessageBox.Critical,
+                    windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
+                    text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
+                    windowTitle='檔案錯誤').exec()
 
 class sync_Thread(QThread):
     processFinish = pyqtSignal(int)
+    connectFailed = pyqtSignal(int)
+    loadFileError = pyqtSignal(int)
     """
     syncronize thread
         syncMode = 0 (pull database data to local)
@@ -175,28 +197,29 @@ class sync_Thread(QThread):
         self.localFile = os.path.join(dirPath,localFileName)
 
     def run(self):
-        self.connectToDB()
-        if self.syncMode:
-            print('Push local data to database')
-            self.writeDataToDB(self.getWordFromLocal())
-        else:
-            print('Pull database data to local')
-            self.writeDataToLocal(self.getWordFromDB())
-
-    def connectToDB(self):
+        self.db = self.connectToDB(self.loginData)
+        if self.db:
+            self.cursor = self.db.cursor()
+            if self.syncMode:
+                print('Push local data to database')
+                self.writeDataToDB(self.getWordFromLocal())
+            else:
+                print('Pull database data to local')
+                self.writeDataToLocal(self.getWordFromDB())
+            
+    def connectToDB(self,loginData):
         """
         connect to database
         """
         try:
-            self.db = pymysql.connect(host=self.loginData['DB_HOST'],
-                                        port=self.loginData['DB_PORT'],
-                                        user=self.loginData['DB_USER'],
-                                        password=self.loginData['DB_PASSWORD'],
-                                        database=self.loginData['DB_DATABASE'],
+            return pymysql.connect(host=loginData['DB_HOST'],
+                                        port=loginData['DB_PORT'],
+                                        user=loginData['DB_USER'],
+                                        password=loginData['DB_PASSWORD'],
+                                        database=loginData['DB_DATABASE'],
                                         connect_timeout=CONNECTION_TIMEOUT)
-            self.cursor = self.db.cursor()
         except:
-            print('conncect to database failed')
+            self.connectFailed.emit(1)
 
     def getWordFromDB(self):
         """
@@ -214,22 +237,16 @@ class sync_Thread(QThread):
         """
         get words from local file
         """
-        localWord = []
         with open(file=self.localFile,mode='r') as file:
             try:
+                localWord = []
                 jsonData = json.loads(file.read())
+                for index in range(len(jsonData)):
+                    localWord.append(jsonData[index]['word'])
+                return sorted(localWord)
             except:
-                print('local file loading error')
-                pass
-                # This is a bug not fixed
-                # QMessageBox(icon=QMessageBox.Critical,
-                #             text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
-                #             windowTitle='檔案錯誤').exec()
+                self.loadFileError.emit(1)
 
-        for index in range(len(jsonData)):
-            localWord.append(jsonData[index]['word'])
-        return sorted(localWord)
-            
     def writeDataToLocal(self,databaseData):
         """
         write database data to local file
