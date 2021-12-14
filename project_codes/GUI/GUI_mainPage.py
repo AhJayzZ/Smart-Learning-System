@@ -152,6 +152,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         clear result and translate box
         """
+        self.inputText = ""
         self.translate_box.clear()
         self.result_box.clear()
 
@@ -200,19 +201,16 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.sentenceOrWord = self.translation_thread.sentenceOrWord
         self.translationOutput = self.translation_thread.translation_output
-
         if self.sentenceOrWord == 0:  # Sentence
             self.translate_box.setText(self.translationOutput)
         else:                       # Word
             try: 
                 outputFormat = '\n'.join(['【定義】\n' + str(self.translationOutput['defination']) + '\n' ,
                                         '【音標】\n' + str(self.translationOutput['eng_pr']) + '\n' + str(self.translationOutput['ame_pr']) + '\n ',
-                                        '【時態】\n' + str(self.translationOutput['tenses'])])
+                                        '【時態】\n' + str(self.translationOutput['tenses']) + '\n',
+                                        '【英文定義】\n' + str(self.translationOutput['def_eng'])])
                 self.translate_box.setText(outputFormat)
             except:
-                try:
-                    self.translate_box.setText('【定義】\n' + str(self.translationOutput['defination']))
-                except:
                     self.translate_box.setText('Find nothing,please try again!')
         self.addTranslateHistory(self.inputText)
 

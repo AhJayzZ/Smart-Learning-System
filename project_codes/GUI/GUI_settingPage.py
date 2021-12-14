@@ -30,8 +30,8 @@ class SettingPage(QDialog,Ui_settingPage):
         self.userPassword = userPassword
         print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
         self.setWindowTitle("Setting")
-        self.setFixedSize(self.size())
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
+        self.setFixedSize(self.size())
 
         # Button default setting
         self.init_btn.clicked.connect(self.initialize)
@@ -87,7 +87,7 @@ class SettingPage(QDialog,Ui_settingPage):
         """
         Initialize all setting configuration
         """
-        self.mainWindow.connectionLabel.setText("Connection:Initializing")
+        self.mainWindow.connectionLabel.setText("連線狀態: 初始化")
         self.mainWindow.connectionLabel.setStyleSheet('color:black')
         self.mainWindow.translate_btn.setEnabled(True)
         self.mainWindow.result_box.clear()
@@ -154,12 +154,11 @@ class SettingPage(QDialog,Ui_settingPage):
             syncMode = 0 (pull database data to local)
             syncMode = 1 (push local data to database)
         """
-        databaseFile = open(file=ENV_FILE,mode='r')
-        databaseData = json.loads(databaseFile.read())
-        self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
-        self.syncDB_thread.start()
+        with open(file=ENV_FILE,mode='r') as databaseFile:
+            databaseData = json.loads(databaseFile.read())
+            self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
+            self.syncDB_thread.start()
     
-
 class sync_Thread(QThread):
     """
     syncronize thread
@@ -196,7 +195,6 @@ class sync_Thread(QThread):
             self.cursor = self.db.cursor()
         except:
             print('conncect to database failed')
-            self.exit()
 
     def getWordFromDB(self):
         """
@@ -217,11 +215,14 @@ class sync_Thread(QThread):
         localWord = []
         with open(file=self.localFile,mode='r') as file:
             try:
-                jsonData = json.loads(file.read()) # Output should be a list
+                jsonData = json.loads(file.read())
             except:
-                QMessageBox(icon=QMessageBox.Critical,
-                            text='Loading localDictionary.txt JSON format error,please fix the file',
-                            windowTitle='File Error').exec()
+                print('local file loading error')
+                pass
+                # This is a bug not fixed
+                # QMessageBox(icon=QMessageBox.Critical,
+                #             text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
+                #             windowTitle='檔案錯誤').exec()
 
         for index in range(len(jsonData)):
             localWord.append(jsonData[index]['word'])

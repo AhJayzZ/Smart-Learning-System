@@ -5,6 +5,10 @@ from PyQt5.QtCore import *
 from .GUI_mainPage import MainWindow
 from .Ui_loginPage import *
 import sys
+import json
+import webbrowser
+
+ENV_FILE = './.env'
 
 class LoginPage(QDialog,Ui_loginPage):
     """
@@ -59,4 +63,9 @@ class LoginPage(QDialog,Ui_loginPage):
         """
         open review website
         """
-        print('Not finish yet')
+        with open(file=ENV_FILE,mode='r') as file:
+            direction = 'accounts/login/'
+            fileContent = json.loads(file.read())
+            webbrowser.open("http://{}:{}/{}".format(fileContent["WEBSITE_HOST"],
+                                                    fileContent["WEBSITE_PORT"],
+                                                    direction))

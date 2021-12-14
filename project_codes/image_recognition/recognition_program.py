@@ -4,7 +4,7 @@ from .state import State
 import cv2
 import mediapipe as mp
 import numpy as np
-import time
+
 
 from .finger_trigger import if_only_index_finger, if_indexNmiddle_finger
 from .text_recognition import text_recognition

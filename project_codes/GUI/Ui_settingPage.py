@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_settingPage(object):
     def setupUi(self, settingPage):
         settingPage.setObjectName("settingPage")
-        settingPage.resize(274, 560)
+        settingPage.resize(274, 582)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(settingPage)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.language_label = QtWidgets.QLabel(settingPage)
@@ -146,6 +146,12 @@ class Ui_settingPage(object):
         self.frameInverse_btn.setObjectName("frameInverse_btn")
         self.frameShow_layout.addWidget(self.frameInverse_btn)
         self.verticalLayout_2.addLayout(self.frameShow_layout)
+        self.line_3 = QtWidgets.QFrame(settingPage)
+        self.line_3.setLineWidth(5)
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.verticalLayout_2.addWidget(self.line_3)
         self.init_btn = QtWidgets.QPushButton(settingPage)
         font = QtGui.QFont()
         font.setPointSize(12)
