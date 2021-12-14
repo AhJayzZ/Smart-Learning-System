@@ -141,6 +141,7 @@ class RecognitionProgram:
     MIN_CROP_SCALE = 10
     MIN_DETECTION_CONFIDENCE = 0.7
     MIN_TRACKING_CONFIDENCE = 0.7
+    MAX_OVERTIME_ROI = 20
 
     def __init__(self):
         """
@@ -159,6 +160,9 @@ class RecognitionProgram:
         self.Position_initial = Position("Position Initial")
         self.index_finger_point = Position("Position of Index_Finger")
         self.Position_final = Position("Position Final")
+
+        self._counter_overtime_ROI = 0
+        self._flag_overtime_ROI = False
 
         self._stored_point_list = []
         for i in range(max_store_index_finger_point_number):
@@ -233,12 +237,7 @@ class RecognitionProgram:
 
                 i = i + 1
 
-    def _update_index_finger_point(self):
-        """
-        update self.index_finger_point
-
-        [need to update self.list_point_hand first]
-        """
+    def _update_stored_pointer(self):
         self._new_point.x = int(self.list_point_hand[NUM_DIMENSION*8]*float(
             self._input_img.shape[1]))
         self._new_point.y = int(self.list_point_hand[NUM_DIMENSION*8+1]*float(
@@ -251,6 +250,12 @@ class RecognitionProgram:
         if self._new_point_pointer == max_store_index_finger_point_number:
             self._new_point_pointer = 0
 
+    def _update_index_finger_point(self):
+        """
+        update self.index_finger_point
+
+        [need to update self.list_point_hand first]
+        """
         self.index_finger_point.x, self.index_finger_point.y = get_stabilized_finger(
             self._stored_point_list)
 
@@ -309,6 +314,19 @@ class RecognitionProgram:
 
         self._update_output_img()
 
+    def _update_flag_overtime_ROI(self):
+        if self._stored_point_list[0].x == self._stored_point_list[self._new_point_pointer].x:
+            if self._counter_overtime_ROI < self.MAX_OVERTIME_ROI:
+                self._counter_overtime_ROI = self._counter_overtime_ROI + 1
+                self._flag_overtime_ROI = False
+            else:
+                self._counter_overtime_ROI = 0
+                self._only_index_finger = False
+                self._flag_overtime_ROI = True
+        else:
+            self._counter_overtime_ROI = 0
+            self._flag_overtime_ROI = False
+
     def _do_DoingCropping(self):
         if self.hand_results.multi_hand_landmarks:
             self._update_hand_point()
@@ -318,6 +336,7 @@ class RecognitionProgram:
                 self.list_point_hand)
             self.Position_final.x, self.Position_final.y = self.index_finger_point()
 
+        self._update_flag_overtime_ROI()
         self._update_output_img_edited()
 
     def _do_FinishCropping(self):
@@ -337,6 +356,7 @@ class RecognitionProgram:
             self.Position_initial.x = self.Position_initial.y = self.Position_final.x = self.Position_final.y = 0
             self._only_index_finger = self._only_indexNmiddle_finger = False
             if self.crop_img.shape[1] != 0:
+                self._counter_overtime_ROI = 0
                 self._flag_success_cropping = True
             else:
                 self._flag_success_cropping = False
@@ -392,13 +412,16 @@ class RecognitionProgram:
         elif self.now_state == STATE.StartCropping:
             self._check_tolerance()
         elif self.now_state == STATE.DoingCropping:
-            diff_x = self.Position_initial.x - self.Position_final.x
-            diff_y = self.Position_initial.y - self.Position_final.y
-            # if self.MIN_CROP_SCALE < (diff_x + diff_y):
-            if 0 != diff_x + diff_y:  # means Position_initial != Position_final
-                self._check_tolerance()
+            if self._flag_overtime_ROI == False:
+                diff_x = self.Position_initial.x - self.Position_final.x
+                diff_y = self.Position_initial.y - self.Position_final.y
+                # if self.MIN_CROP_SCALE < (diff_x + diff_y):
+                if 0 != diff_x + diff_y:  # means Position_initial != Position_final
+                    self._check_tolerance()
+                else:
+                    self._flag_change_state = False
             else:
-                self._flag_change_state = False
+                self._flag_change_state = True
 
         elif self.now_state == STATE.FinishCropping:
             if self._flag_success_cropping:
@@ -433,11 +456,14 @@ class RecognitionProgram:
                 self.next_state = STATE.StartCropping
         elif self.now_state == STATE.DoingCropping:
             # if self.handedness == USER.HANDEDNESS and self._only_indexNmiddle_finger:
-            if self._only_indexNmiddle_finger:
-                self.next_state = STATE.FinishCropping
-            # elif self.handedness == USER.HANDEDNESS and self._only_index_finger:
-            elif self._only_index_finger:
-                self.next_state = STATE.DoingCropping
+            if self._flag_overtime_ROI == False:
+                if self._only_indexNmiddle_finger:
+                    self.next_state = STATE.FinishCropping
+                # elif self.handedness == USER.HANDEDNESS and self._only_index_finger:
+                elif self._only_index_finger:
+                    self.next_state = STATE.DoingCropping
+                else:
+                    self.next_state = STATE.WaitingSignal
             else:
                 self.next_state = STATE.WaitingSignal
         elif self.now_state == STATE.FinishCropping:
@@ -522,6 +548,7 @@ class RecognitionProgram:
 
                     self._update_state_lightness()
                     self._process_state_mechine()
+                    self._update_stored_pointer()
                     self._debug_print_statement()
 
                     if cv2.waitKey(1) & 0xFF == 27:
