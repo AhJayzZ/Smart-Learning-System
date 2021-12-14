@@ -66,6 +66,30 @@ HD_SIZE = 720
 
 red_color = (0, 0, 255)
 
+max_store_index_finger_point_number = 5
+
+
+def update_stored_point(stored_point_list, new_point, pointer):
+    stored_point_list[pointer].x, stored_point_list[pointer].y = new_point()
+
+    return stored_point_list
+
+
+def get_stabilized_finger(stored_point_list, stored_point_length=max_store_index_finger_point_number):
+    """
+    stored_point_list must be in class Position
+    """
+    total_sum_x = 0
+    total_sum_y = 0
+
+    for index in range(stored_point_length):
+        total_sum_x = total_sum_x + stored_point_list[index].x
+        total_sum_y = total_sum_y + stored_point_list[index].y
+
+    stabilized_finger_point_x = int(total_sum_x/stored_point_length)
+    stabilized_finger_point_y = int(total_sum_y/stored_point_length)
+    return [stabilized_finger_point_x, stabilized_finger_point_y]
+
 
 def get_dsize(height, weight, max_size=HD_SIZE):
     if height > HD_SIZE:
@@ -135,6 +159,15 @@ class RecognitionProgram:
         self.Position_initial = Position("Position Initial")
         self.index_finger_point = Position("Position of Index_Finger")
         self.Position_final = Position("Position Final")
+
+        self._stored_point_list = []
+        for i in range(max_store_index_finger_point_number):
+            new_position = Position(str(i))
+            new_position.x, new_position.y = self.Position_final()
+            self._stored_point_list.append(new_position)
+
+        self._new_point = Position("new_point")
+        self._new_point_pointer = 0
 
         self._input_img = cv2.imread("init_img.jpg")
         self.output_img = self._input_img
@@ -206,10 +239,20 @@ class RecognitionProgram:
 
         [need to update self.list_point_hand first]
         """
-        self.index_finger_point.x = int(self.list_point_hand[NUM_DIMENSION*8]*float(
+        self._new_point.x = int(self.list_point_hand[NUM_DIMENSION*8]*float(
             self._input_img.shape[1]))
-        self.index_finger_point.y = int(self.list_point_hand[NUM_DIMENSION*8+1]*float(
+        self._new_point.y = int(self.list_point_hand[NUM_DIMENSION*8+1]*float(
             self._input_img.shape[0]))
+
+        self._stored_point_list = update_stored_point(
+            self._stored_point_list, self._new_point, self._new_point_pointer)
+
+        self._new_point_pointer = self._new_point_pointer + 1
+        if self._new_point_pointer == max_store_index_finger_point_number:
+            self._new_point_pointer = 0
+
+        self.index_finger_point.x, self.index_finger_point.y = get_stabilized_finger(
+            self._stored_point_list)
 
     def _update_hand_point(self):
         """
