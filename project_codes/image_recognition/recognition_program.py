@@ -159,11 +159,6 @@ class RecognitionProgram:
 
         self._flag_can_get_text = False
 
-        self._show_height_i = 0
-        self._show_height_f = 0
-        self._show_weight_i = 0
-        self._show_weight_f = 0
-
     def has_recognited_text(self):
         return self._flag_can_get_text
 
@@ -248,12 +243,11 @@ class RecognitionProgram:
     def _update_output_img_edited(self):
         # self.output_img = self._input_img[self._show_size[2]:self._show_size[3],
         #                                  self._show_size[0]:self._show_size[1]].copy()
-        self.output_img = self._input_img.copy()
+        self._temp_output_img = self._input_img.copy()
         edit_img.draw_frame(
             self._temp_output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self._temp_output_img, self.Position_final)
-        self.output_img = self._temp_output_img[self._show_height_i:self._show_height_f,
-                                                self._show_weight_i:self._show_weight_f]
+        self.output_img = self._temp_output_img
         # self.output_img = cv2.flip(self.output_img, 1)
 
     def _do_WaitingSignal(self):
