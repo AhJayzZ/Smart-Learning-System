@@ -158,6 +158,8 @@ class SettingPage(QDialog,Ui_settingPage):
             databaseData = json.loads(databaseFile.read())
             self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
             self.syncDB_thread.processFinish.connect(self.mainWindow.loadWordList)
+            self.syncDB_thread.pushFinish.connect(self.pushFinishMsg)
+            self.syncDB_thread.pullFinish.connect(self.pullFinishMsg)
             self.syncDB_thread.connectFailed.connect(self.connectFailedMsg)
             self.syncDB_thread.loadFileError.connect(self.loadFileErrorMsg)
             self.syncDB_thread.start()
@@ -179,11 +181,25 @@ class SettingPage(QDialog,Ui_settingPage):
                     windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
                     text='載入本地單字本失敗，請檢查檔案中的JSON的格式並修復',
                     windowTitle='檔案錯誤').exec()
+    
+    def pushFinishMsg(self):
+        QMessageBox(icon=QMessageBox.Information,
+                    windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxInformation),
+                    text='上傳本地端資料至資料庫完成',
+                    windowTitle='上傳完成').exec()
+
+    def pullFinishMsg(self):
+        QMessageBox(icon=QMessageBox.Information,
+                    windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxInformation),
+                    text='下載資料庫資料至本地端完成',
+                    windowTitle='下載完成').exec()
 
 class sync_Thread(QThread):
     processFinish = pyqtSignal(int)
     connectFailed = pyqtSignal(int)
     loadFileError = pyqtSignal(int)
+    pushFinish = pyqtSignal(int)
+    pullFinish = pyqtSignal(int)
     """
     syncronize thread
         syncMode = 0 (pull database data to local)
@@ -203,9 +219,11 @@ class sync_Thread(QThread):
             if self.syncMode:
                 print('Push local data to database')
                 self.writeDataToDB(self.getWordFromLocal())
+                self.pushFinish.emit(1)
             else:
                 print('Pull database data to local')
                 self.writeDataToLocal(self.getWordFromDB())
+                self.pullFinish.emit(1)
             
     def connectToDB(self,loginData):
         """

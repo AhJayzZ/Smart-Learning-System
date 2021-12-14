@@ -106,8 +106,6 @@ class LoginPage(QDialog,Ui_loginPage):
                         windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
                         text='帳號或密碼不存在，請重新確認帳號密碼或註冊會員',
                         windowTitle='帳號密碼不存在').exec()
-    
-
 
 class connectDB_Thread(QThread):
     """
