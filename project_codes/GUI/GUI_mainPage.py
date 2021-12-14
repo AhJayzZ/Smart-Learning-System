@@ -264,7 +264,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         check and update frame brightness status
         """
-        self.averageGrayValue = numpy.mean(self.frame_thread.frame)
+        self.averageGrayValue = numpy.mean(self.frame_thread.Recognition.average_gray_value)
         if self.averageGrayValue > self.frame_thread.Recognition.MAX_AVERAGE_GRAY_VALUE:
             self.warning_label.setStyleSheet("color:red")
             self.warning_label.setText('光線:過亮')

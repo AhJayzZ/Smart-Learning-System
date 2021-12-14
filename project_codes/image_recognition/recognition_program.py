@@ -77,10 +77,13 @@ def get_dsize(height, weight, max_size=HD_SIZE):
     return dsize
 
 
-def get_show_size(height, weight, cut_percentage=0.06):
+def update_show_size(height, weight, cut_percentage=0.1):
+    """
+    get_show_size for make user seems don't whole hand on the camera
+    """
+    show_weight_i = int(weight * cut_percentage/2)  # compiler friendly
     show_height_i = int(height * cut_percentage)
-    show_height_f = int(height - show_height_i)
-    show_weight_i = int(weight * cut_percentage)
+    show_height_f = int(height)
     show_weight_f = int(weight - show_weight_i)
 
     return [show_height_i, show_height_f, show_weight_i, show_weight_f]
@@ -149,7 +152,8 @@ class RecognitionProgram:
         self._only_indexNmiddle_finger = False
 
         self.state_lightness = None
-        self.average_gray_value = None
+        self.average_gray_value = (
+            self.MIN_AVERAGE_GRAY_VALUE + self.MAX_AVERAGE_GRAY_VALUE)/2
 
         self.text = ""
 
@@ -234,12 +238,17 @@ class RecognitionProgram:
             self.state_lightness = STATE_LIGHTNESS.Fine
 
     def _update_output_img(self):
-        self.output_img = self._input_img[self._show_height_i:self._show_height_f,
-                                          self._show_weight_i:self._show_weight_f]
-        # self.output_img = cv2.flip(self.output_img, 1)
+        # self.output_img = self._input_img[self._show_size[2]:self._show_size[3],
+        #                                   self._show_size[1]:self._show_size[0]]
+        self.output_img = self._input_img
+        #self.output_img = cv2.flip(self.output_img, 1)
+        #cv2.imshow("input", self._input_img)
+        #cv2.imshow("show", self.output_img)
 
     def _update_output_img_edited(self):
-        self._temp_output_img = self._input_img.copy()
+        # self.output_img = self._input_img[self._show_size[2]:self._show_size[3],
+        #                                  self._show_size[0]:self._show_size[1]].copy()
+        self.output_img = self._input_img.copy()
         edit_img.draw_frame(
             self._temp_output_img, self.Position_initial, self.Position_final)
         edit_img.draw_point(self._temp_output_img, self.Position_final)
@@ -272,7 +281,6 @@ class RecognitionProgram:
                 self.list_point_hand)
             self.Position_final.x, self.Position_final.y = self.index_finger_point()
 
-        self._update_state_lightness()
         self._update_output_img_edited()
 
     def _do_FinishCropping(self):
@@ -452,8 +460,11 @@ class RecognitionProgram:
                 if success:
                     dsize = get_dsize(
                         self._input_img.shape[1], self._input_img.shape[0], max_size=HD_SIZE)
-                    [self._show_height_i, self._show_height_f, self._show_weight_i, self._show_weight_f] = get_show_size(
-                        self._input_img.shape[1], self._input_img.shape[0])
+                    self._show_size = update_show_size(
+                        self._input_img.shape[0], self._input_img.shape[1])
+                    print(self._input_img.shape[0], self._input_img.shape[1])
+                    print(self._show_size[0], self._show_size[1],
+                          self._show_size[2], self._show_size[3])
                     break
 
             while self.cap.isOpened():
@@ -472,6 +483,7 @@ class RecognitionProgram:
                     img.flags.writeable = False
                     self.hand_results = hands.process(img)
 
+                    self._update_state_lightness()
                     self._process_state_mechine()
                     self._debug_print_statement()
 
