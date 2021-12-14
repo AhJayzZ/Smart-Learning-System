@@ -157,9 +157,11 @@ class SettingPage(QDialog,Ui_settingPage):
         with open(file=ENV_FILE,mode='r') as databaseFile:
             databaseData = json.loads(databaseFile.read())
             self.syncDB_thread = sync_Thread(databaseData,self.userID,syncMode)
+            self.syncDB_thread.processFinish.connect(self.mainWindow.loadWordList)
             self.syncDB_thread.start()
-    
+
 class sync_Thread(QThread):
+    processFinish = pyqtSignal(int)
     """
     syncronize thread
         syncMode = 0 (pull database data to local)
@@ -243,6 +245,7 @@ class sync_Thread(QThread):
                 wordDict = {"word":word}
                 fileData.append(wordDict)
             json.dump(fileData,file,ensure_ascii=False)
+        self.processFinish.emit(1)
 
     def writeDataToDB(self,localData):
         """
@@ -258,3 +261,4 @@ class sync_Thread(QThread):
             print(sql)
             self.cursor.execute(sql)
         self.db.commit()
+        self.processFinish.emit(1)

@@ -4,8 +4,11 @@
 ## 簡介 Introduction
 本系統主要透過**手勢辨識、文字辨識、網路爬蟲、網站架設來實現**，打造一個適合為學習外文、正在學習說話、識字的幼童或老年人士設計的一個閱讀學習系統，**將手指輕輕滑過一個詞彙或一行文字，便能聽到喇叭發出該詞彙的發音與該詞彙的翻譯(翻譯、時態、音標)**。此外，若想學習外文，可以使用本系統的附加功能——即時翻譯，例如：當手指指到「dictionary」單字時，喇叭或耳機便會唸出「dictionary」和「字典」的發音，期望對學習外文有實質性的幫助。
 
-![](https://i.imgur.com/6AFZYzn.jpg)
+- ### 過程簡述 Process
+    ![](https://i.imgur.com/6AFZYzn.jpg)
 
+- ### 展示影片 Demonstration
+    <iframe width="1008" height="586" src="https://www.youtube.com/embed/Rt-9JXD9Apw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ----------------------------------------
 
 ## 環境設定 Environment
