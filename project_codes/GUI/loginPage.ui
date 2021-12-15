@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>741</width>
-    <height>259</height>
+    <width>557</width>
+    <height>231</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>140</y>
+     <y>110</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -36,8 +36,8 @@
   <widget class="QPushButton" name="exitButton">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>200</y>
+     <x>580</x>
+     <y>180</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -53,33 +53,13 @@
     <string>離開</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="reviewWebsiteButton">
-   <property name="geometry">
-    <rect>
-     <x>400</x>
-     <y>200</y>
-     <width>151</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>網頁複習系統</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="titleLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>721</width>
-     <height>91</height>
+     <width>541</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="font">
@@ -101,8 +81,8 @@
   <widget class="QPushButton" name="registerButton">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>140</y>
+     <x>400</x>
+     <y>180</y>
      <width>151</width>
      <height>41</height>
     </rect>
@@ -122,9 +102,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>140</y>
+     <y>110</y>
      <width>361</width>
-     <height>101</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="font">
@@ -150,7 +130,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>10</y>
+      <y>30</y>
       <width>271</width>
       <height>31</height>
      </rect>
@@ -171,7 +151,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>60</y>
+      <y>70</y>
       <width>271</width>
       <height>31</height>
      </rect>
@@ -196,8 +176,8 @@
    <widget class="QLabel" name="accountLabel">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
+      <x>11</x>
+      <y>30</y>
       <width>61</width>
       <height>25</height>
      </rect>
@@ -218,7 +198,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>70</y>
       <width>61</width>
       <height>25</height>
      </rect>
@@ -235,13 +215,61 @@
      <string>密碼:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="clear_btn">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>0</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>true</underline>
+     </font>
+    </property>
+    <property name="text">
+     <string>重新輸入</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="noLogin_btn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>150</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>不登入使用</string>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
   </widget>
   <zorder>groupBox</zorder>
   <zorder>loginButton</zorder>
   <zorder>exitButton</zorder>
-  <zorder>reviewWebsiteButton</zorder>
   <zorder>titleLabel</zorder>
   <zorder>registerButton</zorder>
+  <zorder>noLogin_btn</zorder>
  </widget>
  <resources/>
  <connections/>

@@ -10,6 +10,7 @@ from image_recognition import text_to_speech
 from word_transtale import selector_TranslateOrWord
 
 import requests
+import webbrowser
 import numpy
 import cv2
 import sys
@@ -24,6 +25,8 @@ dirPath = os.path.split(currentPath)[0]  # ../ => project_code
 localFile = os.path.join(dirPath,"localDictionary.txt")
 guideFile = os.path.join(currentPath,'guide.txt')
 
+ENV_FILE = './.env'
+
 class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     """
     Ui_SmartLearningSystemGUI 
@@ -34,9 +37,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.loginPage = loginPage
         self.userID = self.loginPage.userID
         self.userPassword = self.loginPage.userPassword
+        self.userLogin = self.loginPage.userLogin
         self.settingPage = SettingPage(mainWindow=self,
-                                       userID=self.userID,
-                                       userPassword=self.userPassword)
+                                        userLogin=self.userLogin,
+                                        userID=self.userID,
+                                        userPassword=self.userPassword)
         self.setupUi(self)
         self.setWindowTitle('Smart Learning System')
         self.setFixedSize(self.size())
@@ -45,6 +50,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.setIcon(QIcon('./project_codes/GUI/images/sound_icon.png'))
         self.translate_btn.setIcon(QIcon('./project_codes/GUI/images/translate_icon.png'))
         self.add_btn.setIcon(QIcon('./project_codes/GUI/images/add_icon.png'))
+        self.reviewWebsite_btn.setIcon(QIcon('./project_codes/GUI/images/review_icon.png'))
         self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
         self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png'))
         self.removeWord_btn.setIcon(QIcon('./project_codes/GUI/images/remove_icon.png'))
@@ -80,6 +86,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.clicked.connect(self.playSound)
         self.expand_btn.clicked.connect(self.expandPage)
         self.removeWord_btn.clicked.connect(self.wordRemove)
+        self.reviewWebsite_btn.clicked.connect(self.openReviewWebsite)
         self.back_btn.clicked.connect(self.backToLoginPage)
 
         # List widget default setting
@@ -112,6 +119,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.wordList.setStyleSheet("background-color:white")
         self.add_btn.setStyleSheet(button_style)
         self.back_btn.setStyleSheet(button_style)
+        self.reviewWebsite_btn.setStyleSheet(button_style)
         self.translate_btn.setStyleSheet(button_style)
         self.sound_btn.setStyleSheet(button_style)
         self.clear_btn.setStyleSheet(button_style)
@@ -137,7 +145,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
                             windowTitle='離開程式',
                             text='是否離開本程式?',
                             standardButtons=(QMessageBox.Yes | QMessageBox.No)).exec_()
-
         if reply == QMessageBox.Yes:
             event.accept()
             sys.exit()
@@ -151,6 +158,18 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.Recognition.cap.release()
         self.hide()
         self.loginPage.show()
+
+    def openReviewWebsite(self):
+        """
+        open review website
+        """
+        with open(file=ENV_FILE,mode='r') as file:
+            direction = 'accounts/login/'
+            fileContent = json.loads(file.read())
+            webbrowser.open("http://{}:{}/{}".format(fileContent["WEBSITE_HOST"],
+                                                    fileContent["WEBSITE_PORT"],
+                                                    direction))
+
 
 # -----------------------------------------Functions-----------------------------------------
 

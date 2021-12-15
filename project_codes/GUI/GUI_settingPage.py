@@ -22,13 +22,13 @@ class SettingPage(QDialog,Ui_settingPage):
     """
     Ui_settingPage
     """
-    def __init__(self,mainWindow,userID,userPassword):
+    def __init__(self,mainWindow,userLogin,userID,userPassword):
         super(SettingPage,self).__init__()
         self.setupUi(self)
         self.mainWindow = mainWindow
         self.userID = userID
         self.userPassword = userPassword
-        print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
+       
         self.setWindowTitle("Setting")
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
         self.setFixedSize(self.size())
@@ -82,6 +82,14 @@ class SettingPage(QDialog,Ui_settingPage):
             self.updateCamera)
         self.language_selector.currentTextChanged.connect(
             self.updateLanguage)
+
+        if userLogin:
+            print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
+        else:
+            self.syncDB_btn.setEnabled(False)
+            self.syncLocal_btn.setEnabled(False)
+            print("user not login")
+        
 
     def initialize(self):
         """

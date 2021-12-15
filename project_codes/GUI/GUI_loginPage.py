@@ -34,8 +34,8 @@ class LoginPage(QDialog,Ui_loginPage):
 
         self.loginButton.clicked.connect(self.openMainPage)
         self.registerButton.clicked.connect(self.openRegisterWebsite)
-        self.reviewWebsiteButton.clicked.connect(self.openReviewWebsite)
-        self.exitButton.clicked.connect(sys.exit)
+        self.noLogin_btn.clicked.connect(self.noServerLogin)
+        self.clear_btn.clicked.connect(self.clear)
 
         # Style
         textboxStyle = "color:black;background-color:white;"
@@ -44,9 +44,15 @@ class LoginPage(QDialog,Ui_loginPage):
         self.accountTextbox.setStyleSheet(textboxStyle)
         self.passwordTextbox.setStyleSheet(textboxStyle)
         self.loginButton.setStyleSheet(buttonStyle)
-        self.reviewWebsiteButton.setStyleSheet(buttonStyle)
         self.registerButton.setStyleSheet(buttonStyle)
-        self.exitButton.setStyleSheet(buttonStyle)
+        self.accountTextbox.setFocus()
+    
+    def clear(self):
+        """
+        clear accountTextbox and passwordTextbox
+        """
+        self.accountTextbox.clear()
+        self.passwordTextbox.clear()
         self.accountTextbox.setFocus()
 
     def openMainPage(self):
@@ -72,17 +78,13 @@ class LoginPage(QDialog,Ui_loginPage):
             webbrowser.open("http://{}:{}/{}".format(fileContent["WEBSITE_HOST"],
                                                     fileContent["WEBSITE_PORT"],
                                                     direction))
-        
-    def openReviewWebsite(self):
-        """
-        open review website
-        """
-        with open(file=ENV_FILE,mode='r') as file:
-            direction = 'accounts/login/'
-            fileContent = json.loads(file.read())
-            webbrowser.open("http://{}:{}/{}".format(fileContent["WEBSITE_HOST"],
-                                                    fileContent["WEBSITE_PORT"],
-                                                    direction))
+    
+    def noServerLogin(self):
+        self.hide()
+        self.userID = None
+        self.userPassword = None
+        self.userLogin = False
+        self.mainWindow = MainWindow(self)
 
     def connectFailedMsg(self):
         """
@@ -100,6 +102,7 @@ class LoginPage(QDialog,Ui_loginPage):
         if self.connect_thread.userExist == True:
             print('loginTime:'+self.connect_thread.loginTime)
             self.hide()
+            self.userLogin = True
             self.mainWindow = MainWindow(self)
         else:
             QMessageBox(icon=QMessageBox.Critical,

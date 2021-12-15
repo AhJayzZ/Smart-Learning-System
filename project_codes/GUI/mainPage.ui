@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1387</width>
-    <height>846</height>
+    <width>1389</width>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -116,9 +116,9 @@
    <widget class="QPushButton" name="back_btn">
     <property name="geometry">
      <rect>
-      <x>840</x>
+      <x>1130</x>
       <y>740</y>
-      <width>540</width>
+      <width>250</width>
       <height>50</height>
      </rect>
     </property>
@@ -400,7 +400,7 @@
      </font>
     </property>
     <property name="text">
-     <string> 移除單字</string>
+     <string>移除單字</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -414,6 +414,26 @@
     </property>
     <property name="orientation">
      <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reviewWebsite_btn">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>740</y>
+      <width>250</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string> 線上複習網站</string>
     </property>
    </widget>
    <zorder>tableWidget</zorder>
@@ -435,13 +455,14 @@
    <zorder>result_label_2</zorder>
    <zorder>removeWord_btn</zorder>
    <zorder>line</zorder>
+   <zorder>reviewWebsite_btn</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1387</width>
+     <width>1389</width>
      <height>25</height>
     </rect>
    </property>
