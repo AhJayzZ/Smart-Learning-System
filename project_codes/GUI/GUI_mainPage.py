@@ -21,13 +21,13 @@ import json
 # Path Configuration
 currentPath = os.path.dirname(__file__)  # GUI
 dirPath = os.path.split(currentPath)[0]  # ../ => project_code
-localFileName = "localDictionary.txt"
+localFile = os.path.join(dirPath,"localDictionary.txt")
+guideFile = os.path.join(currentPath,'guide.txt')
 
 class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
     """
     Ui_SmartLearningSystemGUI 
     """
-
     def __init__(self, loginPage):
         # 繼承Ui_Gui.py
         super(MainWindow, self).__init__()
@@ -121,61 +121,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.loadWordList()
         self.Recognition.run_program()
 
-# -----------------------------------------Word List--------------------------------------------
-    def expandPage(self):
-        """
-        expand main page
-        """
-        EXPAND_SIZE = 320
-        if self.expandFlag == False:
-            self.expandFlag = True
-            self.setFixedSize(self.width()+EXPAND_SIZE,self.height())
-            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/leftexpand_icon.png'))
-        else:
-            self.expandFlag = False  
-            self.setFixedSize(self.width()-EXPAND_SIZE,self.height())
-            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/rightexpand_icon.png'))
-
-    def loadWordList(self):
-        """
-        load local dictionary to wordlist
-        """
-        self.wordList.clear()
-        filePath = os.path.join(dirPath,localFileName)
-        with open(file=filePath,mode='r') as file:
-            try:
-                for word in json.loads(file.read()):
-                    self.wordList.addItem(word["word"])
-            except:
-                print("load local file error")
-                pass
-    
-    def wordRemove(self):
-        """
-        remove word from local dictionary and wordlist
-        """
-        filePath = os.path.join(dirPath,localFileName)
-        wordSelected = self.wordList.currentItem()
-        if not wordSelected: return
-        else:
-            itemIndex = self.wordList.row(wordSelected) 
-            with open(file=filePath,mode='r',encoding='utf-8') as file:
-                fileContent = json.load(file)
-            with open(file=filePath,mode='w',encoding='utf-8') as file:
-                if wordSelected.text() in fileContent[itemIndex].values():
-                    self.wordList.takeItem(itemIndex)
-                    del fileContent[itemIndex]
-                    json.dump(fileContent,file,ensure_ascii=False) 
-
-    def wordListSelected(self):
-        """
-        set word to result box when wordlist selection changed
-        """
-        if self.wordList.currentItem():
-            self.result_box.setText(self.wordList.currentItem().text())
-            self.translate()
-            self.playSound()
-
 # -----------------------------------------Window event--------------------------------------------
 
     def closeEvent(self, event):
@@ -218,19 +163,28 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.inputText = ""
         self.translate_box.clear()
         self.result_box.clear()
+    
+    def enableWidget(self):
+        """
+        avoid process preemption
+        """
+        if self.translation_thread.isFinished() and self.gTTS_thread.isFinished():
+            self.sound_btn.setEnabled(True)
+            self.translate_btn.setEnabled(True)
+            self.add_btn.setEnabled(True)
+            self.wordList.setEnabled(True)
 
     def addToDictionary(self):
         """
         add translate data to localDictionary
         """
-        filePath = os.path.join(dirPath,localFileName)
-        if not os.path.exists(filePath):
-           with open(filePath, 'w', encoding='utf-8') as file:
+        if not os.path.exists(localFile):
+           with open(file=localFile, mode='w', encoding='utf-8') as file:
                file.write("[]")
         try:
             self.inputText = self.result_box.toPlainText()
             if self.inputText != "":
-                with open(filePath,'r+',encoding='utf-8') as file:
+                with open(file=localFile,mode='r+',encoding='utf-8') as file:
                     fileContent = json.loads(file.read())
                     wordDuplicated = False
                     for index in range(len(fileContent)):
@@ -254,6 +208,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         self.inputText = self.result_box.toPlainText()
         self.gTTS_thread = gTTS_Thread(self.inputText)
+        self.gTTS_thread.gTTS_finish.connect(self.enableWidget)
         self.gTTS_thread.start()
 
     def setOutputFormat(self):
@@ -289,9 +244,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             if (self.previousResult != self.inputText) or (self.previousLang != self.settingPage.lang):
                 self.translation_thread = translation_Thread(self.inputText, self.settingPage.lang)
                 self.translation_thread.translation_finished.connect(self.setOutputFormat)
+                self.translation_thread.translation_finished.connect(self.enableWidget)
                 self.translation_thread.start()
 
-                # Avoid translate history preemption
+                # Avoid process preemption
+                self.sound_btn.setEnabled(False)
                 self.translate_btn.setEnabled(False)
                 self.add_btn.setEnabled(False)
                 self.wordList.setEnabled(False)
@@ -312,10 +269,6 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
             self.historyAction[self.historyIndex %
                                self.historyIndexMaximum].setText(word)
         self.historyIndex = self.historyIndex + 1
-        # Avoid translate history preemption
-        self.translate_btn.setEnabled(True)
-        self.add_btn.setEnabled(True)
-        self.wordList.setEnabled(True)
 
     def translateTimeCount(self):
         """
@@ -372,6 +325,59 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         else:
             self.FinishFlag = False
 
+# -----------------------------------------Word List--------------------------------------------
+    def expandPage(self):
+        """
+        expand main page
+        """
+        EXPAND_SIZE = 320
+        if self.expandFlag == False:
+            self.expandFlag = True
+            self.setFixedSize(self.width()+EXPAND_SIZE,self.height())
+            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/leftexpand_icon.png'))
+        else:
+            self.expandFlag = False  
+            self.setFixedSize(self.width()-EXPAND_SIZE,self.height())
+            self.expand_btn.setIcon(QIcon('./project_codes/GUI/images/rightexpand_icon.png'))
+
+    def loadWordList(self):
+        """
+        load local dictionary to wordlist
+        """
+        self.wordList.clear()
+        with open(file=localFile,mode='r') as file:
+            try:
+                for word in json.loads(file.read()):
+                    self.wordList.addItem(word["word"])
+            except:
+                print("load local file error")
+                pass
+    
+    def wordRemove(self):
+        """
+        remove word from local dictionary and wordlist
+        """
+        wordSelected = self.wordList.currentItem()
+        if not wordSelected: return
+        else:
+            itemIndex = self.wordList.row(wordSelected) 
+            with open(file=localFile,mode='r',encoding='utf-8') as file:
+                fileContent = json.load(file)
+            with open(file=localFile,mode='w',encoding='utf-8') as file:
+                if wordSelected.text() in fileContent[itemIndex].values():
+                    self.wordList.takeItem(itemIndex)
+                    del fileContent[itemIndex]
+                    json.dump(fileContent,file,ensure_ascii=False) 
+
+    def wordListSelected(self):
+        """
+        set word to result box when wordlist selection changed
+        """
+        if self.wordList.currentItem():
+            self.result_box.setText(self.wordList.currentItem().text())
+            self.translate()
+            self.playSound()
+
 # -----------------------------------------Menubar-----------------------------------------
 
     def settingAction_triggered(self):
@@ -384,14 +390,11 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         """
         open user guide message box
         """
-        self.guideText = open(
-            file='./project_codes/GUI/guide.txt', mode='r', encoding='utf-8')
-        QMessageBox(icon=QMessageBox.Information,
-                    windowIcon=QIcon(
-                        './project_codes/GUI/images/guide_icon.png'),
-                    windowTitle='使用說明',
-                    text=self.guideText.read()).exec()
-        self.guideText.close()
+        with open(file=guideFile, mode='r', encoding='utf-8') as file:
+            QMessageBox(icon=QMessageBox.Information,
+                        windowIcon=QIcon('./project_codes/GUI/images/guide_icon.png'),
+                        windowTitle='使用說明',
+                        text=file.read()).exec()
 
     def historyAction_triggerred(self):
         """
@@ -440,6 +443,7 @@ class gTTS_Thread(QThread):
     """
     google Text To Speech threading
     """
+    gTTS_finish = pyqtSignal(int)
 
     def __init__(self, inputText):
         super().__init__()
@@ -447,6 +451,7 @@ class gTTS_Thread(QThread):
 
     def run(self):
         text_to_speech.TextToSpeech(self.inputText)
+        self.gTTS_finish.emit(1)
 
 
 class translation_Thread(QThread):
@@ -476,7 +481,7 @@ class localFileOpen_Thread(QThread):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.filePath = os.path.join(dirPath,localFileName)
+        self.filePath = localFile
 
     def run(self):
         if not os.path.exists(self.filePath):
@@ -490,11 +495,11 @@ class localFileOpen_Thread(QThread):
                         text='open local dictionary file error',
                         windowTitle='File Error').exec()
 
+
 class connectCheck_Thread(QThread):
     """
     connection check thread
     """
-
     def __init__(self, mainWindow):
         super().__init__(parent=None)
         self.url = 'http://www.google.com'
@@ -505,6 +510,6 @@ class connectCheck_Thread(QThread):
             requests.get(url=self.url, timeout=1)
             self.mainWindow.connectionLabel.setStyleSheet('color:blue')
             self.mainWindow.connectionLabel.setText('連線狀態: 成功')
-        except requests.exceptions.ConnectionError:
+        except:
             self.mainWindow.connectionLabel.setStyleSheet('color:red')
             self.mainWindow.connectionLabel.setText('連線狀態: 失敗')

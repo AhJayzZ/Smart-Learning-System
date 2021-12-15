@@ -1,7 +1,6 @@
 from gtts import gTTS
-from playsound import playsound
+import vlc
 import os
-
 
 def TextToSpeech(text):
     """
@@ -16,13 +15,9 @@ def TextToSpeech(text):
             soundPath = os.path.join(currentPath,'sound.mp3')
             tts = gTTS(str(text))
             tts.save(soundPath)
-            playsound(soundPath)
 
-            # Avoid error(Permission denied)
-            try:
-                os.remove(soundPath)
-            except:
-                pass
+            player = vlc.MediaPlayer(soundPath)
+            player.play()
         else :
             print('gTTS empty text input')
     except :
