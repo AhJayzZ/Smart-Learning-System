@@ -114,6 +114,9 @@ dmypy.json
 # local word dictionary
 localDictionary.txt
 
+# gTTS sound file
+sound.mp3
+
 # Pyre type checker
 .pyre/
 
