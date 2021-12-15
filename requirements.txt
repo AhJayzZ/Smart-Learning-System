@@ -14,12 +14,12 @@ OpenCC==1.1.1
 opencv_contrib_python==4.5.3.56
 openpyxl==3.0.7
 Pillow==8.4.0
-playsound==1.3.0
 pycallgraph==1.0.1
 pydub==0.25.1
 PyMySQL==1.0.2
 PyQt5==5.15.6
 pytesseract==0.3.7
+python_vlc==3.0.12118
 requests==2.25.1
 selenium==3.141.0
 setuptools==47.1.0

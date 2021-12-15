@@ -22,6 +22,7 @@
     - 影像處理：```OpenCV```
     - 句意翻譯：```googletrans```
     - 文字轉語言：```gTTS(Google Text-to-Speech)```
+    - 語音檔案撥放:```python_vlc```
     - 容器化工具：```Docker```
     - 爬蟲工具：```BeautifulSoup、Selenium``` 
     - 網站框架：```Django```
