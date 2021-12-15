@@ -64,6 +64,10 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.previousResult = ""
         self.previousLang = ""
 
+        # Thread initial
+        self.translation_thread = translation_Thread("",'zh-tw')
+        self.gTTS_thread = gTTS_Thread("")
+
         # Result and translate box default setting
         self.result_box.textChanged.connect(self.translateTimeCount)
         self.translate_box.setReadOnly(True)
@@ -492,8 +496,9 @@ class localFileOpen_Thread(QThread):
             os.system(self.filePath)
         except:
             QMessageBox(icon=QMessageBox.Critical,
-                        text='open local dictionary file error',
-                        windowTitle='File Error').exec()
+                        windowIcon=self.style().standardIcon(QStyle.SP_MessageBoxCritical),
+                        text='無法開啟檔案',
+                        windowTitle='檔案錯誤').exec()
 
 
 class connectCheck_Thread(QThread):
