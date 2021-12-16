@@ -6,7 +6,7 @@ from .GUI_mainPage import MainWindow
 from .Ui_loginPage import *
 from datetime import date
 from datetime import datetime
-import sys,os
+import os
 import json
 import webbrowser
 import pymysql

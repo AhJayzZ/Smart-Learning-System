@@ -54,6 +54,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.back_btn.setIcon(QIcon('./project_codes/GUI/images/back_icon.png'))
         self.clear_btn.setIcon(QIcon('./project_codes/GUI/images/clear_icon.png'))
         self.removeWord_btn.setIcon(QIcon('./project_codes/GUI/images/remove_icon.png'))
+        self.reload_btn.setIcon(QIcon('./project_codes/GUI/images/reload_icon.png'))
 
         # Recognition program
         self.FinishFlag = False
@@ -86,6 +87,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.clicked.connect(self.playSound)
         self.expand_btn.clicked.connect(self.expandPage)
         self.removeWord_btn.clicked.connect(self.wordRemove)
+        self.reload_btn.clicked.connect(self.loadWordList)
         self.reviewWebsite_btn.clicked.connect(self.openReviewWebsite)
         self.back_btn.clicked.connect(self.backToLoginPage)
 
@@ -124,6 +126,7 @@ class MainWindow(QMainWindow, Ui_SmartLearningSystemGUI):
         self.sound_btn.setStyleSheet(button_style)
         self.clear_btn.setStyleSheet(button_style)
         self.expand_btn.setStyleSheet(button_style)
+        self.reload_btn.setStyleSheet(button_style)
         self.removeWord_btn.setStyleSheet(button_style)
         self.translate_box.setStyleSheet(textbox_style)
         self.result_box.setStyleSheet(textbox_style)

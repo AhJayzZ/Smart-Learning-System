@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1389</width>
+    <width>1387</width>
     <height>839</height>
    </rect>
   </property>
@@ -436,6 +436,25 @@
      <string> 線上複習網站</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="reload_btn">
+    <property name="geometry">
+     <rect>
+      <x>1650</x>
+      <y>0</y>
+      <width>50</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>tableWidget</zorder>
    <zorder>camera_label</zorder>
    <zorder>translate_box</zorder>
@@ -456,13 +475,14 @@
    <zorder>removeWord_btn</zorder>
    <zorder>line</zorder>
    <zorder>reviewWebsite_btn</zorder>
+   <zorder>reload_btn</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1389</width>
+     <width>1387</width>
      <height>25</height>
     </rect>
    </property>
