@@ -28,10 +28,11 @@ class SettingPage(QDialog,Ui_settingPage):
         self.mainWindow = mainWindow
         self.userID = userID
         self.userPassword = userPassword
-       
-        self.setWindowTitle("Setting")
+        self.userLogin = userLogin
+        self.setWindowTitle("設定")
         self.setWindowIcon(QIcon("./project_codes/GUI/images/setting_icon.png"))
         self.setFixedSize(self.size())
+        self.checkUserLogin()
 
         # Button default setting
         self.init_btn.clicked.connect(self.initialize)
@@ -83,14 +84,6 @@ class SettingPage(QDialog,Ui_settingPage):
         self.language_selector.currentTextChanged.connect(
             self.updateLanguage)
 
-        if userLogin:
-            print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
-        else:
-            self.syncDB_btn.setEnabled(False)
-            self.syncLocal_btn.setEnabled(False)
-            print("user not login")
-        
-
     def initialize(self):
         """
         Initialize all setting configuration
@@ -104,6 +97,7 @@ class SettingPage(QDialog,Ui_settingPage):
         self.mainWindow.historyAction.clear()
         self.mainWindow.historyDict.clear()
         self.mainWindow.historyIndex = 0
+        self.mainWindow.expandFlag = False
         self.frameFlip = False
         self.contrast , self.brightness = 1 , 0
         self.camera_selector.setCurrentIndex(0)
@@ -112,6 +106,15 @@ class SettingPage(QDialog,Ui_settingPage):
         self.brightness_scrollbar.setValue(0)
         self.contrast_scrollbar.setValue(100)
         self.frameDefault_btn.setChecked(True)
+
+    def checkUserLogin(self):
+        if self.userLogin:
+            print('userID:'+self.userID+'\n'+'userPassword:'+self.userPassword)
+        else:
+            self.setWindowTitle("設定(未登入)")
+            self.syncDB_btn.setEnabled(False)
+            self.syncLocal_btn.setEnabled(False)
+            print('user not login')
 
     def updateFrameMode(self):
         """
