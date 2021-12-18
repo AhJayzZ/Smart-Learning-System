@@ -8,6 +8,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 def text_recognition(image_for_get_text):
     try:
         new_image_for_get_text = cropped_img_handler(image_for_get_text)
+        # white text with black backgroud, could not be recognited correctly
         # text = pytesseract.image_to_string(new_image_for_get_text, lang='eng')
 
         # test codes: if get img to pytesseract directly
