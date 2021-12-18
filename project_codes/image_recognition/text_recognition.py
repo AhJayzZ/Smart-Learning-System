@@ -8,10 +8,10 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 def text_recognition(image_for_get_text):
     try:
         new_image_for_get_text = cropped_img_handler(image_for_get_text)
-        text = pytesseract.image_to_string(new_image_for_get_text, lang='eng')
+        # text = pytesseract.image_to_string(new_image_for_get_text, lang='eng')
 
         # test codes: if get img to pytesseract directly
-        #text = pytesseract.image_to_string(image_for_get_text, lang='eng')
+        text = pytesseract.image_to_string(image_for_get_text, lang='eng')
 
         # print(text)
         text = get_corrected_text(text)

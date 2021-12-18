@@ -173,9 +173,9 @@ class RecognitionProgram:
         self._new_point = Position("new_point")
         self._new_point_pointer = 0
 
-        self._input_img = cv2.imread("init_img.jpg")
+        self._input_img = cv2.imread("./project_codes/init_img.png")
         self.output_img = self._input_img
-        self.crop_img = None
+        self.crop_img = self._input_img
 
         self._temp_output_img = None
         self._temp_crop_img = None
@@ -528,6 +528,8 @@ class RecognitionProgram:
                     print(self._input_img.shape[0], self._input_img.shape[1])
                     print(self._show_size[0], self._show_size[1],
                           self._show_size[2], self._show_size[3])
+                    _ = text_recognition(self.crop_img)
+                    print(_)
                     break
 
             while self.cap.isOpened():
