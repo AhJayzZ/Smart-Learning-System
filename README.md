@@ -17,20 +17,20 @@
 - 2.在終端機執行 ```pip install -r requirements.txt``` 安裝會使用到的套件
 - 3.使用工具:
     - 手部辨識 ：```Mediapipe```
-    - 文字辨識：```Pytesseract```
-    - 文字校正: ```language_tool_python```
-    - 影像處理：```OpenCV```
-    - 句意翻譯：```googletrans```
-    - 文字轉語言：```gTTS(Google Text-to-Speech)```
-    - 語音檔案撥放:```python_vlc```
-    - 容器化工具：```Docker```
-    - 爬蟲工具：```BeautifulSoup、Selenium``` 
-    - 網站框架：```Django```
-    - Python GUI：```PyQt5```
-    - 版本管理工具：```Git```
-    - 資料庫：```MySQL 8.0.26```
+    - 文字辨識：```pytesseract==0.3.7```
+    - 文字校正: ```language_tool_python==2.6.1```
+    - 影像處理：```opencv_contrib_python==4.5.3.56```
+    - 句意翻譯：```googletrans==3.0.0```
+    - 文字轉語言：```gTTS==2.2.2```
+    - 語音檔案撥放:```pygame==2.0.1```
+    - 爬蟲工具：```beautifulsoup4==4.10.0、selenium==3.141.0``` 
+    - Python GUI：```PyQt5==5.15.6```
+    - 資料庫連線：```PyMySQL==1.0.2```
     - 資料庫管理工具：```phpMyAdmin 5.1.1```
-    - 函數關係圖輸出工具：```pycallgraph```
+    - 函數關係圖輸出工具：```pycallgraph==1.0.1```
+    - 網站框架：```Django```
+    - 容器化工具：```Docker```
+    - 版本管理工具：```Git```
 
 ----------------------------------------
 ## 設計方法 Design
